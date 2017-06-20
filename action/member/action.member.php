@@ -11,9 +11,10 @@ if($do == "login"){//用户登陆
     $db->p_e($sql,array($_POST['user_name'],md5($_POST['password']),$user_type));
     $user=$db->fetchRow();
     if($user['id']>0){
-        $sql="select * from rv_role where 1=1 and  id=?";
-        $db->p_e($sql,array());
-        echo '{"code":"200","uid":"'.$user['id'].'","roleid":"'.$user[roleid].'"}';//登陆成功返回code：200 用户id 与角色权限id
+        $sql="select action from rv_role where 1=1 and  id=?";
+        $db->p_e($sql,array($user['roleid']));
+        $user_role=explode(",", $db->fetchRow()[action]);//获取用户权限
+        echo '{"code":"200","uid":"'.$user['id'].'","user_role":"'.json_encode($user_role).'","roleid":"'.$user['roleid'].'"}';//登陆成功返回code：200 用户id 与角色权限id
     }else{
         echo '{"code":"500","msg":"登陆信息有误"}';
     }

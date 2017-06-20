@@ -23,6 +23,9 @@ function isLogin(){
 		exit;
 	}
 }
+function ismobile($mobile){
+    return (strlen($mobile) == 11 || strlen($mobile) == 12) && (preg_match("/^13\d{9}$/", $mobile) || preg_match("/^14\d{9}$/", $mobile) || preg_match("/^15\d{9}$/", $mobile) || preg_match("/^18\d{9}$/", $mobile) || preg_match("/^0\d{10}$/", $mobile) || preg_match("/^0\d{11}$/", $mobile));
+}
 function cha_province($id){
 	global $db;
 	$sql="select province from rv_province where 1=1 and provinceid=?";
@@ -80,46 +83,36 @@ function user($uid){
 	}
 	return $user;
 }
-function send_sms($tel,$sms,$smstpl){
-	$pub_arr = array(
-		'app_key' => '23274158',
-		'format' => 'json',
-		'method' => 'alibaba.aliqin.fc.sms.num.send',
-		'rec_num' => $tel,
-		'sign_method'=>'md5',
-		'simplify' => 'true',			
-		'sms_free_sign_name' => '房团惠',
-		'sms_param' => $sms,
-		'sms_template_code' => $smstpl,
-		'sms_type' => 'normal',
-		'timestamp' => date('Y-m-d H:i:s'),	
-		'v' => '2.0'
-	);
-	
-	ksort($pub_arr);
-	$appSecret = '7f301f4577c08a9ffaf0563b7aeb32ff';
-	$arrstr=''; 
-	foreach ($pub_arr as $key => $val) {
-		$arrstr .= $key.$val;
-	}
-	$sign = strtoupper(md5($appSecret.$arrstr.$appSecret)); 
-	$strParam = http_build_query($pub_arr);
-	$strParam .= '&sign='.$sign;
-	$ch = curl_init();
-	$url = 'http://gw.api.taobao.com/router/rest?'.$strParam;
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch,CURLOPT_IPRESOLVE , CURL_IPRESOLVE_V4);	
-	curl_setopt($ch , CURLOPT_URL , $url);
-	$res = json_decode(curl_exec($ch),true);
-	if(!empty($res['result'])){
-		if($res['result']['err_code'] == 0 && $res['result']['success'] == true){
-			return true;
-		}else{
-			return false;
-		}
-	}else{
-		return false;
-	}	
+
+//发送短信
+function send_sms($phone,$content){
+    $param=array(
+        'u' =>'dyw123',
+        'p' =>md5('duyiwang123'),
+        'm' =>$phone,
+        'c' =>urlencode($content),
+    );
+    foreach ($param as $key=>$val){
+        $param_url.="$key=$val&";
+    }
+    $ch = curl_init();
+    $url = 'http://www.smsbao.com/sms?'.$param_url;
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch,CURLOPT_IPRESOLVE , CURL_IPRESOLVE_V4);
+    curl_setopt($ch , CURLOPT_URL , $url);
+    $res = json_decode(curl_exec($ch),true);
+    if($res == 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+//验证码
+function getverifycode() {
+    $length = 6;
+    PHP_VERSION < '4.2.0' && mt_srand((double)microtime() * 1000000);
+    $hash = sprintf('%0'.$length.'d', mt_rand(0, pow(10, $length) - 1));
+    return $hash;
 }
 //  推送消息
 function to_msg($post_data){
