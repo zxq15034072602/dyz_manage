@@ -5,8 +5,8 @@
 * @author: fx
 */
 if(!defined("CORE")) exit("error");
+$user_type=$_REQUEST['type']??0;//所屬用戶 （0独一张，1食维健）
 if($do == "login"){//用户登陆
-    $user_type=$_REQUEST['type']??0;//所屬用戶 （0独一张，1食维健）
     $sql="select * from rv_user where 1=1 and username=? and password=? and type=? and status=1";
     $db->p_e($sql,array($_POST['user_name'],md5($_POST['password']),$user_type));
     $user=$db->fetchRow();
@@ -20,5 +20,25 @@ if($do == "login"){//用户登陆
     }
     exit;
 }elseif($do == "register"){//用户注册
-    
+    $mobile=$_POST['mobile'];//手机号
+    $password=md5($_POST['password']);//密码
+    $confirmpass=md5($_POST['confirmpass']);//确认密码
+    $code=$_POST['code'];//验证码
+    $verifycode=$_POST['verifycode'];//短信验证码
+    if(empty($mobile)){echo '{"code":"500","msg":"手机不能为空"}'; exit;}
+    if(empty($password)){echo '{"code":"500","msg":"密码不能为空"}'; exit;}
+    if(empty($confirmpass)){echo '{"code":"500","msg":"确认密码不能为空"}'; exit;}
+    if(empty($code)){echo '{"code":"500","msg":"验证码不能为空"}'; exit;}
+    if($password !=$confirmpass){echo '{"code":"500","msg":"两次密码不一致"}'; exit;}
+    if($code!=$verifycode){echo '{"code":"500","msg":"验证码不正确"}'; exit;}
+    $sql="SELECT * FROM rv_user where username =? LIMIT 1";//判断用户是否存在
+    $db->p_e($sql,array($mobile));
+    if($db->fetchRow()){echo '{"code":"500","msg":"用户已存在"}'; exit;}
+    $reg_uid=$db->insert(0, 2, "rv_user", array("username=$mobile","password=$password","roleid=5","mobile=$mobile","created_at=$date('Y-m-d h:i:s')","type=$user_type"));
+    if($reg_uid){ 
+        echo '{"code":"200","msg":"注册成功","uid":"'.$reg_uid.'"}';
+    }else{
+        echo '{"code":"500","msg":"注册失败"}';
+    }
+    exit;
 }
