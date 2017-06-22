@@ -25,6 +25,7 @@ if($do == "login"){//用户登陆
     $confirmpass=md5($_POST['confirmpass']);//确认密码
     $code=$_POST['code'];//验证码
     $verifycode=$_POST['verifycode'];//短信验证码
+    $addtime=date('Y-m-d h:i:s');
     if(empty($mobile)){echo '{"code":"500","msg":"手机不能为空"}'; exit;}
     if(empty($password)){echo '{"code":"500","msg":"密码不能为空"}'; exit;}
     if(empty($confirmpass)){echo '{"code":"500","msg":"确认密码不能为空"}'; exit;}
@@ -34,7 +35,7 @@ if($do == "login"){//用户登陆
     $sql="SELECT * FROM rv_user where username =? LIMIT 1";//判断用户是否存在
     $db->p_e($sql,array($mobile));
     if($db->fetchRow()){echo '{"code":"500","msg":"用户已存在"}'; exit;}
-    $reg_uid=$db->insert(0, 2, "rv_user", array("username=$mobile","password=$password","roleid=5","mobile=$mobile","created_at=$date('Y-m-d h:i:s')","type=$user_type"));
+    $reg_uid=$db->insert(0, 2, "rv_user", array("username='$mobile'","password='$password'","roleid=5","mobile=$mobile","created_at='$addtime'","type=$user_type"));
     if($reg_uid){ 
         echo '{"code":"200","msg":"注册成功","uid":"'.$reg_uid.'"}';
     }else{

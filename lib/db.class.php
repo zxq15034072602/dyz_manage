@@ -116,7 +116,7 @@ class pdo_mysql{
 	* array('type = 1', 'username like "%os%"') 
 	* string $orderby 排序，默认为id倒序 
 	*/ 
-	public function select($debug, $mode, $table, $fields="*", $sqlwhere="", $orderby="tbid desc"){
+	public function select($debug, $mode, $table, $fields="*", $sqlwhere="", $orderby="id desc"){
 		//参数处理 
 		if(is_array($table)){
 			$table = implode(', ', $table); 
