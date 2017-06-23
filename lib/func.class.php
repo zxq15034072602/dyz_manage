@@ -70,16 +70,20 @@ function user($uid){
 	$db->p_e($sql,array($uid));
 	$user=$db->fetchRow();
 	if($user['roleid']==1){
+	    $user['stroe_id'] =$user['zz'];
 		$user['zz']='总部';
 	}elseif($user['roleid']==2 || $user['roleid']==4){
 		$sql="select name from rv_fengongsi where 1=1 and id=?";
 		$db->p_e($sql,array($user['zz']));
+		$user['stroe_id'] =$user['zz'];
 		$user['zz']=$db->fetch_count();
 	}elseif($user['roleid']==3 || $user['roleid']==5){
 		$sql="select * from rv_mendian where 1=1 and id=?";
 		$db->p_e($sql,array($user['zz']));
 		$md=$db->fetchRow();
+		$user['stroe_id'] =$user['zz'];
 		$user['zz']=cha_province($md['provinceid']).cha_city($md['cityid']).cha_area($md['areaid']).$md['dizhi'].$md['name'];
+		
 	}
 	return $user;
 }
