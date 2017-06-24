@@ -9,6 +9,7 @@ if (! defined("CORE"))
 $user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健）
 if ($do == "uerinfo") { // 用户中心个人信息
     $uid = $_REQUEST['uid']; // 用户id
+    $user = user($uid);//获取用户相关信息
     if ($_REQUEST['dosubmit']) { // 如果是提交修改用户资料
         if (empty($_REQUEST['name'])) {
             echo '{"code":"500","msg":"姓名不能为空"}';
@@ -22,7 +23,25 @@ if ($do == "uerinfo") { // 用户中心个人信息
             echo '{"code":"500","msg":"程序错误"}';
             exit();
         }
-        
+        if($user['stroe_id'] !=$_REQUEST['stroe_id']){//如果用户修改了所属门店，则插入未审核人员记录
+            $sql="select * from rv_verify where 1=1 and uid=? and status=0";
+            $db->p_e($sql, array($uid));
+            if($db->fetchRow()){//如果还有未处理的审核则不能提交门店变更申请
+                echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
+                exit();
+            }
+            $sql="insert into rv_verify (uid,mid,type,addtime,status) VAULES (?,?,?,?,?)";
+            $arr=array($uid,$_REQUEST['stroe_id'],0,date("Y-m-d H:i:s"),0);
+            if($db->p_e($sql, $arr)){
+                echo '{"code":"200","msg":"更换门店提交成功！请等待店长审核！"}';
+                exit();
+            }
+            echo '{"code":"500","msg":"更换门店失败！"}';
+            exit();
+        }
+        if($user['roleid']!=$_REQUEST['roleid']){//如果用户修改了职位，则插入未审核店长记录
+            
+        }
         $db->update(0, 1, "rv_user", array(
             "name=$_REQUEST[name]",
             "sex=$_REQUEST[sex]",
@@ -30,8 +49,6 @@ if ($do == "uerinfo") { // 用户中心个人信息
         ), "id=$uid");
         exit();
     }
-    
-    $user = user($uid);
     $stroe_list = $db->select(0, 0, "rv_mendian"); // 获取所有门店
     echo '{"userinfo":' . json_encode($user) . ',"stroe_list":' . json_encode($stroe_list) . '}';
     exit();
