@@ -97,7 +97,7 @@ if ($do == "uerinfo") { // 用户中心个人信息
         echo '{"code":"500","msg":"修改失败"}';
         exit();
     }
-    $stroe_list = $db->select(0, 0, "rv_mendian"); // 获取所有门店
+    $stroe_list = $db->select(0, 0, "rv_mendian","*","type=$user_type"); // 获取所有门店
     echo '{"userinfo":' . json_encode($user) . ',"stroe_list":' . json_encode($stroe_list) . '}';
     exit();
 } elseif ($do == "login") { // 用户登陆
@@ -115,7 +115,7 @@ if ($do == "uerinfo") { // 用户中心个人信息
         ));
         $roles = $db->fetchRow();
         $user_role = explode(",", $roles[action]); // 获取用户权限
-        echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
+        echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"'.$user['zz'].'"}'; // 登陆成功返回code：200 用户id 与角色权限id
         exit();
     }
     echo '{"code":"500","msg":"登陆信息有误"}';

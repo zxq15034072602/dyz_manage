@@ -87,7 +87,13 @@ function user($uid){
 	}
 	return $user;
 }
-
+function get_time_buy($mid,$start,$end){
+    global $db;
+    $sql="select max(gid),SUM(total_price) as total_price ,g.name,g.money from rv_buy as b,rv_goods as g where b.gid=g.id and mid=? and status=1 and UNIX_TIMESTAMP(b.addtime)  BETWEEN ? AND ?  GROUP BY b.gid limit 5";
+    $db->p_e($sql, array($mid,$start,$end));
+    $list=$db->fetchAll();
+    return $list;
+}
 //发送短信
 function send_sms($phone,$content){
     $param=array(

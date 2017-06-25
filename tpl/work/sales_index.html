@@ -7,7 +7,7 @@
             <div class="hot_one_name"><{$good.name}></div>
             <div class="hot_one_price"><{$good.money}>￥</div>
             <div class="hot_one_img">
-                <img src="<{$good.good_img}>" alt="<{$good.name}>" title="<{$good.name}>">
+                <img src="http://192.168.1.143/dyz/<{$good.good_img}>"  >
             </div>
             <div class="hot_one_num">销售<{$good.shuliang}>套</div>
         </li>
@@ -16,8 +16,9 @@
 </div>
 <{/if}>
 <{if store_goods}>
+<{foreach from=$store_goods item=type}>
 <div class="hot_in">
-    <{foreach from=$store_goods item=type}>
+    
     <div class="hot_in_title"><{$type.typename}></div>
     <ul class="hot_in_con">
         <{foreach from=$type.goods item=good}>
@@ -25,12 +26,12 @@
             <div class="hot_one_name"><{$good.name}></div>
             <div class="hot_one_price"><{$good.money}>￥</div>
             <div class="hot_one_img">
-                <img src="<{$good.good_img}>" alt="<{$good.name}>">
+                <img src="http://192.168.1.143/dyz/<{$good.good_img}>" >
             </div>
             <div class="hot_one_num">库存<{$good.kucun}>套</div>
         </li>
         <{/foreach}>
     </ul>
-    <{/foreach}>
 </div>
+ <{/foreach}>
 <{/if}>
