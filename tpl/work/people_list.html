@@ -1,0 +1,20 @@
+<div class="dyz_qty"><{$store_name}></div>
+<div class="shopBox_qty">
+  	<div class="shopSmallBox_qty">
+  		<ul class="shopSmallBox_qty_qty">
+  		    <{foreach from=$store_people_list item=people}>
+  		    
+  			<li>
+  				<div class="personShop_qty">
+  					<img src="../../image/img_qty/shopperson_03.png" alt="">
+  				</div>
+  				<div class="shopPer_qty">
+  					<div class="shopPerTop_qty"><{$people.name}></div>
+  					<div class="shopPerB_qty"><{if $people.roleid == 3}>店长<{else}>店员<{/if}></div>
+  				</div>
+  				<div class="shopMangment_qty"><{if $roleid == 3 && $people.roleid == 3}>管理店员<{/if}></div>
+  			</li>
+  			<{/foreach}>
+  		</ul>
+  	</div>
+  </div>
