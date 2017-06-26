@@ -7,7 +7,7 @@
 if (! defined("CORE"))
     exit("error");
 $user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健）
-if ($do == "uerinfo") { // 用户中心个人信息
+if ($do == "userinfo") { // 用户中心个人信息
     $uid = $_REQUEST['uid']; // 用户id
     $user = user($uid); // 获取用户相关信息
     if ($_REQUEST['dosubmit']) { // 如果是提交修改用户资料
@@ -97,8 +97,10 @@ if ($do == "uerinfo") { // 用户中心个人信息
         echo '{"code":"500","msg":"修改失败"}';
         exit();
     }
-    $stroe_list = $db->select(0, 0, "rv_mendian","*","type=$user_type"); // 获取所有门店
-    echo '{"userinfo":' . json_encode($user) . ',"stroe_list":' . json_encode($stroe_list) . '}';
+    $sql="select * from rv_mendian where 1=1 and type=?";//获取所有门店
+    $db->p_e($sql, array($user_type));
+    $stroe_list=$db->fetchAll();
+    echo '{"userinfo":' . json_encode($user) . ',"stroe_list":"'.json_encode($stroe_list).'"}';
     exit();
 } elseif ($do == "login") { // 用户登陆
     $sql = "select * from rv_user where 1=1 and username=? and password=? and type=? and status=1";
