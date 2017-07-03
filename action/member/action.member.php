@@ -23,73 +23,68 @@ if ($do == "userinfo") { // 用户中心个人信息
             echo '{"code":"500","msg":"程序错误"}';
             exit();
         }
-        // 不能同时修改所属门店和职位
-        if ($user['roleid'] != $_REQUEST['roleid'] && $user['stroe_id'] != $_REQUEST['stroe_id']) {
-            echo '{"code":"500","msg":"请不要同时修改所属门店和职位！"}';
-            exit();
+        if ($user['stroe_id'] != $_REQUEST['stroe_id'] || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录
+            if ($_REQUEST[roleid] == 5) { // 如果是店员身份修改所属门店
+                $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
+                $db->p_e($sql, array(
+                    $uid
+                ));
+                if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交门店变更申请
+                    echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
+                    exit();
+                }
+                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
+                $arr = array(
+                    $uid,
+                    $_REQUEST['stroe_id'],
+                    0,
+                    0
+                );
+                if ($db->p_e($sql, $arr)) {
+                    $db->update(0, 1, "rv_user", array(
+                        "name='$_REQUEST[name]'",
+                        "sex=$_REQUEST[sex]",
+                        "age=$_REQUEST[age]"
+                    ), "id=$uid");
+                    echo '{"code":"200","msg":"更换门店提交成功！请等待店长审核！"}';
+                    exit();
+                }
+                echo '{"code":"500","msg":"更换门店失败！"}';
+                exit();
+            } else 
+                if ($_REQUEST[roleid] == 3) {
+                    if (empty($_REQUEST[stroe_id])) { // 如果未选择门店，则不能申请店长
+                        echo '{"code":"500","msg":"请先选择所属门店"}';
+                        exit();
+                    }
+                    $sql = "select * from rv_verify where 1=1 and uid=?  and type=1 and status=0";
+                    $db->p_e($sql, array(
+                        $uid
+                    ));
+                    if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
+                        echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
+                        exit();
+                    }
+                    $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
+                    $arr = array(
+                        $uid,
+                        $_REQUEST['stroe_id'],
+                        1,
+                        0
+                    );
+                    if ($db->p_e($sql, $arr)) {
+                        $db->update(0, 1, "rv_user", array(
+                            "name='$_REQUEST[name]'",
+                            "sex=$_REQUEST[sex]",
+                            "age=$_REQUEST[age]"
+                        ), "id=$uid");
+                        echo '{"code":"200","msg":"申请成为店长提交成功！请等待审核！"}';
+                        exit();
+                    }
+                    echo '{"code":"500","msg":"申请店长失败！"}';
+                    exit();
+                }
         }
-        if ($user['stroe_id'] != $_REQUEST['stroe_id']) { // 如果用户修改了所属门店，则插入未审核人员记录
-            $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
-            $db->p_e($sql, array(
-                $uid
-            ));
-            if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交门店变更申请
-                echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
-                exit();
-            }
-            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
-            $arr = array(
-                $uid,
-                $_REQUEST['stroe_id'],
-                0,
-                0
-            );
-            if ($db->p_e($sql, $arr)) {
-                $db->update(0, 1, "rv_user", array(
-                    "name='$_REQUEST[name]'",
-                    "sex=$_REQUEST[sex]",
-                    "age=$_REQUEST[age]"
-                ), "id=$uid");
-                echo '{"code":"200","msg":"更换门店提交成功！请等待店长审核！"}';
-                exit();
-            }
-            echo '{"code":"500","msg":"更换门店失败！"}';
-            exit();
-        }
-        
-        if ($user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了职位，则插入未审核店长记录
-            if (empty($_REQUEST[stroe_id])) { // 如果未选择门店，则不能申请店长
-                echo '{"code":"500","msg":"请先选择所属门店"}';
-                exit();
-            }
-            $sql = "select * from rv_verify where 1=1 and uid=?  and type=1 and status=0";
-            $db->p_e($sql, array(
-                $uid
-            ));
-            if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
-                echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
-                exit();
-            }
-            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
-            $arr = array(
-                $uid,
-                $_REQUEST['stroe_id'],
-                1,
-                0
-            );
-            if ($db->p_e($sql, $arr)) {
-                $db->update(0, 1, "rv_user", array(
-                    "name='$_REQUEST[name]'",
-                    "sex=$_REQUEST[sex]",
-                    "age=$_REQUEST[age]"
-                ), "id=$uid");
-                echo '{"code":"200","msg":"申请成为店长提交成功！请等待审核！"}';
-                exit();
-            }
-            echo '{"code":"500","msg":"申请店长失败！"}';
-            exit();
-        }
-        
         if ($db->update(0, 1, "rv_user", array(
             "name='$_REQUEST[name]'",
             "sex=$_REQUEST[sex]",
