@@ -126,7 +126,7 @@ function getverifycode() {
 }
 //  推送消息
 function to_msg($post_data){
-	$ch = curl_init('http://127.0.0.1:4000');
+	$ch = curl_init('http://127.0.0.1:4002');
 	curl_setopt_array($ch, array(
 		CURLOPT_POST => TRUE,
 		CURLOPT_HEADER=> 0,

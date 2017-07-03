@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<{if $flag == "list_i_verify"}>
+<{foreach from=$verify_list item=list}>
+<div class="applyBox_qty">
+	<div class="applySmallBox_qty">
+		<div class="seeBox_qty">
+			<div class="see_qty">查看</div>
+		</div>
+		<div class="apply_qty">
+			<div class="applyLeftFont_qty apply">申请人</div>
+			<div class="applyName_qty"><{$list.name}></div>
+		</div>
+		<div class="apply_qty">
+			<div class="applyLeftFont_qty">申请事项</div>
+			<div class="applyName_qty"><{$list.name}>销售了<{$list.goodname}><{$list.shuliang}><{$list.dw}></div>
+		</div>
+		<div class="dateBox_qty">
+			<div class="data_qty"><{$list.addtime}></div>
+			<{if $list.status ==0}><div class="pendApproved_qty">待审批</div><{elseif $list.status==1}><div class="approved_qty">已审批</div><{/if}>
+		</div>
+	</div>
+</div>
+<{/foreach}>
+<{else}>
 
-</body>
-</html>
+<{/if}>

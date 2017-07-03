@@ -37,17 +37,16 @@ if ($do == "userinfo") { // 用户中心个人信息
                 echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                 exit();
             }
-            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VAULES (?,?,?,?,?)";
+            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
             $arr = array(
                 $uid,
                 $_REQUEST['stroe_id'],
                 0,
-                date("Y-m-d H:i:s"),
                 0
             );
             if ($db->p_e($sql, $arr)) {
                 $db->update(0, 1, "rv_user", array(
-                    "name=$_REQUEST[name]",
+                    "name='$_REQUEST[name]'",
                     "sex=$_REQUEST[sex]",
                     "age=$_REQUEST[age]"
                 ), "id=$uid");
@@ -71,17 +70,16 @@ if ($do == "userinfo") { // 用户中心个人信息
                 echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                 exit();
             }
-            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VAULES (?,?,?,?,?)";
+            $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
             $arr = array(
                 $uid,
                 $_REQUEST['stroe_id'],
                 1,
-                date("Y-m-d H:i:s"),
                 0
             );
             if ($db->p_e($sql, $arr)) {
                 $db->update(0, 1, "rv_user", array(
-                    "name=$_REQUEST[name]",
+                    "name='$_REQUEST[name]'",
                     "sex=$_REQUEST[sex]",
                     "age=$_REQUEST[age]"
                 ), "id=$uid");
@@ -91,8 +89,9 @@ if ($do == "userinfo") { // 用户中心个人信息
             echo '{"code":"500","msg":"申请店长失败！"}';
             exit();
         }
+        
         if ($db->update(0, 1, "rv_user", array(
-            "name=$_REQUEST[name]",
+            "name='$_REQUEST[name]'",
             "sex=$_REQUEST[sex]",
             "age=$_REQUEST[age]"
         ), "id=$uid")) {

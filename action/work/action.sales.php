@@ -122,7 +122,12 @@ if ($do == "index") { // 销售录入主页面
             "mid=$store_id",
             "gid=$gid"
         ))) {
-            echo '{"code":"200","msg":"录入成功,请到我的审查中查看"}';
+            if($user_roleid==3){//如果是店长
+                echo '{"code":"200","msg":"录入成功"}';
+            }else{
+                echo '{"code":"200","msg":"录入成功,请到我的审查中查看"}';
+            }
+           
             exit();
         }
     }

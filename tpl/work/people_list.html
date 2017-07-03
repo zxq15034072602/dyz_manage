@@ -12,7 +12,7 @@
   					<div class="shopPerTop_qty"><{$people.name}></div>
   					<div class="shopPerB_qty"><{if $people.roleid == 3}>店长<{else}>店员<{/if}></div>
   				</div>
-  				<div class="shopMangment_qty"><{if $roleid == 3 && $people.roleid == 3}>管理店员<{/if}></div>
+  				<{if $roleid == 3 && $people.roleid == 3}><div class="shopMangment_qty">管理店员</div><{/if}>
   			</li>
   			<{/foreach}>
   		</ul>
