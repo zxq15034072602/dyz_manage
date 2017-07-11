@@ -23,8 +23,9 @@ if ($do == "userinfo") { // 用户中心个人信息
             echo '{"code":"500","msg":"程序错误"}';
             exit();
         }
+      
         if ($user['stroe_id'] != $_REQUEST['stroe_id'] || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录
-            if ($_REQUEST[roleid] == 5) { // 如果是店员身份修改所属门店
+            if ($_REQUEST[roleid] == 5 && $user['roleid'] !=3) { // 如果是店员身份修改所属门店
                 $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
                 $db->p_e($sql, array(
                     $uid
@@ -41,11 +42,8 @@ if ($do == "userinfo") { // 用户中心个人信息
                     0
                 );
                 if ($db->p_e($sql, $arr)) {
-                    $db->update(0, 1, "rv_user", array(
-                        "name='$_REQUEST[name]'",
-                        "sex=$_REQUEST[sex]",
-                        "age=$_REQUEST[age]"
-                    ), "id=$uid");
+                    $sql ="update rv_user set name=?,sex=?,age=? where id=?";
+                    $db->p_e($sql, array($_REQUEST[name],$_REQUEST[sex],$_REQUEST[age],$uid));
                     echo '{"code":"200","msg":"更换门店提交成功！请等待店长审核！"}';
                     exit();
                 }
@@ -73,11 +71,8 @@ if ($do == "userinfo") { // 用户中心个人信息
                         0
                     );
                     if ($db->p_e($sql, $arr)) {
-                        $db->update(0, 1, "rv_user", array(
-                            "name='$_REQUEST[name]'",
-                            "sex=$_REQUEST[sex]",
-                            "age=$_REQUEST[age]"
-                        ), "id=$uid");
+                        $sql ="update rv_user set name=?,sex=?,age=? where id=?";
+                        $db->p_e($sql, array($_REQUEST[name],$_REQUEST[sex],$_REQUEST[age],$uid));
                         echo '{"code":"200","msg":"申请成为店长提交成功！请等待审核！"}';
                         exit();
                     }
@@ -85,11 +80,9 @@ if ($do == "userinfo") { // 用户中心个人信息
                     exit();
                 }
         }
-        if ($db->update(0, 1, "rv_user", array(
-            "name='$_REQUEST[name]'",
-            "sex=$_REQUEST[sex]",
-            "age=$_REQUEST[age]"
-        ), "id=$uid")) {
+        
+        $sql ="update rv_user set name=?,sex=?,age=? where id=?";
+        if($db->p_e($sql, array($_REQUEST[name],$_REQUEST[sex],$_REQUEST[age],$uid))){
             echo '{"code":"200","msg":"修改成功"}';
             exit();
         }
@@ -181,4 +174,23 @@ if ($do == "userinfo") { // 用户中心个人信息
     }
     echo '{"code":"500","msg":"注册失败"}';
     exit();
+}elseif ($do == "area"){ //门店省级联动页面
+    $sql="select  GET_SZM(province) as szm from rv_province group by szm";
+    $db->p_e($sql,array());
+    $szm=$db->fetchAll();
+    foreach($szm as &$k){
+        $sql="select * from rv_province where 1=1 and GET_SZM(province) = ?";
+        $db->p_e($sql,array($k['szm']));
+        $k['province']=$db->fetchAll();
+        foreach ($k[province] as &$value) {
+            $sql="select city,cityid from rv_city where 1=1 and fatherid=?";
+            $db->p_e($sql,array($value['provinceid']));
+            $value['area']=$db->fetchAll();
+        }
+    }
+    $smt = new smarty();smarty_cfg($smt);
+    $smt->assign('province',$szm);
+    $smt->display('area.html');
+}else if($do == "find_store_list"){//获得 指定市级门店
+    
 }

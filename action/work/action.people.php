@@ -22,4 +22,24 @@ if($do == "index"){//人员管理页面
     $smt->assign("store_people_list",$store_people_list);
     $smt->display("people_list.html");
     exit(); 
+}elseif ($do == 'delete_people'){ //删除店员
+    if(empty($user_roleid) ||empty($store_id)||empty($uid)){
+        echo '{"code":"500","msg":"关键数据获取失败"}';
+        exit();
+    }
+    if ($user_roleid != 3) {
+        echo '{"code":"500","msg":"对不起，你不是店长"}';
+        exit();
+    }
+    $sql ="update rv_user set zz=0 where id=?";
+    if($db->p_e($sql, array($uid))){//如果删除成功则，sokect推送数据
+        
+        $cont=array("time"=>date('m月d日 H:i'),"msg"=>"你好，你已经被店长请离团队");
+        $cont=json_encode($cont);
+        to_msg(array('type'=>'people_to_user','cont'=>$cont,'to'=>$uid));
+        echo '{"code":"200","msg":"删除店员成功"}';
+        exit();
+    }
+    echo '{"code":"500","msg":"删除店员成功"}';
+    exit();
 }

@@ -1,4 +1,109 @@
 <{if $flag == "show_i_verify"}>
-<{else}>
-
+<div class="applyBox_qty">
+   <div class="applySmall_qty">
+      <div class="apply_qty">
+         <div class="applyLeft_qty">所在门店</div>
+         <div class="applyRightFont_qty"><{$verify_info.mdname}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">审批内容</div>
+         <div class="applyRightFont_qty"><{$verify_info.name}>销售了<{$verify_info.goodname}><{$verify_info.shuliang}><{$verify_info.dw}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">开始时间</div>
+         <div class="applytime_qty"><{$verify_info.addtime}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">结束时间</div>
+         <div class="applytime_qty"><{if $verify_info.endtime}><{$verify_info.endtime}><{else}>暂未结束<{/if}></div>
+      </div>
+   </div>
+</div>
+<div class="teleBox_qty">
+   <div class="teleSmall_qty">
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty"><{$verify_info.name}>发起了审批申请</div>
+            
+      </div>
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty tele_qty">等待店长审批</div>
+         <{if $verify_info.status ==0}>
+         <div class="teleImg_qty_qty">
+                <img src="../../image/img_qty/dui_03.png" alt="">
+         </div>
+         <{/if}>
+      </div>
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty tele_qty">审批结束</div>
+         <{if $verify_info.status ==1 or $verify_info.status ==2}>
+         <div class="teleImg_qty_qty">
+                <img src="../../image/img_qty/dui_03.png" alt="">
+         </div>
+         <{/if}>
+      </div>
+   </div>
+</div>
+<{elseif $flag == "show_p_verify"}>
+<div class="applyBox_qty">
+   <div class="applySmall_qty">
+      <div class="apply_qty">
+         <div class="applyLeft_qty">所在门店</div>
+         <div class="applyRightFont_qty"><{$verify_info.mdname}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">审批内容</div>
+         <div class="applyRightFont_qty">申请成为<{$verify_info.mdname}><{if $verify_info.type==0}>店员<{else}>店长<{/if}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">开始时间</div>
+         <div class="applytime_qty"><{$verify_info.addtime}></div>
+      </div>
+      <div class="apply_qty">
+         <div class="applyLeft_qty">结束时间</div>
+         <div class="applytime_qty"><{if $verify_info.updatetime}><{$verify_info.updatetime}><{else}>暂未结束<{/if}></div>
+      </div>
+   </div>
+</div>
+<div class="teleBox_qty">
+   <div class="teleSmall_qty">
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty"><{$verify_info.name}>发起了审批申请</div>
+            
+      </div>
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty tele_qty">等待店长审批</div>
+         <{if $verify_info.status ==0}>
+         <div class="teleImg_qty_qty">
+                <img src="../../image/img_qty/dui_03.png" alt="">
+         </div>
+         <{/if}>
+      </div>
+      <div class="teleSmallBox_qty">
+         <div class="teleImg_qty">
+            <img src="../../image/img_qty/auditBg_03.png">
+         </div>
+         <div class="teleRightFont_qty tele_qty">审批结束</div>
+         <{if $verify_info.status ==1 or $verify_info.status ==2}>
+         <div class="teleImg_qty_qty">
+                <img src="../../image/img_qty/dui_03.png" alt="">
+         </div>
+         <{/if}>
+      </div>
+   </div>
+</div>
 <{/if}>

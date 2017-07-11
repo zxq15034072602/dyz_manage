@@ -157,15 +157,14 @@ if ($do == "index") { // 销售录入主页面
     
     $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
-    $yaer_list = get_time_buy($store_id, $year_start, $year_end);
-    
+    $year_list = get_time_buy($store_id, $year_start, $year_end);
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("store_name", $store_name);
     $smt->assign("day_list", $day_list);
     $smt->assign("week_list", $week_list);
     $smt->assign("month_list", $month_list);
-    $smt->assign("yaer_list", $yaer_list);
+    $smt->assign("year_list", $year_list);
     $smt->display("sales_history.html");
     exit();
 } elseif ($do == "stock") { // 查看库存

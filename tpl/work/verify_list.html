@@ -1,59 +1,36 @@
 <{if $flag == "list_i_verify"}>
 <{foreach from=$verify_list item=list}>
-<div class="applyBox_qty">
-	<div class="applySmallBox_qty">
-		<div class="seeBox_qty">
-			<div class="see_qty">查看</div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeftFont_qty apply">申请人</div>
-			<div class="applyName_qty"><{$list.name}></div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeftFont_qty">申请事项</div>
-			<div class="applyName_qty"><{$list.name}>销售了<{$list.goodname}><{$list.shuliang}><{$list.dw}></div>
-		</div>
-		<div class="dateBox_qty">
-			<div class="data_qty"><{$list.addtime}></div>
-			<{if $list.status ==0}><div class="pendApproved_qty">待审批</div><{elseif $list.status==1}><div class="approved_qty">已审批</div><{/if}>
-		</div>
-		<{if $list.roleid ==3}>
-		<div class="agreeBox_qty">
-		    <div class="agree_qty ClickMe_qty" onclick="agree_i_verify(<{$list.id}>,<{$list.roleid}>,<{$list.name}>)">同意</div>
-		    <div class="cancel_qty ClickMe_qty">拒绝</div>
-		</div>
-		<{/if}>
+<div class="shBox_yyt">
+	<div class="person_sq_yyt">
+		<div class="person_sq_name">申请人</div>
+		<div class="person_sq_con"><{$list.name}></div>
 	</div>
+	<div class="shWatch_yyt" onclick="open_verify(<{$list.id}>)">查看</div>
+	<div class="shXiang_yyt">
+		<div class="shXiang_yyt_name">录入详情</div>
+		<div class="shXiang_con_yyt"><{$list.name}>销售了<{$list.goodname}><{$list.shuliang}><{$list.dw}></div>
+	</div>
+	<div class="shTime_yyt"><{$list.addtime}></div>
+	<{if $list.status ==0}><div class="wait_sh_yyt" <{if $user_roleid ==3 && $list.status ==0}> onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)" <{/if}>>待审批</div><{elseif $list.status==1}><div class="wait_sh_yyt">已审批</div><{else}><div class="wait_sh_yyt">已拒绝</div><{/if}>
+	
 </div>
 <{/foreach}>
 <{elseif $flag =="list_p_verify"}>
 <{foreach from=$verify_list item=list}>
-<div class="applyBox_qty">
-	<div class="applySmallBox_qty">
-		<div class="seeBox_qty">
-			<div class="see_qty">查看</div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeftFont_qty apply">申请人</div>
-			<div class="applyName_qty"><{$list.name}></div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeftFont_qty">申请事项</div>
-			<div class="applyName_qty"><{$list.name}>申请成为<{$list.mdname}>的<{if $list.type==0}>店员<{elseif $list.type==1}>店长<{/if}></div>
-		</div>
-		<div class="dateBox_qty">
-			<div class="data_qty"><{$list.addtime}></div>
-			<{if $list.status ==0}><div class="pendApproved_qty">待审批</div><{elseif $list.status==1}><div class="approved_qty">已审批</div><{/if}>
-		</div>
-		<{if $list.type==0}>
-		<{if $list.roleid ==3}>
-		<div class="agreeBox_qty">
-		    <div class="agree_qty ClickMe_qty" onclick="agree_p_verify(<{$list.id}>,<{$list.roleid}>,<{$list.name}>)">同意</div>
-		    <div class="cancel_qty ClickMe_qty">拒绝</div>
-		</div>
-		<{/if}>
-		<{/if}>
+<div class="shBox_yyt">
+	<div class="person_sq_yyt">
+		<div class="person_sq_name">申请人</div>
+		<div class="person_sq_con"><{$list.name}></div>
 	</div>
+	<div class="shWatch_yyt" onclick="open_verify(<{$list.id}>)">查看</div>
+	<div class="shXiang_yyt">
+		<div class="shXiang_yyt_name">申请事项</div>
+		<div class="shXiang_con_yyt"><{$list.name}>申请成为<{$list.mdname}>的<{if $list.type==0}>店员<{elseif $list.type==1}>店长<{/if}></div>
+	</div>
+	<div class="shTime_yyt"><{$list.addtime}></div>
+	<{if $list.status ==0}><div class="wait_sh_yyt" <{if $list.type==0}><{if $user_roleid ==3 && $list.status ==0}> onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)" <{/if}><{/if}> >待审批</div><{elseif $list.status==1}><div class="wait_sh_yyt">已审批</div><{else}><div class="wait_sh_yyt">已拒绝</div><{/if}>
+	
+	
 </div>
 <{/foreach}>
 <{/if}>
