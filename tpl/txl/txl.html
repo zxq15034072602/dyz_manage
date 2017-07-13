@@ -1,0 +1,35 @@
+<{if $flag ==0}>
+<{else}>
+<{foreach from=$szm item=s}>
+<div class="englishBox_qty">
+	<div class="english_qty"><{$s.szm}></div>
+</div>
+<div class="groupChart_qty">
+	<ul class="groupChartSmall_qty">
+	    <{foreach from=$txl item=txlrow}>
+	    <{if $txlrow.szm==$s.szm and count($txlrow.yh_user)>0}>
+		<li class="groupParent_qty" >
+			<a>
+				<span class="grouplist_qty"><{$txlrow.name}></span>
+				<span class="arrowTop_qty"></span>
+			</a>
+			<ul class="groupNavBox_qty">
+			    <{foreach from=$txlrow.yh_user item=row}>
+				<li>
+					<div class="groupImg_qty">
+						<img src="../../image/img_qty/head.jpg" alt="">
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id" value="<{$row.user.id}>"><{$row.user.name}></label>
+					</div>
+				</li>
+				
+				<{/foreach}>
+			</ul>
+		</li>
+		<{/if}>
+		<{/foreach}>
+	</ul>
+</div>
+<{/foreach}>
+<{/if}>

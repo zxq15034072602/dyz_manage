@@ -2,9 +2,9 @@
 if(!defined('CORE'))exit("error!"); 
 //消息列表
 if($do=="xiaoxi"){
-	$uid=$_POST['uid']??1;
+	$uid=$_REQUEST['uid']??1;
 	$pagenum=10;
-	$page=$_POST['page']??1;
+	$page=$_REQUEST['page']??1;
 	$page=($page-1)*$pagenum;
 	//总部
 	$sql="select *,date_format(addtime,'%m月%d日') as addtime1 from rv_xiaoxi where id in (SELECT max(id) FROM rv_xiaoxi where uid=? GROUP BY toid) order by addtime desc limit ".$page.",".$pagenum;

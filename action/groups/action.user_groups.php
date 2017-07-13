@@ -14,6 +14,7 @@ if($do == "add_groups"){
             $params=array();
             $groups_users=unique($groups_users);//去除重复人员
             foreach ($groups_users as $value){
+                $item_list_tmp .=$item_list_tmp ? ",(?,?,?)" : "(?,?,?)";
                 array_push($params,$ug_id,$value[0],"$value[1]");
             }
             $sql .=$item_list_tmp;
@@ -28,17 +29,33 @@ if($do == "add_groups"){
 }elseif($do == "qlxx"){//获取群聊信息
     $gid=$_REQUEST['gid'];//群聊id
     $uid=$_REQUEST['uid'];
+  
+    if($gid){
+        $sql=" SELECT * from rv_group_to_users where gu_gid=?";
+        $db->p_e($sql, array($gid));
+        $groups_users_list=json_encode($db->fetchAll());//群聊组员
+        $groups_info=json_encode($db->select(0, 1, "rv_users_groups","*,date_format(ug_create_time,'%m月%d日 %H:%i') as ug_create_time_format",array("ug_id = $gid"),' ug_id desc'));//群聊信息
+        echo '{"code":"200","gid":"'.$gid.'","groups_info":'.$groups_info.',"groups_users_list":'.$groups_users_list.'}';
+        exit();
+    }
+    echo '{"code":"500"}';
+    exit();
+   
+}elseif($do == "qldhxx"){//打开群聊框信息
+    $gid=$_REQUEST['gid'];//群聊id
+    $uid=$_REQUEST['uid'];
     $is_openwin=0;
     if($gid){
         if($db->update(0, 1, "rv_user", array("is_openwin=1"),array("id=$uid"))){
             $is_openwin=1;
         }
-        $sql=" SELECT * from rv_group_to_users where gu_gid=?";
+        $sql=" SELECT count(*) from rv_group_to_users where gu_gid=?";
         $db->p_e($sql, array($gid));
-        $groups_users_list=json_encode($db->fetchAll());//群聊组员
-        $groups_info=json_encode($db->select(0, 1, "rv_users_groups","*,date_format(ug_create_time,'%m月%d日 %H:%i') as ug_create_time_format",array("ug_id = $gid"),' ug_id desc'));//群聊信息
-        echo '{"code":"200","gid":"'.$gid.'","groups_info":'.$groups_info.',"groups_users_list":'.$groups_users_list.',"is_openwin":"'.$is_openwin.'"}';
+        $groups_users_count=$db->fetch_count();
+        $groups_info=json_encode($db->select(0, 1, "rv_users_groups","ug_name,ug_notice",array("ug_id = $gid"),' ug_id desc'));//群聊信息
+        echo '{"code":"200","gid":"'.$gid.'","groups_info":'.$groups_info.',"groups_users_count":"'.$groups_users_count.'","is_openwin":"'.$is_openwin.'"}';
         exit();
+    
     }
     echo '{"code":"500"}';
     exit();
@@ -109,11 +126,10 @@ if($do == "add_groups"){
     $gid = $_REQUEST['gid'];
     $groups_room=$_REQUEST['groups_room'];
     $at_user_ids=$_REQUEST['at_user_ids'];
-    $is_openwin=$_REQUEST['is_openwin'];
     $txt=$_REQUEST['txt'];
     $nowtime=date('m月d日 H:i');
     $send_name=$db->select(0, 1, "rv_group_to_users","gu_group_nick",array("gu_gid=$gid","gu_uid=$uid"),"gu_id desc");
-    $cont=array('lx'=>0,'nr'=>$txt,'time'=>date('m月d日 H:i'),"from_id"=>$uid,"send_name"=>$send_name[gu_group_nick],"at_user_ids"=>$at_user_ids,"gid"=>$gid,"is_openwin"=>$is_openwin);
+    $cont=array('lx'=>0,'nr'=>$txt,'time'=>date('m月d日 H:i'),"from_id"=>$uid,"send_name"=>$send_name[gu_group_nick],"at_user_ids"=>$at_user_ids,"gid"=>$gid);
     $cont=json_encode($cont);
     $sql= "insert into rv_groups_xiaoxi (from_uid,togid,content,content_type,at_user_ids) values(?,?,?,0,?)";
     if($db->p_e($sql, array($uid,$gid,$txt,$at_user_ids))){//成功后像socket 服务端推送数据
@@ -166,6 +182,7 @@ elseif($do == "update_groups_user"){//修改群组成员
             $params=array();
             $groups_users=unique($groups_users);//去除重复人员
             foreach ($groups_users as $value){
+                $item_list_tmp .=$item_list_tmp ? ",(?,?,?)" : "(?,?,?)";
                 array_push($params,$gid,$value[0],"$value[1]");
             }
             $sql .=$item_list_tmp;
@@ -180,11 +197,23 @@ elseif($do == "update_groups_user"){//修改群组成员
         exit();
     }
 }
+else if($do == "get_user_openwin"){//获取用户窗口是否打开
+    $uid=$_REQUEST[uid];
+    $sql="select is_openwin from rv_user where id=?";
+    $db->p_e($sql, array($uid));
+    $is_openwin=$db->fetch_count();
+    echo '{"is_openwin":"'.$is_openwin.'"}';
+    exit();
+}
 else if($do == "update_openwin"){//更新用户窗口状态
     $uid=$_POST['uid'];
     $db->update(0, 1, "rv_user", array("is_openwin=0"),array("id=$uid"));
 }
 elseif($do == "test"){
-    $smt = new smarty();smarty_cfg($smt);
-    $smt->display("test.html");
+    $sql ="select id from rv_mendian where status=1";
+    $db->p_e($sql, array());
+    $mendian=$db->fetchAll();
+    foreach ($mendian as $value){
+       $db->insert(0, 1, 'rv_kucun', array("mid=$value[id]","gid=21 ","kucun=100"));
+    }
 }

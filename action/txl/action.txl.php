@@ -22,14 +22,34 @@ if($do=="txl"){
 	}else{
 		$txl=array();
 	}
-	var_dump($szm);
-	var_dump($txl);
+
 	//模版
-	/*$flag=$_REQUEST['flag']??'0';//0未默认通信录 1群聊通讯录
+	$flag=$_REQUEST['flag']??'0';//0未默认通信录 1群聊通讯录
 	$smt = new smarty();smarty_cfg($smt);
 	$smt->assign("flag",$flag);
 	$smt->assign('szm',$szm);
 	$smt->assign('txl',$txl);
-	$smt->display('txl.html'); */
+	$smt->display('txl.html'); 
 	exit;
+}elseif ($do == "get_store"){//获取省份对应门店
+    $cityid=$_REQUEST['cityid']??0;
+    $sql="select id,name from rv_mendian where cityid=? and status=1 ";
+    $db->p_e($sql, array($cityid));
+    $stores=$db->fetchAll();
+    echo '{"code":"200","stores":'.json_encode($stores).'}';
+    exit;
 }
+elseif ($do == "single_txl"){//单聊通讯录
+    $storeid=$_REQUEST['store_id'];
+    $sql="select id from rv_user where 1=1 and zz=? and status=1 and roleid in (3,5)";
+    $db->p_e($sql,array($storeid));
+    $txl=$db->fetchAll();
+    //模版
+    $flag=$_REQUEST['flag']??'0';//0未默认通信录 1群聊通讯录
+    $smt = new smarty();smarty_cfg($smt);
+    $smt->assign("flag",$flag);
+    $smt->assign('txl',$txl);
+    $smt->display('txl.html');
+    exit;
+}
+

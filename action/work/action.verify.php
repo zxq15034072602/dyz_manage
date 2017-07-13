@@ -9,16 +9,17 @@ if (! defined("CORE"))
 $store_id = $_REQUEST["store_id"]; // 所属门店Id
 $user_roleid = $_REQUEST['roleid']; // 用户权限id
 $uid = $_REQUEST['uid']; // 登陆用户id
+
 if ($do == "input_verify_list") // 销售录入列表页面
 {
     if (empty($store_id)||empty($user_roleid)) { // 销售录入需要用户有了所属门店后才能使用
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
-    $sql = "select b.id,b.uid,b.mid,u.name,b.addtime,b.status,g.dw,g.name as goodname,b.shuliang,u.roleid from rv_buy as b,rv_user as u,rv_goods as g where 1=1  and g.id=b.gid and b.uid=u.id and b.mid=?  ";
+    $sql = "select b.id,b.uid,b.mid,u.name,b.addtime,b.status,g.dw,g.name as goodname,b.shuliang,u.roleid,b.gid from rv_buy as b,rv_user as u,rv_goods as g where 1=1  and g.id=b.gid and b.uid=u.id and b.mid=?  ";
     $db->p_e($sql, array(
         $store_id,
-        
+
     ));
     $verify_list = $db->fetchAll();
     $smt = new Smarty();
@@ -29,7 +30,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
     $smt->display('verify_list.html');
     exit();
 } elseif ($do == "agree_i_verify") { // 同意销售录入审核
-    if (empty($_REQUEST['bid']) || empty($user_roleid)) {
+    $count = $_REQUEST['count']; // 已选数量
+    $gid=$_REQUEST[gid];
+    if (empty($_REQUEST['bid']) || empty($user_roleid)||empty($count)||empty($gid)) {
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
@@ -37,11 +40,22 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"对不起，你不是店长"}';
         exit();
     }
-    
+    $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
+    $db->p_e($sql, array(
+        $gid,
+        $_REQUEST[mid]
+    ));
+    $sales_kucun = $db->fetchRow();
+    if ($sales_kucun['kucun'] < $count) {
+        echo '{"code":"500","msg":"对不起，此商品库存不足"}';
+        exit();
+    }
     $sql = "update rv_buy set status=1,endtime=now() where id=?";
     if ($db->p_e($sql, array(
         $_REQUEST['bid']
     ))) { // 如果同意成功则，sokect推送数据
+        $new_kuncun = $sales_kucun['kucun'] - $count;
+        $db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array("mid=$_REQUEST[mid]","gid=$gid"));
         $cont=array("time"=>date('m月d日 H:i'),"msg"=>"你好，你的录入申请已经通过审核");
         $cont=json_encode($cont);
         to_msg(array('type'=>'verify_to_user','cont'=>$cont,'to'=>$_REQUEST[touid]));

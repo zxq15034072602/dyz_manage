@@ -25,7 +25,7 @@
     <ul class="hot_in_con">
         <{foreach from=$type.goods item=good}>
         <li class="hot_one" onclick="open_sales(<{$good.gid}>)">
-            <div class="hot_one_name"><{$good.name}></div>
+            <div class="hot_one_name"><{$good.name|truncate:6:""}></div>
             <div class="hot_one_price"><{$good.money}>￥</div>
             <div class="hot_one_img">
                 <img src="http://app.duyiwang.cn/<{$good.good_img}>" >
