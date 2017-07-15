@@ -1,5 +1,4 @@
-<{if $flag == "list_i_verify"}>
-<{foreach from=$verify_list item=list}>
+<{if $flag == "list_i_verify"}> <{foreach from=$verify_list item=list}>
 <div class="shBox_yyt">
 	<div class="person_sq_yyt">
 		<div class="person_sq_name">申请人</div>
@@ -11,12 +10,20 @@
 		<div class="shXiang_con_yyt"><{$list.name}>销售了<{$list.goodname}><{$list.shuliang}><{$list.dw}></div>
 	</div>
 	<div class="shTime_yyt"><{$list.addtime}></div>
-	<{if $list.status ==0}><div class="wait_sh_yyt" <{if $user_roleid ==3 && $list.status ==0}> onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)" <{/if}>>待审批</div><{elseif $list.status==1}><div class="wait_sh_yyt">已审批</div><{else}><div class="wait_sh_yyt">已拒绝</div><{/if}>
-	
+	<{if $list.status ==0}>
+	<div class="wait_sh_yyt"<{if $user_roleid ==3 && $list.status
+		==0}>
+		onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)"
+		<{/if}>>待审批</div>
+	<{elseif $list.status==1}>
+	<div class="wait_sh_yyt">已审批</div>
+	<{else}>
+	<div class="wait_sh_yyt">已拒绝</div>
+	<{/if}>
+
 </div>
-<{/foreach}>
-<{elseif $flag =="list_p_verify"}>
-<{foreach from=$verify_list item=list}>
+<{/foreach}> <{elseif $flag =="list_p_verify"}> <{foreach
+from=$verify_list item=list}>
 <div class="shBox_yyt">
 	<div class="person_sq_yyt">
 		<div class="person_sq_name">申请人</div>
@@ -25,12 +32,21 @@
 	<div class="shWatch_yyt" onclick="open_verify(<{$list.id}>)">查看</div>
 	<div class="shXiang_yyt">
 		<div class="shXiang_yyt_name">申请事项</div>
-		<div class="shXiang_con_yyt"><{$list.name}>申请成为<{$list.mdname}>的<{if $list.type==0}>店员<{elseif $list.type==1}>店长<{/if}></div>
+		<div class="shXiang_con_yyt"><{$list.name}>申请成为<{$list.mdname}>的<{if
+			$list.type==0}>店员<{elseif $list.type==1}>店长<{/if}></div>
 	</div>
 	<div class="shTime_yyt"><{$list.addtime}></div>
-	<{if $list.status ==0}><div class="wait_sh_yyt" <{if $list.type==0}><{if $user_roleid ==3 && $list.status ==0}> onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)" <{/if}><{/if}> >待审批</div><{elseif $list.status==1}><div class="wait_sh_yyt">已审批</div><{else}><div class="wait_sh_yyt">已拒绝</div><{/if}>
-	
-	
+	<{if $list.status ==0}>
+	<div class="wait_sh_yyt"<{if $list.type==0}><{if $user_roleid
+		==3 && $list.status ==0}>
+		onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)"
+		<{/if}><{/if}> >待审批</div>
+	<{elseif $list.status==1}>
+	<div class="wait_sh_yyt">已审批</div>
+	<{else}>
+	<div class="wait_sh_yyt">已拒绝</div>
+	<{/if}>
+
+
 </div>
-<{/foreach}>
-<{/if}>
+<{/foreach}> <{/if}>

@@ -115,21 +115,24 @@ if ($do == "index") { // 销售录入主页面
         "status=$status"
     ));
     if ($insert_buy) { // 销售录入插入成功后更新商品库存
-            if($user_roleid==3){//如果是店长
-                $new_kuncun = $sales_kucun['kucun'] - $count;
-                if($db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array("mid=$store_id","gid=$gid"))){
-                    echo '{"code":"200","msg":"录入成功"}';
-                    exit();
-                }else{
-                    echo '{"code":"500","msg":"录入失败,请重试"}';
-                    exit();
-                }
-            }else{
-                echo '{"code":"200","msg":"录入成功,请到我的审查中查看"}';
+        if ($user_roleid == 3) { // 如果是店长
+            $new_kuncun = $sales_kucun['kucun'] - $count;
+            if ($db->update(0, 1, "rv_kucun", array(
+                "kucun=$new_kuncun"
+            ), array(
+                "mid=$store_id",
+                "gid=$gid"
+            ))) {
+                echo '{"code":"200","msg":"录入成功"}';
+                exit();
+            } else {
+                echo '{"code":"500","msg":"录入失败,请重试"}';
                 exit();
             }
-            
-        
+        } else {
+            echo '{"code":"200","msg":"录入成功,请到我的审查中查看"}';
+            exit();
+        }
     }
     echo '{"code":"500","msg":"录入失败,请重试"}';
     exit();

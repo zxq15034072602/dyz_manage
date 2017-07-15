@@ -1,17 +1,18 @@
 <{foreach from=$dh item=row}>
-<div class="dh clearfix">
-	<span class="dh_time"><{$row.addtime1}></span>
-	<div class="dh_tx dh_tx<{if $row.type==1}>2<{else}>1<{/if}>">
-		<span class="name"><{if $row.type==1}><{$row.wo.name}><{else}><{$row.to.name}><{/if}></span>
-		<p class="shuxian"></p>
-	</div>
-	<div class="dh_con dh_con<{if $row.type==1}>2<{else}>1<{/if}>">
-		<i class="xiaosanjiao"></i>
-		<{if $row.content_type==0}>
-		<p><{$row.content}></p>
-		<{elseif $row.content_type==1}>
-		<img src="<{$row.content}>" class='img'>
-		<{/if}>
-	</div>
+<div  class="secret_chat_left">
+    <div <{if $row.type ==1 }>class="icon_img_right"<{else}>class="icon_img"<{/if}>>
+        <img src="../../image/img_qty/leftper.png" alt="">
+        <p><{if $row.type==1}><{$row.wo.name}><{else}><{$row.to.name}><{/if}></p>
+    </div>
+    <{if $row.content_type==0}>
+    <div <{if $row.type==1}>class="icon_chat_right"<{else}>class="icon_chat" <{/if}>>
+        <{$row.content}>
+    </div>
+    <{elseif $row.content_type==1}>
+    <div <{if $row.type==1}>class="icon_chat_right_img"<{else}>class="icon_chat_right_img" <{/if}>>
+        <img src="<{$row.content}>" alt="">
+    </div>
+    <{/if}>
+    
 </div>
 <{/foreach}>

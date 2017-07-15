@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smarty Internal Plugin Compile Function Plugin
  *
@@ -15,7 +16,8 @@
  * @package Smarty
  * @subpackage Compiler
  */
-class Smarty_Internal_Compile_Private_Function_Plugin extends Smarty_Internal_CompileBase {
+class Smarty_Internal_Compile_Private_Function_Plugin extends Smarty_Internal_CompileBase
+{
 
     /**
      * Attribute definition: Overwrites base class.
@@ -24,29 +26,37 @@ class Smarty_Internal_Compile_Private_Function_Plugin extends Smarty_Internal_Co
      * @see Smarty_Internal_CompileBase
      */
     public $required_attributes = array();
+
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
      * @see Smarty_Internal_CompileBase
      */
-    public $optional_attributes = array('_any');
+    public $optional_attributes = array(
+        '_any'
+    );
 
     /**
      * Compiles code for the execution of function plugin
      *
-     * @param array $args array with attributes from parser
-     * @param object $compiler compiler object
-     * @param array $parameter array with compilation parameter
-     * @param string $tag name of function plugin
-     * @param string $function PHP function name
+     * @param array $args
+     *            array with attributes from parser
+     * @param object $compiler
+     *            compiler object
+     * @param array $parameter
+     *            array with compilation parameter
+     * @param string $tag
+     *            name of function plugin
+     * @param string $function
+     *            PHP function name
      * @return string compiled code
      */
     public function compile($args, $compiler, $parameter, $tag, $function)
     {
         // This tag does create output
         $compiler->has_output = true;
-
+        
         // check and get attributes
         $_attr = $this->getAttributes($compiler, $args);
         if ($_attr['nocache'] === true) {
@@ -67,7 +77,6 @@ class Smarty_Internal_Compile_Private_Function_Plugin extends Smarty_Internal_Co
         $output = "<?php echo {$function}({$_params},\$_smarty_tpl);?>\n";
         return $output;
     }
-
 }
 
 ?>

@@ -1,18 +1,18 @@
- <div class="dyz_qty"><{$store_name}></div>
-    <div class="checkBox_qty">
-    	<div class="checkFont_qty">存货告急</div>
-    	<div class="checkSmallBox_qty">	
-    		<ul>
-    		    <{foreach from=$stock_goods item=good}>
-    			<li class="border_qty">
-    				<div class="productName_qty"><{$good.name}></div>
-    				<div class="productImg_qty">
-    					<img src="http://app.duyiwang.cn/<{$good.good_img}>" alt="">    				
-    				</div>
-    				<div class="repertoryName_qty">库存<{$good.kucun}><{$good.dw}></div>
-    			</li>
-    			<{/foreach}>
-    		</ul>
-    	</div>
-    	
-    </div>
+
+<div class="dyz_qty"><{$store_name}></div>
+<div class="checkBox_qty">
+	<div class="checkFont_qty">存货告急</div>
+	<div class="checkSmallBox_qty">
+		<ul>
+			<{foreach from=$stock_goods item=good}>
+			<li class="border_qty">
+				<div class="productName_qty"><{$good.name}></div>
+				<div class="productImg_qty">
+					<img src="http://app.duyiwang.cn/<{$good.good_img}>" alt="">
+				</div>
+				<div class="repertoryName_qty">库存<{$good.kucun}><{$good.dw}></div>
+			</li> <{/foreach}>
+		</ul>
+	</div>
+
+</div>

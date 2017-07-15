@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smarty Internal Plugin Config File Compiler
  *
@@ -16,7 +17,8 @@
  * @package Smarty
  * @subpackage Config
  */
-class Smarty_Internal_Config_File_Compiler {
+class Smarty_Internal_Config_File_Compiler
+{
 
     /**
      * Lexer object
@@ -56,7 +58,8 @@ class Smarty_Internal_Config_File_Compiler {
     /**
      * Initialize compiler
      *
-     * @param Smarty $smarty base instance
+     * @param Smarty $smarty
+     *            base instance
      */
     public function __construct($smarty)
     {
@@ -68,14 +71,17 @@ class Smarty_Internal_Config_File_Compiler {
     /**
      * Method to compile a Smarty template.
      *
-     * @param  Smarty_Internal_Config $config config object
+     * @param Smarty_Internal_Config $config
+     *            config object
      * @return bool true if compiling succeeded, false if it failed
      */
     public function compileSource(Smarty_Internal_Config $config)
     {
-        /* here is where the compiling takes place. Smarty
-          tags in the templates are replaces with PHP code,
-          then written to compiled files. */
+        /*
+         * here is where the compiling takes place. Smarty
+         * tags in the templates are replaces with PHP code,
+         * then written to compiled files.
+         */
         $this->config = $config;
         // get config file source
         $_content = $config->source->content . "\n";
@@ -86,10 +92,12 @@ class Smarty_Internal_Config_File_Compiler {
         // init the lexer/parser to compile the config file
         $lex = new Smarty_Internal_Configfilelexer($_content, $this->smarty);
         $parser = new Smarty_Internal_Configfileparser($lex, $this);
-        if ($this->smarty->_parserdebug) $parser->PrintTrace();
+        if ($this->smarty->_parserdebug)
+            $parser->PrintTrace();
         // get tokens from lexer and parse them
         while ($lex->yylex()) {
-            if ($this->smarty->_parserdebug) echo "<br>Parsing  {$parser->yyTokenName[$lex->token]} Token {$lex->value} Line {$lex->line} \n";
+            if ($this->smarty->_parserdebug)
+                echo "<br>Parsing  {$parser->yyTokenName[$lex->token]} Token {$lex->value} Line {$lex->line} \n";
             $parser->doParse($lex->token, $lex->value);
         }
         // finish parsing process
@@ -105,7 +113,8 @@ class Smarty_Internal_Config_File_Compiler {
      *
      * If parameter $args contains a string this is used as error message
      *
-     * @param string $args individual error message or null
+     * @param string $args
+     *            individual error message or null
      */
     public function trigger_config_file_error($args = null)
     {
@@ -138,7 +147,6 @@ class Smarty_Internal_Config_File_Compiler {
         }
         throw new SmartyCompilerException($error_text);
     }
-
 }
 
 ?>

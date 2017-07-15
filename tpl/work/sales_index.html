@@ -1,39 +1,35 @@
 <{if $sales_goods}>
 <div class="hot_in">
-    <div class="hot_in_title">热门录入</div>
-    <ul class="hot_in_con">
-        <{foreach from=$sales_goods item=good}>
-        <li class="hot_one" onclick="open_sales(<{$good.gid}>)">
-            <div class="hot_one_name"><{$good.name}></div>
-            <div class="hot_one_price"><{$good.money}>￥</div>
-            <div class="hot_one_img">
-                <img src="http://app.duyiwang.cn/<{$good.good_img}>"  >
-            </div>
-            <div class="hot_one_num">销售<{$good.shuliang}>套</div>
-        </li>
-        <{/foreach}>
-    </ul>
+	<div class="hot_in_title">热门录入</div>
+	<ul class="hot_in_con">
+		<{foreach from=$sales_goods item=good}>
+		<li class="hot_one" onclick="open_sales(<{$good.gid}>)">
+			<div class="hot_one_name"><{$good.name}></div>
+			<div class="hot_one_price"><{$good.money}>￥</div>
+			<div class="hot_one_img">
+				<img src="http://app.duyiwang.cn/<{$good.good_img}>">
+			</div>
+			<div class="hot_one_num">销售<{$good.shuliang}>套</div>
+		</li> <{/foreach}>
+	</ul>
 </div>
 <{else}>
-<div style="width: 100%;height: auto;overflow: hidden;font-size: 0.3rem;line-height: 3rem;color: #333;text-align: center">未找到相关数据！</div>
-<{/if}>
-<{if $store_goods}>
-<{foreach from=$store_goods item=type}>
+<div
+	style="width: 100%; height: auto; overflow: hidden; font-size: 0.3rem; line-height: 3rem; color: #333; text-align: center">未找到相关数据！</div>
+<{/if}> <{if $store_goods}> <{foreach from=$store_goods item=type}>
 <div class="hot_in">
-    
-    <div class="hot_in_title"><{$type.typename}></div>
-    <ul class="hot_in_con">
-        <{foreach from=$type.goods item=good}>
-        <li class="hot_one" onclick="open_sales(<{$good.gid}>)">
-            <div class="hot_one_name"><{$good.name|truncate:6:""}></div>
-            <div class="hot_one_price"><{$good.money}>￥</div>
-            <div class="hot_one_img">
-                <img src="http://app.duyiwang.cn/<{$good.good_img}>" >
-            </div>
-            <div class="hot_one_num">库存<{$good.kucun}>套</div>
-        </li>
-        <{/foreach}>
-    </ul>
+
+	<div class="hot_in_title"><{$type.typename}></div>
+	<ul class="hot_in_con">
+		<{foreach from=$type.goods item=good}>
+		<li class="hot_one" onclick="open_sales(<{$good.gid}>)">
+			<div class="hot_one_name"><{$good.name|truncate:6:""}></div>
+			<div class="hot_one_price"><{$good.money}>￥</div>
+			<div class="hot_one_img">
+				<img src="http://app.duyiwang.cn/<{$good.good_img}>">
+			</div>
+			<div class="hot_one_num">库存<{$good.kucun}>套</div>
+		</li> <{/foreach}>
+	</ul>
 </div>
- <{/foreach}>
-<{/if}>
+<{/foreach}> <{/if}>

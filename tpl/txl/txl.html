@@ -1,34 +1,40 @@
-<{if $flag ==0}>
-<{else}>
+<{if $flag ==0}> 
+<{foreach from=$txl item=user}>
+<li class="user_box_zn" onclick="talk_about(<{$user.id}>)">
+    <div class="user_zn">
+        <div class="user_picture_zn">
+            <img src="../../image/image_zn/user.png" alt="">
+        </div>
+        <div class="user_name_zn">
+        <{$user.name}>
+        </div>
+    </div>
+</li>
+<{/foreach}>
+<{else}> 
 <{foreach from=$szm item=s}>
 <div class="englishBox_qty">
 	<div class="english_qty"><{$s.szm}></div>
 </div>
 <div class="groupChart_qty">
 	<ul class="groupChartSmall_qty">
-	    <{foreach from=$txl item=txlrow}>
-	    <{if $txlrow.szm==$s.szm and count($txlrow.yh_user)>0}>
-		<li class="groupParent_qty" >
-			<a>
-				<span class="grouplist_qty"><{$txlrow.name}></span>
+		<{foreach from=$txl item=txlrow}> 
+		<{if $txlrow.szm==$s.szm and count($txlrow.yh_user)>0}>
+		<li class="groupParent_qty"><a> <span class="grouplist_qty"><{$txlrow.name}></span>
 				<span class="arrowTop_qty"></span>
-			</a>
+		</a>
 			<ul class="groupNavBox_qty">
-			    <{foreach from=$txlrow.yh_user item=row}>
+				<{foreach from=$txlrow.yh_user item=row}>
 				<li>
 					<div class="groupImg_qty">
 						<img src="../../image/img_qty/head.jpg" alt="">
 					</div>
 					<div class="groupLabel_qty">
-						<label><input type="checkbox" name="user_id" id="user_id" value="<{$row.user.id}>"><{$row.user.name}></label>
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$row.user.id}>"><{$row.user.name}></label>
 					</div>
-				</li>
-				
-				<{/foreach}>
-			</ul>
-		</li>
-		<{/if}>
-		<{/foreach}>
+				</li> <{/foreach}>
+			</ul></li> <{/if}> <{/foreach}>
 	</ul>
 </div>
 <{/foreach}>

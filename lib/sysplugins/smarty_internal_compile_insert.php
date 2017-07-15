@@ -16,7 +16,8 @@
  * @package Smarty
  * @subpackage Compiler
  */
-class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
+class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase
+{
 
     /**
      * Attribute definition: Overwrites base class.
@@ -24,27 +25,37 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
      * @var array
      * @see Smarty_Internal_CompileBase
      */
-    public $required_attributes = array('name');
+    public $required_attributes = array(
+        'name'
+    );
+
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
      * @see Smarty_Internal_CompileBase
      */
-    public $shorttag_order = array('name');
+    public $shorttag_order = array(
+        'name'
+    );
+
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
      * @see Smarty_Internal_CompileBase
      */
-    public $optional_attributes = array('_any');
+    public $optional_attributes = array(
+        '_any'
+    );
 
     /**
      * Compiles code for the {insert} tag
      *
-     * @param array  $args     array with attributes from parser
-     * @param object $compiler compiler object
+     * @param array $args
+     *            array with attributes from parser
+     * @param object $compiler
+     *            compiler object
      * @return string compiled code
      */
     public function compile($args, $compiler)
@@ -57,7 +68,7 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
         $_smarty_tpl = $compiler->template;
         $_name = null;
         $_script = null;
-
+        
         $_output = '<?php ';
         // save posible attributes
         eval('$_name = ' . $_attr['name'] . ';');
@@ -73,7 +84,7 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
             $_smarty_tpl = $compiler->template;
             $_filepath = false;
             eval('$_script = ' . $_attr['script'] . ';');
-            if (!isset($compiler->smarty->security_policy) && file_exists($_script)) {
+            if (! isset($compiler->smarty->security_policy) && file_exists($_script)) {
                 $_filepath = $_script;
             } else {
                 if (isset($compiler->smarty->security_policy)) {
@@ -81,8 +92,8 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
                 } else {
                     $_dir = $compiler->smarty->trusted_dir;
                 }
-                if (!empty($_dir)) {
-                    foreach((array)$_dir as $_script_dir) {
+                if (! empty($_dir)) {
+                    foreach ((array) $_dir as $_script_dir) {
                         $_script_dir = rtrim($_script_dir, '/\\') . DS;
                         if (file_exists($_script_dir . $_script)) {
                             $_filepath = $_script_dir . $_script;
@@ -97,16 +108,16 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
             // code for script file loading
             $_output .= "require_once '{$_filepath}' ;";
             require_once $_filepath;
-            if (!is_callable($_function)) {
+            if (! is_callable($_function)) {
                 $compiler->trigger_template_error(" {insert} function '{$_function}' is not callable in script file '{$_script}'", $compiler->lex->taglineno);
             }
         } else {
             $_filepath = 'null';
             $_function = "insert_{$_name}";
             // function in PHP script ?
-            if (!is_callable($_function)) {
+            if (! is_callable($_function)) {
                 // try plugin
-                if (!$_function = $compiler->getPlugin($_name, 'insert')) {
+                if (! $_function = $compiler->getPlugin($_name, 'insert')) {
                     $compiler->trigger_template_error("{insert} no function or plugin found for '{$_name}'", $compiler->lex->taglineno);
                 }
             }
@@ -136,7 +147,6 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
         }
         return $_output;
     }
-
 }
 
 ?>

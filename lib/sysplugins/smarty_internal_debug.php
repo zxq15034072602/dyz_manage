@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smarty Internal Plugin Debug
  *
@@ -15,7 +16,8 @@
  * @package Smarty
  * @subpackage Debug
  */
-class Smarty_Internal_Debug extends Smarty_Internal_Data {
+class Smarty_Internal_Debug extends Smarty_Internal_Data
+{
 
     /**
      * template data
@@ -27,7 +29,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * Start logging of compile time
      *
-     * @param object $template
+     * @param object $template            
      */
     public static function start_compile($template)
     {
@@ -38,7 +40,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * End logging of compile time
      *
-     * @param object $template
+     * @param object $template            
      */
     public static function end_compile($template)
     {
@@ -49,7 +51,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * Start logging of render time
      *
-     * @param object $template
+     * @param object $template            
      */
     public static function start_render($template)
     {
@@ -60,7 +62,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * End logging of compile time
      *
-     * @param object $template
+     * @param object $template            
      */
     public static function end_render($template)
     {
@@ -71,7 +73,8 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * Start logging of cache time
      *
-     * @param object $template cached template
+     * @param object $template
+     *            cached template
      */
     public static function start_cache($template)
     {
@@ -82,7 +85,8 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * End logging of cache time
      *
-     * @param object $template cached template
+     * @param object $template
+     *            cached template
      */
     public static function end_cache($template)
     {
@@ -93,7 +97,8 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * Opens a window for the Smarty Debugging Consol and display the data
      *
-     * @param Smarty_Internal_Template|Smarty $obj object to debug
+     * @param Smarty_Internal_Template|Smarty $obj
+     *            object to debug
      */
     public static function display_debug($obj)
     {
@@ -138,7 +143,8 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
     /**
      * Recursively gets variables from all template/data scopes
      *
-     * @param Smarty_Internal_Template|Smarty_Data $obj object to debug
+     * @param Smarty_Internal_Template|Smarty_Data $obj
+     *            object to debug
      * @return StdClass
      */
     public static function get_debug_vars($obj)
@@ -155,32 +161,39 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
                 $tpl_vars[$key]->scope = 'Smarty root';
             }
         }
-
+        
         if (isset($obj->parent)) {
             $parent = self::get_debug_vars($obj->parent);
             $tpl_vars = array_merge($parent->tpl_vars, $tpl_vars);
             $config_vars = array_merge($parent->config_vars, $config_vars);
         } else {
             foreach (Smarty::$global_tpl_vars as $name => $var) {
-                if (!array_key_exists($name, $tpl_vars)) {
+                if (! array_key_exists($name, $tpl_vars)) {
                     $clone = clone $var;
                     $clone->scope = 'Global';
                     $tpl_vars[$name] = $clone;
                 }
             }
         }
-        return (object) array('tpl_vars' => $tpl_vars, 'config_vars' => $config_vars);
+        return (object) array(
+            'tpl_vars' => $tpl_vars,
+            'config_vars' => $config_vars
+        );
     }
 
     /**
      * Return key into $template_data for template
      *
-     * @param object $template  template object
-     * @return string   key into $template_data
+     * @param object $template
+     *            template object
+     * @return string key into $template_data
      */
     private static function get_key($template)
     {
-        static $_is_stringy = array('string' => true, 'eval' => true);
+        static $_is_stringy = array(
+            'string' => true,
+            'eval' => true
+        );
         // calculate Uid if not already done
         if ($template->source->uid == '') {
             $template->source->filepath;
@@ -190,7 +203,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
             return $key;
         } else {
             if (isset($_is_stringy[$template->source->type])) {
-                self::$template_data[$key]['name'] = '\''.substr($template->source->name,0,25).'...\'';
+                self::$template_data[$key]['name'] = '\'' . substr($template->source->name, 0, 25) . '...\'';
             } else {
                 self::$template_data[$key]['name'] = $template->source->filepath;
             }
@@ -200,7 +213,6 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data {
             return $key;
         }
     }
-
 }
 
 ?>
