@@ -117,7 +117,9 @@ if ($do == "userinfo") { // 用户中心个人信息
         md5($_REQUEST['password']),
         $user_type
     ));
+    
     $user = $db->fetchRow();
+    
     if ($user['id'] > 0) {
         $sql = "select action from rv_role where 1=1 and  id=?";
         $db->p_e($sql, array(

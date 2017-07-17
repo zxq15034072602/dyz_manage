@@ -9,7 +9,7 @@ if ($do == "txl") {
     $db->p_e($sql, array());
     $szm = $db->fetchAll();
     if (count($szm) > 0) {
-        $sql = "select a.*,b.name as fgsname,GET_SZM(b.name) as szm from rv_mendian as a left join rv_fengongsi as b on a.fid=b.id where 1=1 and a.status=1 and a.type=? and b.status=1";
+        $sql = "select a.*,b.name as fgsname,GET_SZM(a.name) as szm from rv_mendian as a left join rv_fengongsi as b on a.fid=b.id where 1=1 and a.status=1 and a.type=? and b.status=1";
         $db->p_e($sql, array($type));
         $txl = $db->fetchAll();
         foreach ($txl as &$k) {

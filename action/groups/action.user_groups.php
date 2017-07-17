@@ -21,6 +21,7 @@ if ($do == "add_groups") {
             $item_list_tmp = '';
             $params = array();
             $groups_users = unique($groups_users); // 去除重复人员
+            
             foreach ($groups_users as $value) {
                 $item_list_tmp .= $item_list_tmp ? ",(?,?,?)" : "(?,?,?)";
                 array_push($params, $ug_id, $value[0], "$value[1]");
