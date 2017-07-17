@@ -127,9 +127,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
-    $sql = "select v.id,u.name,m.name as mdname,v.addtime,u.roleid,v.type,v.status,v.uid,v.mid from rv_verify as v,rv_user as u,rv_mendian as m where v.uid=u.id and v.mid=m.id  v.mid =?";
+    $sql = "select v.id,u.name,m.name as mdname,v.addtime,u.roleid,v.type,v.status,v.uid,v.mid from rv_verify as v,rv_user as u,rv_mendian as m where v.uid=u.id and v.mid=m.id and v.mid =?";
     $db->p_e($sql, array(
-        $store_isd
+        $store_id
     ));
     $verify_list = $db->fetchAll();
     $smt = new Smarty();
