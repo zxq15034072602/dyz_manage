@@ -5,7 +5,7 @@ if (! defined('CORE'))
 $type=$_REQUEST["type"];
 if ($do == "txl") {
     // 门店
-    $sql = "select GET_SZM(b.name) as szm from rv_mendian as a left join rv_fengongsi as b on a.fid=b.id   where 1=1 and a.status=1  group by szm";
+    $sql = "select GET_SZM(a.name) as szm from rv_mendian as a left join rv_fengongsi as b on a.fid=b.id   where 1=1 and a.status=1  group by szm";
     $db->p_e($sql, array());
     $szm = $db->fetchAll();
     if (count($szm) > 0) {
