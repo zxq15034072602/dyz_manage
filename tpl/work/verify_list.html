@@ -13,7 +13,7 @@
 	<{if $list.status ==0}>
 	<div class="wait_sh_yyt"<{if $user_roleid ==3 && $list.status
 		==0}>
-		onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>)"
+		onclick="shenhe_yyt(<{$list.id}>,'<{$list.name}>',<{$list.uid}>,<{$list.mid}>,<{$list.shuliang}>)"
 		<{/if}>>待审批</div>
 	<{elseif $list.status==1}>
 	<div class="wait_sh_yyt">已审批</div>
