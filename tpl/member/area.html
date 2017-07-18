@@ -1,0 +1,20 @@
+<{foreach from=$province item=list}>
+<li>
+	<div class="englishBox_qty">
+ 	<div class="english_qty"><{$list.szm}></div>
+ </div>
+ <{foreach from=$list.province item=p}>
+ <div class="cityBox_qty">
+ 	<div class="provice_qty"><{$p.province}></div>
+ 	<ul>
+ 		<li>
+ 		<{foreach from=$p.area  item=city}>
+ 			<span class="city_qty" value="" onclick="open_store_list(<{$city.cityid}>,'<{$city.city}>')"><{$city.city|truncate:5:""}></span>
+ 	    <{/foreach}>
+ 		</li>
+ 		
+ 	</ul>
+ </div>
+ <{/foreach}>
+</li>
+<{/foreach}>

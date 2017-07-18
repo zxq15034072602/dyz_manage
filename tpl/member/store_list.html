@@ -1,0 +1,9 @@
+<form>
+<{foreach from=$store_list item=store}>
+	<div class="storeOwendSmall_qty">
+		<div class="storeBox_qty">
+			<label><input type="radio" value="<{$store.id}>" name="address" checked="checked"><{$store.name|truncate:20:""}></label>
+		</div>
+	</div>
+<{/foreach}>
+</form>

@@ -103,12 +103,12 @@ if ($do == "userinfo") { // 用户中心个人信息
         echo '{"code":"500","msg":"修改失败"}';
         exit();
     }
-    $sql = "select * from rv_mendian where 1=1 and type=?"; // 获取所有门店
+    $sql = "select id,name from rv_mendian where 1=1 and type=? and id=?"; // 获取指定门店
     $db->p_e($sql, array(
-        $user_type
+        $user_type,$_REQUEST['stroe_id']
     ));
-    $stroe_list = $db->fetchAll();
-    echo '{"userinfo":' . json_encode($user) . ',"stroe_list":' . json_encode($stroe_list) . '}';
+    $stroe = $db->fetchRow();
+    echo '{"userinfo":' . json_encode($user) . ',"stroe":' . json_encode($stroe) . '}';
     exit();
 } elseif ($do == "login") { // 用户登陆
     $sql = "select * from rv_user where 1=1 and username=? and password=? and type=? and status=1";
@@ -194,18 +194,22 @@ if ($do == "userinfo") { // 用户中心个人信息
     $sql = "select  GET_SZM(province) as szm from rv_province group by szm";
     $db->p_e($sql, array());
     $szm = $db->fetchAll();
-    foreach ($szm as &$k) {
-        $sql = "select * from rv_province where 1=1 and GET_SZM(province) = ?";
+    foreach ($szm as $key=>&$k) {
+        $sql = "select * from (select *,provinceid as pid,(select count(id) from rv_mendian where  provinceid =pid ) as count from rv_province where 1=1 and GET_SZM(province) = ?) as a where a.count >0";
         $db->p_e($sql, array(
             $k['szm']
         ));
         $k['province'] = $db->fetchAll();
+        if(empty($k['province'])){
+          $k['szm']="";
+        }
         foreach ($k[province] as &$value) {
-            $sql = "select city,cityid from rv_city where 1=1 and fatherid=?";
+            $sql = "select * from (select city,cityid ,cityid as t,(select count(id) from rv_mendian where cityid=t) as count from rv_city where 1=1  and fatherid=? ) as a  where a.count>0";
             $db->p_e($sql, array(
                 $value['provinceid']
             ));
             $value['area'] = $db->fetchAll();
+            
         }
     }
     $smt = new smarty();
@@ -213,4 +217,12 @@ if ($do == "userinfo") { // 用户中心个人信息
     $smt->assign('province', $szm);
     $smt->display('area.html');
 } else if ($do == "find_store_list") { // 获得 指定市级门店
+    $cityid=$_REQUEST['cityid'];//城市id
+    $sql="select * from rv_mendian where 1=1 and cityid=?";
+    $db->p_e($sql, array($cityid));
+    $store_list=$db->fetchAll();
+    $smt = new smarty();
+    smarty_cfg($smt);
+    $smt->assign('store_list', $store_list);
+    $smt->display('store_list.html');
 }
