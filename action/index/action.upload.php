@@ -5,7 +5,7 @@ if (! defined('CORE'))
 $base64 = $_POST['formFile'];
 $IMG = base64_decode($base64);
 $save_url = "http://static.duyiwang.cn/image/";
-$dir_name = "D:/image/";
+$dir_name = "E:/apptupian/image/";
 $ymd = date("Ymd");
 $dir_name .= $ymd . "/";
 $save_url .= $ymd . "/";
