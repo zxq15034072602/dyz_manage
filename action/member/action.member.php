@@ -217,9 +217,10 @@ if ($do == "userinfo") { // 用户中心个人信息
     $smt->assign('province', $szm);
     $smt->display('area.html');
 } else if ($do == "find_store_list") { // 获得 指定市级门店
+    $type=$_REQUEST[type]??0;
     $cityid=$_REQUEST['cityid'];//城市id
-    $sql="select * from rv_mendian where 1=1 and cityid=?";
-    $db->p_e($sql, array($cityid));
+    $sql="select * from rv_mendian where 1=1 and cityid=? and type=?";
+    $db->p_e($sql, array($cityid,$type));
     $store_list=$db->fetchAll();
     $smt = new smarty();
     smarty_cfg($smt);
