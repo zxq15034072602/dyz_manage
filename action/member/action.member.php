@@ -227,11 +227,12 @@ if ($do == "userinfo") { // 用户中心个人信息
     $smt->assign('store_list', $store_list);
     $smt->display('store_list.html');
 }elseif($do=='info'){//获取用户个人信息
+    $uid=$_REQUEST['uid'];
     if(empty($uid)){
         echo '{"code":"500","msg":"关键数据缺失"}';
         exit();
     }
-    $sql="select a.name,a.sex,a.age,a.head_img,a.mobile,a.roleid,b.name as mdname from rv_user as a join rv_mendian as b on a.id=b.uid where 1=1 and a.id=?";
+    $sql="select u.name,u.age,u.sex,u.mobile,u.head_img,u.roleid,m.name as mdname FROM rv_user as u LEFT JOIN rv_mendian as m on u.zz=m.id where u.id=?";
     $db->p_e($sql, array(
         $uid
     ));
