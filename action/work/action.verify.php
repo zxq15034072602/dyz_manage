@@ -224,20 +224,16 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
-    $sql="select count(*) from rv_verify where 1=1 and uid=? and status=0";    
-   
-   if( $db->p_e($sql, array(
+   $sql="select count(*) from rv_verify where 1=1 and uid=? and status=0";      
+   $db->p_e($sql, array(
         $uid,
-    ))){
-            echo '{"code":"200","verify_status":"1"}';
-        $sql1="select count(*) from rv_buy where 1=1 and uid=? and status=0";
-        if($db->p_e($sql, array(
-            $uid
-        ))){
-            echo '{"code":"200","buy_status":"1"}';
-            exit();
-        }
-   }
-    echo '{"code":"500"}';
-    exit();
+    ));
+   $verify=$db->fetch_count();
+   $sql1="select count(*) from rv_buy where 1=1 and uid=? and status=0";
+   $db->p_e($sql1, array(
+       $uid
+   ));
+   $buy=$db->fetch_count();
+   echo '{"verify":'.$verify.',"buy":'.$buy.'}';
+   exit;
 }
