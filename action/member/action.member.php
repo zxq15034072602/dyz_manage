@@ -226,4 +226,22 @@ if ($do == "userinfo") { // 用户中心个人信息
     smarty_cfg($smt);
     $smt->assign('store_list', $store_list);
     $smt->display('store_list.html');
+}elseif($do=='info'){//获取用户个人信息
+    $uid=$_REQUEST['uid'];
+    if(empty($uid)){
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
+    }
+    $sql="select u.name,u.age,u.sex,u.mobile,u.head_img,u.roleid,m.name as mdname FROM rv_user as u LEFT JOIN rv_mendian as m on u.zz=m.id where u.id=?";
+    $db->p_e($sql, array(
+        $uid
+    ));
+    $info=$db->fetchAll();
+    if(!empty($info)){
+        echo '{"code":"200","info":'.json_encode($info).'}';
+        exit();
+    }else{
+        echo '{"code":"500"}';
+        exit();
+    }
 }
