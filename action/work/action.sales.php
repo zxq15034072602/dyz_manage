@@ -10,24 +10,12 @@ $store_id = $_REQUEST["store_id"]; // 所属门店Id
 $uid = $_REQUEST['uid']; // 登陆用户id
 $user_roleid = $_REQUEST['roleid']; // 用户权限id
 if ($do == "index") { // 销售录入主页面
-    $search = '';
-    $arr = array();
-    if ($_REQUEST['keywords']) { // 如果有搜索
-        $search .= "and g.name like ? ";
-        $arr[] = "%" . $_REQUEST['keywords'] . "%";
-    }
-    $sql = "select * from rv_buy as b,rv_goods as g where b.gid=g.id " . $search . " and b.mid=? ORDER BY shuliang desc";
-    
-    $arr[] = $store_id;
-    $db->p_e($sql, $arr);
-    $sales_goods = $db->fetchAll();
-    
-    $sql = "select * from rv_type where 1=1";
-    $good_type = $db->select(0, 0, "rv_type");
+    $type=$_REQUEST[type]??0;//0独一张/1食维健
+    $good_type = $db->select(0, 0, "rv_type","*","and type=$type");
     $store_goods = array();
     if ($good_type) { // 获取商品品牌，并获取所属门店的商品
         foreach ($good_type as $key => $type) {
-            $sql = "select * from rv_goods as g,rv_kucun as k where k.gid=g.id and k.mid=? and g.fatherid=?";
+            $sql = "select *,g.id as gid from rv_goods as g,rv_kucun as k where k.gid=g.id and k.mid=? and g.fatherid=?";
             $db->p_e($sql, array(
                 $store_id,
                 $type[id]
@@ -39,37 +27,68 @@ if ($do == "index") { // 销售录入主页面
             }
         }
     }
+    
     $smt = new Smarty();
     smarty_cfg($smt);
-    $smt->assign("sales_goods", $sales_goods);
     $smt->assign("store_goods", $store_goods);
     $smt->display("sales_index.html");
     exit();
-} elseif ($do == "sales_view") { // 获取销售录入信息
-    $gid = $_REQUEST['gid']; // 商品id
-    $sql = "select * from rv_goods as g,rv_kucun as k where k.gid=g.id and k.mid=? and k.gid=?";
-    $db->p_e($sql, array(
-        $store_id,
-        $gid
-    ));
-    $good = $db->fetchRow();
-    if ($good) {
-        echo '{"code":"200","goodinfo":' . json_encode($good) . '}';
+} elseif ($do == "add_buy_cart"){ //添加销售商品到录入单
+    $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id,商品名称,商品单价）
+    $number=$_REQUEST['number']??1;//添加的商品数量
+    if(empty($store_id)&&empty($add_goods_list)&&!is_array($add_goods_list)&&empty($uid)){
+       echo '{"code":"500","msg":"关键数据获取失败！"}';
+       exit();
+    }
+    $add_type=$_REQUEST['add_type']??0;//添加类型:0 添加普通商品/1 添加赠品
+    foreach($add_goods_list as $good){
+        $sql="select * from rv_buy_cart where buyer_id=? and store_id=? and goods_id =? and bl_id=?";
+        $db->p_e($sql, array($uid,$store_id,$good[id],$add_type));
+        $row=$db->fetchRow();
+        if($row){//如果已存在，则更新数据
+            
+        }else{
+          
+        }
+    }
+
+}
+elseif ($do == "sales_view") { // 获取销售录入信息
+    $type=$_REQUEST[type]??0;//0独一张/1食维健
+    $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id）
+    if(empty($store_id)||empty($add_goods_list)||!is_array($add_goods_list)){
+        echo '{"code":"500","msg":"关键数据获取失败！"}';
+        exit();
+    }
+    $item_list_tmp = '';
+    foreach ($add_goods_list as $good){
+        $item_list_tmp .= $item_list_tmp ? ",$good[0]" : "$good[0]";
+    }
+    $sql = "select * from rv_goods as g,rv_kucun as k where k.gid=g.id and k.mid=? and k.gid in ($item_list_tmp)";
+    $db->p_e($sql, array($store_id));
+    $goods_list= $db->fetchAll();
+    if ($goods_list) {
+        $store_goods = array();
+        $sql = "select * from rv_goods as g,rv_kucun as k where k.gid=g.id and k.mid=? ";// 获取商品品牌，并获取所属门店的商品 (赠品时用)
+        $db->p_e($sql, array(
+            $store_id
+        ));
+        $store_goods = $db->fetchAll();
+        echo '{"code":"200","goodslist":' . json_encode($goods_list) . ',"store_goods":'.json_encode($store_goods).'}';
         exit();
     }
     echo '{"code":"500","msg":"程序异常，请稍后重试"}';
     exit();
 } elseif ($do == "sales_add") { // 提交销售录入
-    $gid = $_REQUEST['gid']; // 商品id
-    $count = $_REQUEST['count']; // 已选数量
+    $add_goods_list=json_decode($_REQUEST['goods_list'],true);//要入单的商品 （要求商品id,数量,商品类型0是正常商品/1 赠品）
     $total_price = $_REQUEST['total_price']; // 销售总价
+    $sale_price = $_REQUEST['sale_price']??$total_price;//实际自定义的活动价格
     $sex = $_REQUEST['sex'] ?? 1;
-    $address = $_REQUEST['address'] ?? "123";
+    $address = $_REQUEST['address'] ?? "传国医精粹,布健康功德";
     $addtime = date('Y-m-d h:i:s');
-    
     $status = ($user_roleid == 3 || $user_roleid == 1) ? 1 : 0; // 录入状态
-    if (empty($count)) {
-        echo '{"code":"500","msg":"录入数量不能为空！"}';
+    if(empty($add_goods_list)&&!is_array($add_goods_list)){
+        echo '{"code":"500","msg":"商品信息有误"}';
         exit();
     }
     if (empty($_REQUEST['username'])) {
@@ -88,47 +107,67 @@ if ($do == "index") { // 销售录入主页面
         echo '{"code":"500","msg":"手机号码不正确"}';
         exit();
     }
-    $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
-    $db->p_e($sql, array(
-        $gid,
-        $store_id
-    ));
-    $sales_kucun = $db->fetchRow();
-    
-    if ($sales_kucun['kucun'] < $count) {
-        echo '{"code":"500","msg":"对不起，此商品库存不足"}';
-        exit();
-    }
-    
-    $insert_buy = $db->insert(0, 2, "rv_buy", array(
+    foreach ($add_goods_list as $good){//循环全部商品 判断库存
+        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
+        $db->p_e($sql, array(
+            $good[0],
+            $store_id
+        ));
+        $sales_kucun = $db->fetchRow();
+        
+        if ($sales_kucun['kucun'] < $good[1]) {
+            echo '{"code":"500","msg":"对不起，商品库存不足","kucun":"'.$store_id.'"}';
+            exit();
+        }
+    }  
+   $array= array(
         "uid=$uid",
         "mid=$store_id",
-        "gid=$gid",
         "username='$_REQUEST[username]'",
         "sex=$sex",
         "age=$_REQUEST[age]",
         "tel=$_REQUEST[mobile]",
-        "shuliang=$count",
         "addtime='$addtime'",
         "address='$address'",
+        "sale_price=$sale_price",
+        "total_price=$total_price",
+        "status=$status"
+    );
+   echo '{"array":'.json_encode($array).'}';
+   exit();
+    $insert_buy = $db->insert(0, 2, "rv_buy", array(
+        "uid=$uid",
+        "mid=$store_id",
+        "username='$_REQUEST[username]'",
+        "sex=$sex",
+        "age=$_REQUEST[age]",
+        "tel=$_REQUEST[mobile]",
+        "addtime='$addtime'",
+        "address='$address'",
+        "sale_price=$sale_price",
         "total_price=$total_price",
         "status=$status"
     ));
+    
     if ($insert_buy) { // 销售录入插入成功后更新商品库存
+        $sql="INSERT INTO rv_buy_goods (goods_id,buy_id,count,goods_type) VALUES";
+        $item_list_tmp = '';
+        $params = array();
+        foreach($add_goods_list as $good){
+            $item_list_tmp .= $item_list_tmp ? ",(?,?,?,?)" : "(?,?,?,?)";
+            array_push($params,$good[0],$insert_buy,$good[1],$good[2]);
+        }
+        $sql .= $item_list_tmp;
+        $db->p_e($sql, $params);
         if ($user_roleid == 3) { // 如果是店长
-            $new_kuncun = $sales_kucun['kucun'] - $count;
-            if ($db->update(0, 1, "rv_kucun", array(
-                "kucun=$new_kuncun"
-            ), array(
-                "mid=$store_id",
-                "gid=$gid"
-            ))) {
-                echo '{"code":"200","msg":"录入成功"}';
-                exit();
-            } else {
-                echo '{"code":"500","msg":"录入失败,请重试"}';
-                exit();
+            foreach($add_goods_list as $good){
+                $new_kuncun = $sales_kucun['kucun'] - $good[1];
+                $db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array( "mid=$store_id","gid=$good[0]"));
+                  
             }
+            echo '{"code":"200","msg":"录入成功"}';
+            exit();
+            
         } else {
             echo '{"code":"200","msg":"录入成功,请到我的审查中查看"}';
             exit();

@@ -122,7 +122,7 @@ function user($uid)
 function get_time_buy($mid, $start, $end)
 {
     global $db;
-    $sql = "select max(gid),SUM(total_price) as total_price ,g.name,g.money from rv_buy as b,rv_goods as g where b.gid=g.id and mid=? and status=1 and UNIX_TIMESTAMP(b.addtime)  BETWEEN ? AND ?  GROUP BY b.gid limit 5";
+    $sql="select *,(num* money) as total_price from (select bg.id,bg.goods_id,bg.goods_type,g.name,g.money,g.dw,SUM(count) as num from rv_buy_goods as bg,rv_goods as g  where bg.goods_id=g.id and bg.buy_id in(select id from rv_buy where mid=? and status=1 and UNIX_TIMESTAMP(addtime)  BETWEEN ? AND ? ) and bg.goods_type=0 GROUP BY bg.goods_id ) as b ORDER BY num desc LIMIT 5";
     $db->p_e($sql, array(
         $mid,
         $start,

@@ -12,6 +12,11 @@
     <div <{if $row.type==1}> class="icon_chat_right_img" <{else}> class="icon_chat_left_img" <{/if}>>
         <img src="<{$row.content}>" alt="">
     </div>
+    <{elseif $row.content_type==2}>
+    <div class="icon_chat_right_yuyin" path="<{$row.content}>" style="width:<{$row.send_length}>">
+        <span class="yuyin_yyt_r" ></span>
+    </div>
+    <span class="yuyin_time_right"><{$row.time_length}></span>
     <{/if}>
 </div>
 <{/foreach}>

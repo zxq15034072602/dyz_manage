@@ -16,12 +16,18 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
-    $sql = "select b.id,b.uid,b.mid,u.name,b.addtime,b.status,g.dw,g.name as goodname,b.shuliang,u.roleid,b.gid from rv_buy as b,rv_user as u,rv_goods as g where 1=1  and g.id=b.gid and b.uid=u.id and b.mid=?  ";
-    $db->p_e($sql, array(
-        $store_id
     
-    ));
+    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,GROUP_CONCAT(g.goods_id ) as goods_id_list from rv_buy as b ,rv_user as u,rv_buy_goods as g where u.id=b.uid and g.buy_id=b.id GROUP BY b.id and b.mid =?";
+    $db->p_e($sql, array($store_id));
     $verify_list = $db->fetchAll();
+    
+    foreach ($verify_list as &$values){
+        $sql="select g.id,b.count,b.goods_type,g.name,g.money,g.dw,g.good_img from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and b.goods_id in ($values[goods_id_list])";
+        $db->p_e($sql, $arr);
+        $values['goods_list']=$db->fetchAll();
+    }
+    var_dump($verify_list);
+    exit();
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("verify_list", $verify_list);
@@ -30,9 +36,8 @@ if ($do == "input_verify_list") // 销售录入列表页面
     $smt->display('verify_list.html');
     exit();
 } elseif ($do == "agree_i_verify") { // 同意销售录入审核
-    $count = $_REQUEST['count']; // 已选数量
-    $gid = $_REQUEST[gid];
-    if (empty($_REQUEST['bid']) || empty($user_roleid) || empty($count) || empty($gid)) {
+    $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id,数量）
+    if (empty($_REQUEST['bid']) || empty($user_roleid) || empty($add_goods_list) || !is_array($add_goods_list)|| empty($store_id)) {
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
@@ -40,27 +45,26 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"对不起，你不是店长"}';
         exit();
     }
-    $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
-    $db->p_e($sql, array(
-        $gid,
-        $_REQUEST[mid]
-    ));
-    $sales_kucun = $db->fetchRow();
-    if ($sales_kucun['kucun'] < $count) {
-        echo '{"code":"500","msg":"对不起，此商品库存不足"}';
-        exit();
-    }
-    $sql = "update rv_buy set status=1,endtime=now() where id=?";
-    if ($db->p_e($sql, array(
-        $_REQUEST['bid']
-    ))) { // 如果同意成功则，sokect推送数据
-        $new_kuncun = $sales_kucun['kucun'] - $count;
-        $db->update(0, 1, "rv_kucun", array(
-            "kucun=$new_kuncun"
-        ), array(
-            "mid=$_REQUEST[mid]",
-            "gid=$gid"
+    foreach ($add_goods_list as $good){//循环全部商品 判断库存
+        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
+        $db->p_e($sql, array(
+            $good[0],
+            $store_id
         ));
+        $sales_kucun = $db->fetchRow();
+        if ($sales_kucun['kucun'] < $good[1]) {
+            echo '{"code":"500","msg":"对不起，商品库存不足"}';
+            exit();
+        }
+    }  
+    $sql = "update rv_buy set status=1,endtime=now() where id=?";
+    if ($db->p_e($sql, array($_REQUEST['bid']))) { // 如果同意成功则，sokect推送数据
+        $new_kuncun = $sales_kucun['kucun'] - $count;
+        foreach($add_goods_list as $good){
+            $new_kuncun = $sales_kucun['kucun'] - $good[1];
+            $db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array( "mid=$store_id","gid=$good[0]"));
+        
+        }
         $cont = array(
             "time" => date('m月d日 H:i'),
             "msg" => "你好，你的录入申请已经通过审核"
