@@ -65,7 +65,7 @@ if($do == "send_voice"){//发送语音（单聊）
     );
     $cont = json_encode($cont);
     $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content,local_url,time_length,send_length,content_type) values(?,?,?,?,?,?,2)";
-    if ($db->p_e($sql, array($uid,$gid, $amr))) { // 成功后像socket 服务端推送数据
+    if ($db->p_e($sql, array($uid,$gid, $amr,$local_url,$time_length,$send_length))) { // 成功后像socket 服务端推送数据
         to_msg(array('type' => 'sixin_to_groups','cont' => $cont,'to' => $groups_room)); // 推送消息
         echo '{"code":"200","url":"' . $file_url . '","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '"}';
         exit();
