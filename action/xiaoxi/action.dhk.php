@@ -3,8 +3,8 @@ if (! defined('CORE'))
     exit("error!");
 // 对话框
 if ($do == "dhk") {
-    $uid = $_POST['uid'];
-    $id = $_POST['id'];
+    $uid = $_REQUEST['uid'];
+    $id = $_REQUEST['id'];
     // 变已读
     $sql = "update rv_xiaoxi set is_du=1 where 1=1 and uid=? and toid=?";
     $db->p_e($sql, array(

@@ -4,7 +4,7 @@
     <{foreach from=$good.goods item=g}>
 	<li value="<{$g.gid}>">
 		<div class="productBox_qty">
-			<div class="productName_qty"><{$g.name|truncate:6:""}></div>
+			<div class="productName_qty"><{$g.name|truncate:5:""}></div>
 			<div class="productMoney_qty"><{$g.money}> <span>(￥)</span></div>
 			<div class="productImg_qty">
 				<img src="http://app.duyiwang.cn/<{$g.good_img}>" alt="">

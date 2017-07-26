@@ -120,21 +120,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
             exit();
         }
     }  
-   $array= array(
-        "uid=$uid",
-        "mid=$store_id",
-        "username='$_REQUEST[username]'",
-        "sex=$sex",
-        "age=$_REQUEST[age]",
-        "tel=$_REQUEST[mobile]",
-        "addtime='$addtime'",
-        "address='$address'",
-        "sale_price=$sale_price",
-        "total_price=$total_price",
-        "status=$status"
-    );
-   echo '{"array":'.json_encode($array).'}';
-   exit();
+   
     $insert_buy = $db->insert(0, 2, "rv_buy", array(
         "uid=$uid",
         "mid=$store_id",

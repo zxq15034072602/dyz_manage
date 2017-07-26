@@ -26,8 +26,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
         $db->p_e($sql, $arr);
         $values['goods_list']=$db->fetchAll();
     }
-    var_dump($verify_list);
-    exit();
+    
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("verify_list", $verify_list);

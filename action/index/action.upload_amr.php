@@ -26,7 +26,7 @@ if($do == "send_voice"){//发送语音（单聊）
     $local_url=$_REQUEST["local_url"];
     $time_length=$_REQUEST['time_length'];
     $send_length=$_REQUEST['send_length'];
-    $cont = array('lx' => 2,'nr' => $file_url, 'time' => date('m月d日 H:i'), 'time_length'=>$time_length,'send_length'=>$send_length);
+    $cont = array('lx' =>2,'nr' => $file_url, 'time' => date('m月d日 H:i'), 'time_length'=>$time_length,'send_length'=>$send_length);
     $cont = json_encode($cont);
     $sql = "insert into rv_xiaoxi(uid,toid,content,local_url,time_length,send_length,content_type,type,status,is_du) values(?,?,?,?,?,?,2,1,1,1)";
     if ($db->p_e($sql, array( $uid,$toid,$amr,$local_url,$time_length,$send_length))) {
@@ -55,7 +55,7 @@ if($do == "send_voice"){//发送语音（单聊）
         "gu_uid=$uid"
     ), "gu_id desc");
     $cont = array(
-        'lx' => 2,
+        'lx' =>2,
         'nr' => $file_url,
         'time' => date('m月d日 H:i'),
         "from_id" => $uid,
