@@ -237,8 +237,11 @@ if ($do == "userinfo") { // 用户中心个人信息
         $uid
     ));
     $info=$db->fetchAll();
+    $sql = "select  max(status) status from rv_verify where 1=1 and uid=? ";
+    $db->p_e($sql, array($uid));
+    $verify_status=$db->fetchRow();
     if(!empty($info)){
-        echo '{"code":"200","info":'.json_encode($info).'}';
+        echo '{"code":"200","info":'.json_encode($info).',"status":'.json_encode($verify_status).'}';
         exit();
     }else{
         echo '{"code":"500"}';

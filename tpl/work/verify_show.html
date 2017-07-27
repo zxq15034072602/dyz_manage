@@ -1,58 +1,69 @@
 <{if $flag == "show_i_verify"}>
-<div class="applyBox_qty">
-	<div class="applySmall_qty">
-		<div class="apply_qty">
-			<div class="applyLeft_qty">所在门店</div>
-			<div class="applyRightFont_qty"><{$verify_info.mdname}></div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeft_qty">审批内容</div>
-			<div class="applyRightFont_qty"><{$verify_info.name}>销售了<{$verify_info.goodname}><{$verify_info.shuliang}><{$verify_info.dw}></div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeft_qty">开始时间</div>
-			<div class="applytime_qty"><{$verify_info.addtime}></div>
-		</div>
-		<div class="apply_qty">
-			<div class="applyLeft_qty">结束时间</div>
-			<div class="applytime_qty"><{if
-				$verify_info.endtime}><{$verify_info.endtime}><{else}>暂未结束<{/if}></div>
-		</div>
-	</div>
+<div class="review_con_zn">
+    <p class="review_title_zn">
+        <span class="review_title_man">录入人员</span>
+        <span class="review_man"><{$verify_info.name}></span>
+    </p>
+    <div class="review_con">
+        <p class="review_con_title">审批内容</p>
+        <div class="review_con_box">
+            <ul class="product_con_zn">
+                <{foreach from=$verify_info.goods item=good}>
+                 <{if $good.goods_type == 0}>
+                <li class="product_list_zn">
+                    <span><{$good.name}></span>
+                    <span>数量<{$good.count}></span>
+                    <span>总价￥<{$good.count*$good.money}></span>
+                </li>
+                <{/if}>
+                <{/foreach}>
+            </ul>
+           
+            <p class="present_zn">赠品:</p>
+            <ul class="present_con_zn">
+                 <{foreach from=$verify_info.goods item=good}>
+                 <{if $good.goods_type == 1}>
+                <li class="product_list_zn">
+                    <span><{$good.name}></span>
+                    <span>数量<{$good.count}></span>
+                    <span>总价￥<{$good.count*$good.money}></span>
+                </li>
+                <{/if}>
+                <{/foreach}>
+            </ul>
+            
+            <p class="real_price_zn"><span>实际收款额：</span><span>￥<{$verify_info.total_price}></span></p>
+        </div>
+    </div>
+    <p class="time_zn">
+        <span class="review_title_man">录入时间</span>
+        <span class="review_man"><{$verify_info.addtime}></span>
+    </p>
 </div>
-<div class="teleBox_qty">
-	<div class="teleSmall_qty">
-		<div class="teleSmallBox_qty">
-			<div class="teleImg_qty">
-				<img src="../../image/img_qty/auditBg_03.png">
-			</div>
-			<div class="teleRightFont_qty"><{$verify_info.name}>发起了审批申请</div>
-
-		</div>
-		<div class="teleSmallBox_qty">
-			<div class="teleImg_qty">
-				<img src="../../image/img_qty/auditBg_03.png">
-			</div>
-			<div class="teleRightFont_qty tele_qty">等待店长审批</div>
-			<{if $verify_info.status ==0}>
-			<div class="teleImg_qty_qty">
-				<img src="../../image/img_qty/dui_03.png" alt="">
-			</div>
-			<{/if}>
-		</div>
-		<div class="teleSmallBox_qty">
-			<div class="teleImg_qty">
-				<img src="../../image/img_qty/auditBg_03.png">
-			</div>
-			<div class="teleRightFont_qty tele_qty">审批结束</div>
-			<{if $verify_info.status ==1 or $verify_info.status ==2}>
-			<div class="teleImg_qty_qty">
-				<img src="../../image/img_qty/dui_03.png" alt="">
-			</div>
-			<{/if}>
-		</div>
-	</div>
-</div>
+<ul class="wait_for_man">
+    <li class="wait_for_list">
+        <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
+        <p class="man_review_zn"><{$verify_info.name}>发起了审批申请</p>
+        <div class="preview_con_zn">
+        </div>
+    </li>
+    <li class="wait_for_list">
+        <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
+        <p class="man_review_zn">等待店长审批</p>
+         <{if $verify_info.status ==0}>
+         <div class="preview_con_zn hide_zn">
+        <{/if}>
+        </div>
+    </li>
+    <li class="wait_for_list">
+        <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
+        <p class="man_review_zn">审批结束</p>
+        <{if $verify_info.status ==1 or $verify_info.status ==2}>
+         <div class="preview_con_zn hide_zn">
+        <{/if}>
+        </div>
+    </li>
+</ul>
 <{elseif $flag == "show_p_verify"}>
 <div class="applyBox_qty">
 	<div class="applySmall_qty">

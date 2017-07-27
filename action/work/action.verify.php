@@ -17,14 +17,15 @@ if ($do == "input_verify_list") // 销售录入列表页面
         exit();
     }
     
-    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,GROUP_CONCAT(g.goods_id ) as goods_id_list from rv_buy as b ,rv_user as u,rv_buy_goods as g where u.id=b.uid and g.buy_id=b.id GROUP BY b.id and b.mid =?";
+    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price,GROUP_CONCAT(g.goods_id ) as goods_id_list from rv_buy as b ,rv_user as u,rv_buy_goods as g where u.id=b.uid and g.buy_id=b.id GROUP BY b.id and b.mid =?";
     $db->p_e($sql, array($store_id));
     $verify_list = $db->fetchAll();
     
     foreach ($verify_list as &$values){
-        $sql="select g.id,b.count,b.goods_type,g.name,g.money,g.dw,g.good_img from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and b.goods_id in ($values[goods_id_list])";
+        $sql="select g.id,b.count from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and b.goods_id in ($values[goods_id_list])";
         $db->p_e($sql, $arr);
         $values['goods_list']=$db->fetchAll();
+        $values['js_goods_list']=json_encode($values['goods_list']);
     }
     
     $smt = new Smarty();
@@ -113,12 +114,17 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }
-    $sql = "select b.id,b.uid,b.mid,u.name,b.addtime,b.endtime,b.status,g.name as goodname,b.shuliang,m.name as mdname,g.dw from rv_buy as b,rv_user as u,rv_goods as g,rv_mendian as m where 1=1   and b.mid =m.id and g.id=b.gid and b.uid=u.id and b.id=?
-";
+    $sql ="select b.id,b.uid,b.mid,b.addtime,b.endtime,u.name,b.status,b.total_price,b.sale_price,GROUP_CONCAT(bg.goods_id) as goods_id from rv_buy as b,rv_buy_goods as bg,rv_user as u where b.id=bg.buy_id and b.uid=u.id and b.id=?";
     $db->p_e($sql, array(
         $vid
     ));
     $verify_info = $db->fetchRow();
+    if($verify_info){
+        $sql="select * from rv_buy_goods as bg, rv_goods as g where bg.goods_id=g.id and bg.goods_id in ($verify_info[goods_id])";
+        $db->p_e($sql, array());
+        $verify_info['goods']=$db->fetchAll();
+    }
+    
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("verify_info", $verify_info);

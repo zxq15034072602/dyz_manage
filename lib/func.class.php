@@ -18,6 +18,7 @@ function smarty_cfg($self)
     $self->setTemplateDir('./tpl/' . $dir . '/');
     $self->setCompileDir('./tmp/compile/' . $dir . '/');
     $self->setCacheDir('./tmp/cache/' . $dir . '/');
+    
 }
 
 function isLogin()
