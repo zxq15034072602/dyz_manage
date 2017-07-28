@@ -10,7 +10,7 @@
     </div>
     <{elseif $row.content_type==1}>
     <div <{if $row.type==1}> class="icon_chat_right_img" <{else}> class="icon_chat_left_img" <{/if}>>
-        <img src="<{$row.content}>" alt="">
+        <img src="<{$row.content}>" alt="" path="<{$row.content}>">
     </div>
     <{elseif $row.content_type==2}>
     <div <{if $row.type==1}>class="icon_chat_right_yuyin"<{else}>class="icon_chat_left_yuyin"<{/if}> path="<{$row.content}>" style="width:<{$row.send_length}>">
