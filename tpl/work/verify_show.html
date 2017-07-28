@@ -11,7 +11,7 @@
                 <{foreach from=$verify_info.goods item=good}>
                  <{if $good.goods_type == 0}>
                 <li class="product_list_zn">
-                    <span><{$good.name}></span>
+                    <span><{$good.name|truncate:7:""}></span>
                     <span>数量<{$good.count}></span>
                     <span>总价￥<{$good.count*$good.money}></span>
                 </li>
@@ -24,7 +24,7 @@
                  <{foreach from=$verify_info.goods item=good}>
                  <{if $good.goods_type == 1}>
                 <li class="product_list_zn">
-                    <span><{$good.name}></span>
+                    <span><{$good.name|truncate:7:""}></span>
                     <span>数量<{$good.count}></span>
                     <span>总价￥<{$good.count*$good.money}></span>
                 </li>
@@ -44,14 +44,13 @@
     <li class="wait_for_list">
         <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
         <p class="man_review_zn"><{$verify_info.name}>发起了审批申请</p>
-        <div class="preview_con_zn">
         </div>
     </li>
     <li class="wait_for_list">
         <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
         <p class="man_review_zn">等待店长审批</p>
          <{if $verify_info.status ==0}>
-         <div class="preview_con_zn hide_zn">
+         <div class="preview_con_zn ">
         <{/if}>
         </div>
     </li>
@@ -59,7 +58,7 @@
         <img src="../../image/image_zn/man_pic_01_zn.png" alt="">
         <p class="man_review_zn">审批结束</p>
         <{if $verify_info.status ==1 or $verify_info.status ==2}>
-         <div class="preview_con_zn hide_zn">
+         <div class="preview_con_zn">
         <{/if}>
         </div>
     </li>

@@ -17,7 +17,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
         exit();
     }
     
-    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price ,(select sum(count) from rv_buy_goods where buy_id=b.id) as num from rv_buy as b ,rv_user as u WHERE  b.uid=u.id and  b.mid=?";
+    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price ,(select sum(count) from rv_buy_goods where buy_id=b.id) as num from rv_buy as b ,rv_user as u WHERE  b.uid=u.id and  b.mid=? order by b.addtime desc";
     $db->p_e($sql, array($store_id));
     $verify_list = $db->fetchAll();
     
@@ -59,7 +59,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
     }  
     $sql = "update rv_buy set status=1,endtime=now() where id=?";
     if ($db->p_e($sql, array($_REQUEST['bid']))) { // 如果同意成功则，sokect推送数据
-        $new_kuncun = $sales_kucun['kucun'] - $count;
+        
         foreach($add_goods_list as $good){
             $new_kuncun = $sales_kucun['kucun'] - $good[1];
             $db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array( "mid=$store_id","gid=$good[0]"));
@@ -120,8 +120,8 @@ if ($do == "input_verify_list") // 销售录入列表页面
     ));
     $verify_info = $db->fetchRow();
     if($verify_info){
-        $sql="select * from rv_buy_goods as bg, rv_goods as g where bg.goods_id=g.id and bg.goods_id in ($verify_info[goods_id])";
-        $db->p_e($sql, array());
+        $sql="select * from rv_buy_goods as bg, rv_goods as g where bg.goods_id=g.id and bg.goods_id and buy_id=?";
+        $db->p_e($sql, array($verify_info[id]));
         $verify_info['goods']=$db->fetchAll();
     }
     
