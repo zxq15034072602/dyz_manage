@@ -17,13 +17,13 @@ if ($do == "input_verify_list") // 销售录入列表页面
         exit();
     }
     
-    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price,GROUP_CONCAT(g.goods_id ) as goods_id_list from rv_buy as b ,rv_user as u,rv_buy_goods as g where u.id=b.uid and g.buy_id=b.id GROUP BY b.id and b.mid =?";
+    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price ,(select sum(count) from rv_buy_goods where buy_id=b.id) as num from rv_buy as b ,rv_user as u WHERE  b.uid=u.id and  b.mid=?";
     $db->p_e($sql, array($store_id));
     $verify_list = $db->fetchAll();
     
     foreach ($verify_list as &$values){
-        $sql="select g.id,b.count from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and b.goods_id in ($values[goods_id_list])";
-        $db->p_e($sql, $arr);
+        $sql="select g.id,b.count from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and buy_id=?";
+        $db->p_e($sql, array($values[id]));
         $values['goods_list']=$db->fetchAll();
         $values['js_goods_list']=json_encode($values['goods_list']);
     }

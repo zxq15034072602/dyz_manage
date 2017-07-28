@@ -7,7 +7,7 @@
 	<div class="shWatch_yyt" onclick="open_verify(<{$list.id}>)">查看</div>
 	<div class="shXiang_yyt">
 		<div class="shXiang_yyt_name">录入详情</div>
-		<div class="shXiang_con_yyt"><{$list.name}>销售了<{count($list.goods_list)}>件商品 ，总价￥<{$list.sale_price}></div>
+		<div class="shXiang_con_yyt"><{$list.name}>销售了<{$list.num}>件商品 ，总价￥<{$list.sale_price}></div>
 	</div>
 	<div class="shTime_yyt"><{$list.addtime}></div>
 	<{if $list.status ==0}>
