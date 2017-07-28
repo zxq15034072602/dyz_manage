@@ -53,7 +53,7 @@ if($do == "send_voice"){//发送语音（单聊）
     $send_name = $db->select(0, 1, "rv_user", "name", array(
         "id=$uid"
        
-    ), "gu_id desc");
+    ), "id desc");
     $cont = array(
         'lx' =>2,
         'nr' => $file_url,
