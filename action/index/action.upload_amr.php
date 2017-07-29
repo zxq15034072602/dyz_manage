@@ -59,7 +59,7 @@ if($do == "send_voice"){//发送语音（单聊）
         'nr' => $file_url,
         'time' => date('m月d日 H:i'),
         "from_id" => $uid,
-        "send_name" =>$send_name[gu_group_nick],
+        "send_name" =>$send_name[name],
         'time_length'=>$time_length,
         'send_length'=>$send_length
     );
