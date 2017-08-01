@@ -17,7 +17,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
         exit();
     }
     
-    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price ,(select sum(count) from rv_buy_goods where buy_id=b.id) as num from rv_buy as b ,rv_user as u WHERE  b.uid=u.id and  b.mid=? order by b.addtime desc";
+    $sql="select b.id,b.uid,b.mid,b.addtime,b.status,u.name,u.roleid,b.total_price,b.sale_price ,(select sum(count) from rv_buy_goods where buy_id=b.id) as num from rv_buy as b ,rv_user as u WHERE  b.uid=u.id and  b.mid=? order by b.id desc";
     $db->p_e($sql, array($store_id));
     $verify_list = $db->fetchAll();
     
