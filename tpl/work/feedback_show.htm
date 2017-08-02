@@ -7,7 +7,7 @@
             <span><{$quse.name}>的提问</span>
         </p>
         <div class="question_describe_zn">
-            <{$quse.content}>
+            <{$quse.content|truncate:60}>
         </div>
 		<{if $quse.answer===false}>
 		<p class="bigDcheng_answer_title"></p>
