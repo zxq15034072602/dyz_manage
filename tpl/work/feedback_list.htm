@@ -1,0 +1,68 @@
+   
+    <div class="questionDetailBox_qty">
+     <{foreach from=$qArr item=question}>
+    	<div class="questionDetailSmallBox_qty">
+    		<div class="questionAppBox_qty">
+    			<span class="color_qty"></span>
+    			<{if $question.type==0}>APP使用<{else}>门店运营<{/if}>
+    		</div>
+    		<div class="comeQuestionBox_qty">
+    			<span class="comeWho_qty">来自<{$question.name}>的提问</span>
+    			<span class="time_qty"><{$question.addtime}></span>
+    		</div>
+    		<div class="questionBoxFont_qty">
+    			<{$question.content}>
+    		</div>
+    	</div>    	
+    	<{/foreach}>
+    	<div class="anwserBox_qty">回答</div>
+    	<div class="input_box_zn">
+			<input type="text">
+			<span class="click_send_zn">发送</span>
+		</div>
+    </div>
+    
+        <div class="listQuestion_qty">
+    	<ul>
+    	 <{foreach from=$aArr item=answer}>
+    		<li>
+    			<div class="whoQuestion_qty"><{$answer.name}>的回答</div>
+    			<div class="whoQuestionFont_qty">
+					<{$answer.content}>
+    			</div>
+    			<div class="helpBox_qty">
+    				<div class="helpLeftBox_qty">
+						<{if $answer.greet==false}>
+						<span class="helpBtn_qty" aid="<{$answer.aid}>"><img src="../../image/img_qty/help_qty_03.png" alt=""></span>  					
+    					<span class="helpFont_qty">赞同</span>
+    					<{elseif $answer.greet.status==1}>
+    					<span class="helpBtn_qty" aid="<{$answer.aid}>"><img src="../../image/img_qty/helpColor_qty_03.png" alt=""></span>  					
+    					<span class="helpFont_qty">已赞同</span>
+    					<{else}>
+    					<span class="helpBtn_qty" aid="<{$answer.aid}>"><img src="../../image/img_qty/help_qty_03.png" alt=""></span>  					
+    					<span class="helpFont_qty">赞同</span>
+    					<{/if}>
+    				</div>
+    				<div class="helpRightBox_qty">
+    					<div class="infoImg_qty"></div>
+    					<span class="helpFont_qty">回复</span>
+    				</div>
+    				<div class="inputBox_qty">
+    					<input type="text" name="" id="">
+    					<div class="sendFont_qty" aid="<{$answer.aid}>">发送</div>
+    				</div>
+    			</div>
+				<dl class="comment_zn">
+					<dd>
+						<{foreach from=$answer.reply item=reply}>
+						<div class="replySmall_qty">
+		    				<div class="replyName_qty"><{$reply.name}>的回复：</div>
+		    				<div class="replyFont_qty"><{$reply.content}></div>
+		    			</div>
+						<{/foreach}>
+					</dd>
+				</dl>    		
+    		</li>
+ 		<{/foreach}>
+    	</ul>
+    </div>
