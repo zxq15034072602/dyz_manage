@@ -1,0 +1,49 @@
+<{foreach from=$question item=quse}>
+<li class="question_list_zn" qid="<{$quse.id}>">
+    <div class="question_list_box">
+    	<p class="question_type_zn"><{if $quse.type==0}>APP使用<{else}>门店运营<{/if}></p>
+        <p class="xiaojing_question_title">        
+            <img src="../../image/image_zn/user_title_zn.png" alt="">
+            <span><{$quse.name}>的提问</span>
+        </p>
+        <div class="question_describe_zn">
+            <{$quse.content}>
+        </div>
+		<{if $quse.answer===false}>
+		<p class="bigDcheng_answer_title"></p>
+		<div class="bigDcheng_answer_con"></div>
+		<{else}>
+        <p class="bigDcheng_answer_title"><{$quse.answer.name}>的回答：</p >
+        <div class="bigDcheng_answer_con"><{$quse.answer.content|truncate:60}>
+ 		</div>
+ 		<{/if}>
+ 		 <hr class="hr_zn">
+        <div class="follow_with_interest">
+            <p class="interset_left_zn">
+            	<{if $quse.guanzhu==false}>
+				<img src="../../image/image_zn/like_gray_zn.png" alt="" class="like_or_no">			
+				<span class="none_interset_zn interset_zn" qid="<{$quse.id}>">未关注</span>
+				<{elseif $quse.guanzhu.status==1}>
+				<img src="../../image/image_zn/like_red_zn.png" alt="" class="like_or_no">	
+				<span class="none_interset_zn interset_zn" qid="<{$quse.id}>">关注</span>			
+				<{else}>
+				<img src="../../image/image_zn/like_gray_zn.png" alt="" class="like_or_no">  					
+				<span class="none_interset_zn interset_zn" qid="<{$quse.id}>">未关注</span>
+				<{/if}>
+				<span class="num_interset_zn num_interset_zn_zn"><{$quse.guanzhunum.count}></span>
+            </p>
+            <p class="answer_right_zn">
+                <img src="../../image/image_zn/message_zn.png" alt="" class="click_input_zn">
+       
+                <span class="none_interset_zn answer_zn">回答</span>
+                <span class="num_interset_zn"><{$quse.answernum.hdnum}>人回答</span>
+            </p >
+        </div>	
+        <div class="inputBox_qty">
+            <input type="text" name="" id="">
+            <div class="sendFont_qty"  qid="<{$quse.id}>">发送</div>
+        </div>
+    </div>	
+</li>
+<{/foreach}>
+<input type="hidden" value="<{$total}>">
