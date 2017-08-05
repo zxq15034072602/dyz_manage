@@ -1,0 +1,14 @@
+ <ul class="reply_box_zn">
+ <{foreach from=$rArr item=reply}>
+  <li class="reply_list_zn" aid="<{$reply.aid}>">
+        <div class="reply_title_zn">
+            <img src="../../image/image_zn/reply_img_zn.png" alt="">
+            <span class="reply_name_zn"><{$reply.name}></span>
+            <span class="reply_time_zn"><{$reply.addtime}></span>
+        </div>
+        <p class="reply_con_zn">
+			<{$reply.content}>
+        </p>
+    </li>
+ <{/foreach}>
+ </ul>
