@@ -1,6 +1,6 @@
 <{foreach from=$question item=quse}>
-<li class="question_list_zn">
-        <div class="question_list_box">
+<li class="question_list_zn" id="<{$quse.uid}>">
+        <div class="question_list_box" >
             <p class="question_type_zn"><{if $quse.type==0}>APP使用<{else}>门店运营<{/if}></p>
             <p class="xiaojing_question_title" qid="<{$quse.id}>">
                 <img src="../../image/image_zn/user_title_zn.png" alt="">
