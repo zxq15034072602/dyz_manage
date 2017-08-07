@@ -110,7 +110,7 @@ if ($do == "question") {//提问
        $value['greet']=$db->fetchRow();
        //赞同数
        $value['agreenum']=$value['agreenum']??0;
-       $sql="select count(*) as count from rv_answer_greet where aid=$value[aid]";
+       $sql="select count(*) as count from rv_answer_greet where aid=$value[aid] and status=1";
        $db->p_e($sql, array());
        $value['ztnum']=$db->fetchRow();
        //回复的数量
@@ -160,7 +160,7 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回答内容不能为空"}';
         exit();
     }
-    $sql="select addtime from rv_answer where 1=1 and uid=? order by id desc";
+    /*$sql="select addtime from rv_answer where 1=1 and uid=? order by id desc";
     $db->p_e($sql, array(
         $uid
     ));
@@ -171,7 +171,7 @@ if ($do == "question") {//提问
             echo '{"code":"500","msg":"对不起，不要频繁提交"}';
             exit();
         }
-    }
+    }*/
     $addtime = date("Y-m-d H:i:s");
     if ($db->insert(0, 2, "rv_answer", array(
         "uid=$uid",
@@ -199,7 +199,7 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回复内容不能为空"}';
         exit();
     }
-    $sql="select addtime from rv_answer_reply where 1=1 and uid=? order by id desc";
+   /* $sql="select addtime from rv_answer_reply where 1=1 and uid=? order by id desc";
     $db->p_e($sql, array(
         $uid
     ));
@@ -211,6 +211,7 @@ if ($do == "question") {//提问
             exit();
         }
     }
+    */
     $addtime = date("Y-m-d H:i:s");
     if($db->insert(0, 2, "rv_answer_reply", array(
         "uid=$uid",
