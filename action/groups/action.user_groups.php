@@ -68,7 +68,7 @@ if ($do == "add_groups") {
             $gid
         ));
         $groups_users_count = $db->fetch_count();
-        $groups_info = json_encode($db->select(0, 1, "rv_users_groups", "ug_name,ug_notice", array(
+        $groups_info = json_encode($db->select(0, 1, "rv_users_groups", "ug_name,ug_notice,ug_img", array(
             "ug_id = $gid"
         ), ' ug_id desc')); // 群聊信息
         echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '"}';
@@ -109,6 +109,15 @@ if ($do == "add_groups") {
                 echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[notice] . '"}';
                 exit();
             }
+        }elseif($flag=='groups_pic'){//修改群头像
+            if($db->update(0, 1, "rv_users_groups", array(
+                "ug_img='$_REQUEST[ug_img]'"
+            ),array(
+                "ug_id=$gid"
+            ))){
+                echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[ug_img] . '"}';
+                exit();
+            }
         }
     }
     echo '{"code":"500","msg":"修改失败"}';
@@ -140,6 +149,12 @@ if ($do == "add_groups") {
 } elseif ($do == "qldhk") { // 群聊对话框
     $gid = $_REQUEST['gid']; // 群聊id
     $uid = $_REQUEST['uid']; // 用户id
+
+     //分页
+    $pagenum = 15;
+    $page = $_REQUEST['page'] ?? 1;
+    $page = ($page - 1) * $pagenum;
+
     if ($gid && $uid) {
         // 变已读
         $sql = "update rv_groups_msg_details set is_du=1 where 1=1 and guid=? and gid=?";
@@ -147,12 +162,27 @@ if ($do == "add_groups") {
             $uid,
             $gid
         ));
-        $sql = "select *,date_format(addtime,'%m月%d日 %H:%i') as addtime1 from rv_groups_xiaoxi where 1=1 and togid =?";
+        $sql = "select *,date_format(addtime,'%m月%d日 %H:%i') as addtime1 from rv_groups_xiaoxi where 1=1 and togid =? order by id desc limit " . $page . "," . $pagenum;
         
         $db->p_e($sql, array(
             $gid
-        ));
+        ));       
         $qdh = $db->fetchAll();
+         $sort = array(
+         'direction' => 'SORT_ASC', //排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
+         'field'     => 'id',       //排序字段
+        );
+        $arr=array();
+        foreach($qdh as $k=>$v){
+            foreach($v as $kk=>$vv){
+                $arr[$kk][$k]=$vv;
+            }
+        }
+        if($sort['direction']){
+            array_multisort($arr[$sort['field']],constant($sort['direction']),$qdh);
+        }
+        $total = $db->fetch_count();
+        $total = ceil($total / $pagenum);
         foreach ($qdh as $key => &$value) {
             $value['from_uid'] == $uid ? $qdh[$key]['type'] = 1 : $qdh[$key]['type'] = 2; // 获取是收消息or发消息
             $qdh[$key]['from'] = user($value['from_uid']); // 获取发消息人
@@ -161,6 +191,7 @@ if ($do == "add_groups") {
         $smt = new smarty();
         smarty_cfg($smt);
         $smt->assign('qdh', $qdh);
+        $smt->assign('total', $total);
         $smt->display('qdhk.html');
         exit();
     }
@@ -168,6 +199,7 @@ if ($do == "add_groups") {
     $uid = $_REQUEST['uid'];
     $gid = $_REQUEST['gid'];
     $groups_room = $_REQUEST['groups_room'];
+
     $at_user_ids = $_REQUEST['at_user_ids'];
     $txt = $_REQUEST['txt'];
     $nowtime = date('m月d日 H:i');
@@ -175,29 +207,40 @@ if ($do == "add_groups") {
         "gu_gid=$gid",
         "gu_uid=$uid"
     ), "gu_id desc");
+    $sql="select head_img from rv_user where id=?";
+    $db->p_e($sql, array(
+        $uid
+    ));
+    $head=$db->fetchRow();
+    $head_img=$head['head_img'];
+    $last_id=$db->insert(0, 2, "rv_groups_xiaoxi", array(
+        "from_uid='$uid'",
+        "togid='$gid'",
+        "content='$txt'",
+        "content_type=0",
+        "at_user_ids='$at_user_ids'"
+    ));
     $cont = array(
+        'sj'=>0,
         'lx' => 0,
         'nr' => $txt,
         'time' => date('m月d日 H:i'),
         "from_id" => $uid,
         "send_name" => $send_name[gu_group_nick],
         "at_user_ids" => $at_user_ids,
-        "gid" => $gid
+        "gid" => $gid,
+        "head_img"=>$head_img,
+        'xid'=>$last_id,
+        "groups_room"=>$groups_room
     );
     $cont = json_encode($cont);
-    $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content,content_type,at_user_ids) values(?,?,?,0,?)";
-    if ($db->p_e($sql, array(
-        $uid,
-        $gid,
-        $txt,
-        $at_user_ids
-    ))) { // 成功后像socket 服务端推送数据
+    if($last_id){
         to_msg(array(
             'type' => 'sixin_to_groups',
             'cont' => $cont,
             'to' => $groups_room
         )); // 推送消息
-        echo '{"code":"200","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '"}';
+        echo '{"code":"200","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '","head_img":"'.$head_img.'","xid":"'.$last_id.'"}';
         exit();
     }
     echo '{"code":"500"}';
@@ -209,6 +252,7 @@ if ($do == "add_groups") {
         $uid
     ));
     $gids = $db->fetchAll();
+    
     if ($gids) {
         echo '{"code":"200","groups_gids":' . json_encode($gids) . '}';
         exit();
@@ -296,5 +340,41 @@ if ($do == "add_groups") {
             "gid=21 ",
             "kucun=100"
         ));
+    }
+}elseif($do=='del_groups_xiaoxi'){
+    $id=$_REQUEST['xid'];
+    $uid=$_REQUEST['uid'];
+    $gid=$_REQUEST['gid'];
+    $groups_room = $_REQUEST['groups_room'];
+    $cont=array(
+        'sj'=>1,
+        'xid'=>$id
+    );
+    $cont=json_encode($cont);
+    //查询群消息表用户id进行比对
+    $sql="select from_uid from rv_groups_xiaoxi where id=?";
+    $db->p_e($sql, array(
+        $id
+    ));
+    $userid=$db->fetchRow();
+
+    if(!empty($uid) && !empty($gid) && !empty($id) && $uid==$userid['from_uid']){
+        $sql="delete from rv_groups_xiaoxi where 1=1 and id=? and from_uid=? and togid=? ";
+        if($db->p_e($sql, array(
+            $id,
+            $uid,
+            $gid
+        ))){
+            to_msg(array(
+                'type'=>'sixin_to_groups',
+                'cont'=>$cont,
+                'to'=>$groups_room
+            ));
+            echo '{"code":"200","msg":"撤回消息成功"}';
+            exit();
+        }
+    }else{
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
     }
 }

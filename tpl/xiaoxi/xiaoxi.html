@@ -3,7 +3,8 @@
 <{if $row.xiaoxi or $row.admin}>
 <li onclick="open_chat(<{$row.ug_id}>)">
     <div class="groupImg_qty">
-        <img src="../../image/img_qty/head.jpg" alt="">
+       <{if $row.ug_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+        <img src="../../image/header_picture/<{$row.ug_img}>" alt=""><{/if}>
         <{if $row.weidu}>
         <div class="math_qty"><{$row.weidu}></div>
         <{/if}>
@@ -16,9 +17,11 @@
             <{if $row.xiaoxi}>
             <div class="groupB_qty">
             <{if $row.xiaoxi.content_type==0}>
-            <{$row.xiaoxi.from_name}> : <{$row.xiaoxi.content|truncate:18}>
-            <{else}>
+            <{$row.xiaoxi.from_name}> : <{$row.xiaoxi.content|truncate:14}>
+            <{elseif  $row.xiaoxi.content_type==1}>
             <{$row.xiaoxi.from_name}>发了一张图片
+            <{elseif  $row.xiaoxi.content_type==2}>
+            <{$row.xiaoxi.from_name}>发了一条语音
             <{/if}>
             </div>
            <{/if}>
@@ -34,7 +37,9 @@
 <{foreach from=$xiaoxi item=row}>
 <li onclick="talk_about(<{$row.user.id}>)">
     <div class="groupImg_qty">
-        <img src="../../image/img_qty/head.jpg" alt="">
+          <{if $row.user.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+        <img src="../../image/header_picture/<{$row.user.head_img}>" alt="">
+        <{/if}>
         <{if $row.weidu}><div class="math_qty"><{$row.weidu}></div><{/if}>
     </div>
     <div class="groupChartBox_qty">

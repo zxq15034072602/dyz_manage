@@ -12,8 +12,16 @@
 			<span class="comeWho_qty">来自<{$question.name}>的提问</span>
 			<span class="time_qty"><{$question.addtime}></span>
 		</div>
+		<p class="answer_right_zn_zn">
+			<span class="num_interset_zn_zn">回答</span>
+			<span class="click_big_zn_zn"><img src="../../image/image_zn/message_zn.png" alt="" class="click_input_zn"></span>
+		</p>
 	</div>
 	<{/foreach}>
+	<div class="click_shuru_zn_zn">
+		<input type="text" class="value_zn_zn" placeholder="请输入您的回答">
+		<span class="click_send_zn_zn">发送</span>
+	</div>
 </div>
 <ul class="chengxiaojing_question_box">
  <{foreach from=$aArr item=answer}>

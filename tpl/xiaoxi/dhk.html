@@ -1,9 +1,14 @@
 <{foreach from=$dh item=row}>
 <div  class="secret_chat_left">
     <div <{if $row.type ==1 }>class="icon_img_right"<{else}>class="icon_img"<{/if}>>
-        <img src="../../image/img_qty/leftper.png" alt="">
+       <{if $row.type ==1 }>
+       <{if $row.wo.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+       <img src="../../image/header_picture/<{$row.wo.head_img}>" alt=""><{/if}><{else}>
+        <{if $row.to.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+        <img src="../../image/header_picture/<{$row.to.head_img}>" alt=""><{/if}><{/if}>
         <p style="text-align: center;"><{if $row.type==1}><{$row.wo.name}><{else}><{$row.to.name}><{/if}></p>
     </div>
+ 
     <{if $row.content_type==0}>
     <div <{if $row.type==1}>class="icon_chat_right"<{else}>class="icon_chat" <{/if}>>
         <{$row.content}>
@@ -14,7 +19,8 @@
     </div>
     <{elseif $row.content_type ==2}>
     <div <{if $row.type==1}>class="icon_chat_right_yuyin"<{else}>class="icon_chat_left_yuyin"<{/if}> path="<{$row.content}>" style="width:<{$row.send_length}>">
-        <span class="yuyin_yyt_r" ></span>
+    <{if $row.type==1}>  <span  class="yuyin_yyt_r" ><img src="../../image/img_yyt/yuyin_right_yyt.png" ></span>
+      <{else}><span  class="yuyin_yyt_l" ><img src="../../image/img_yyt/yuyin_left_yyt.png" ></span><{/if}>
     </div>
     <span <{if $row.type==1}>class="yuyin_time_right"<{else}>class="yuyin_time_left"<{/if}> ><{$row.time_length}></span>
     <{/if}>

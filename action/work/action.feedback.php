@@ -173,19 +173,21 @@ if ($do == "question") {//提问
         }
     }*/
     $addtime = date("Y-m-d H:i:s");
-    if ($db->insert(0, 2, "rv_answer", array(
+    $last_id=$db->insert(0, 2, "rv_answer", array(
         "uid=$uid",
         "content='$content'",
         "addtime='$addtime'",
         "qid='$qid'"
-    ))) {
+    )); 
+
+    if ($last_id) {
         $cont = array(
             "time" => date('m月d日 H:i'),
             "msg" => $uname."回答了您的问题"
         );
         $cont = json_encode($cont);
         to_msg(array('type'=>"reply_to_msg","cont"=>$cont,"to"=>$q_uid));
-        echo '{"code":"200","msg":"回答成功","uname":"'.$uname.'"}';//添加推送消息
+        echo '{"code":"200","msg":"回答成功","uname":"'.$uname.'","aid":"'.$last_id.'"}';//添加推送消息
         exit();
     }
     echo '{"code":"500","msg":"提交失败"}';

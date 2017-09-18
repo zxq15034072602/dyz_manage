@@ -1,0 +1,10 @@
+ <{foreach from=$gArr item=product}>
+ <li class="product_list_zn" gid="<{$product.id}>">
+        <img src="http://app.duyiwang.cn<{$product.good_img}>" alt=""/>
+        <div class="product_name">
+            <p class="product_name_zn"><{$product.name|truncate:10}></p>
+            <p class="product_time_zn">上传时间：<{$product.addtime}></p>
+        </div>
+        <p class="look_zn">查看</p>
+  </li>
+  <{/foreach}>
