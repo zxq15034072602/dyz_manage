@@ -1,5 +1,6 @@
 <?php
 if(!defined('CORE'))exit("error!");
+
 if($do=='banner'){//广告图片
     $type=$_REQUEST['type'];
     $sql="select * from rv_advinfo where 1=1 and type=?";

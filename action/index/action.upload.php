@@ -25,10 +25,8 @@ file_put_contents($file_path_s, $IMG);
 if(!empty($_POST['path'])){
     $base=$_POST['path'];
     $Y_IMG=base64_decode($base);
-    //$save_url = "http://static.duyiwang.cn/image/";
-    //$dir_name = "E:/apptupian/image/";
-    $save_url = "http://192.168.1.138/apptupian/image/";
-    $dir_name = "F:/wamp/www/apptupian/image/";
+    $save_url = "http://static.duyiwang.cn/image/";
+    $dir_name = "E:/apptupian/image/";
     $ymd = date("Ymd");
     $dir_name .= $ymd . "/";
     $save_url .= $ymd . "/";

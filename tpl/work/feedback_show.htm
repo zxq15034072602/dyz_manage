@@ -1,6 +1,6 @@
 <{foreach from=$question item=quse}>
-<li class="question_list_zn">
-        <div class="question_list_box">
+<li class="question_list_zn" id="<{$quse.uid}>">
+        <div class="question_list_box" >
             <p class="question_type_zn"><{if $quse.type==0}>APP使用<{else}>门店运营<{/if}></p>
             <p class="xiaojing_question_title" qid="<{$quse.id}>">
                 <img src="../../image/image_zn/user_title_zn.png" alt="">
@@ -33,7 +33,7 @@
             	</p>
                 <p class="answer_right_zn">
                     <span class="click_big_zn" qid="<{$quse.id}>"><img src="../../image/image_zn/message_zn.png" alt="" class="click_input_zn"></span>
-                    <span class="none_interset_zn answer_zn">回答</span>
+                    <span class="none_interset_zn answer_zn" qid="<{$quse.id}>">回答</span>
                     <span class="num_interset_zn"><{$quse.answernum.hdnum}></span>
                 </p>
             </div>

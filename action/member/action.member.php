@@ -117,7 +117,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[age],
                         $_REQUEST[head_img],
                         $uid
-                    ));
+                    )); 
                     echo '{"code":"200","msg":"申请成为店长提交成功！请等待审核！"}';
                     exit();
                 }
@@ -240,6 +240,7 @@ if ($do == "userinfo") { // 用户中心个人信息
             }
         }
         
+
         $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
         if ($db->p_e($sql, array(
             $_REQUEST[name],
@@ -385,7 +386,7 @@ if ($do == "userinfo") { // 用户中心个人信息
 } else if ($do == "find_store_list") { // 获得 指定市级门店
     $type=$_REQUEST[type]??0;
     $cityid=$_REQUEST['cityid'];//城市id
-    $sql="select * from rv_mendian where 1=1 and cityid=? and type=?";
+    $sql="select * from rv_mendian where 1=1 and cityid=? and type=? and status=1";
     $db->p_e($sql, array($cityid,$type));
     $store_list=$db->fetchAll();
     $smt = new smarty();

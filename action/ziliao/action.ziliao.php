@@ -32,15 +32,15 @@ if($do=='index'){//资料模块首页
     $mArr=array_slice($mArr,0,3);
     //var_dump($mArr);
     //获取康复案例
+
     $sql="select a.*,b.name as gname,c.name as mname from (rv_case as a left join rv_goods as b on a.gid=b.id)left join rv_mendian as c on a.mid=c.id ";
     $db->p_e($sql, array());
     $cArr=$db->fetchAll(); 
-    foreach($cArr as $k=>&$v){
+     foreach($cArr as $k=>&$v){
         $imgArr=explode(",", $v['case_img']);
         $cArr[$k]['img']=$imgArr['0'];
     }
     $cArr=array_slice($cArr,0,4);
-    //var_dump($cArr);
     //模板
     $smt=new Smarty();
     smarty_cfg($smt);

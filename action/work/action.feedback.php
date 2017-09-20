@@ -146,7 +146,6 @@ if ($do == "question") {//提问
 }elseif($do=='reply'){//回答
     $uid=$_REQUEST['uid'];
     $qid=$_REQUEST['qid'];
-    $q_uid=$_REQUEST['q_uid'];
     $content=$_REQUEST['content'];    
     //获取用户名
     $sql="select name from rv_user where 1=1 and id=?";
@@ -181,13 +180,7 @@ if ($do == "question") {//提问
         "addtime='$addtime'",
         "qid='$qid'"
     ));  
-     if ($last_id) {
-        $cont = array(
-            "time" => date('m月d日 H:i'),
-            "msg" => $uname."回答了您的问题"
-        );
-        $cont = json_encode($cont);
-        to_msg(array('type'=>"reply_to_msg","cont"=>$cont,"to"=>$q_uid));
+    if($last_id) {
         echo '{"code":"200","msg":"回答成功","uname":"'.$uname.'","aid":"'.$last_id.'"}';//添加推送消息
         exit();
     }

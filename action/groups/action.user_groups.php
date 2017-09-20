@@ -160,7 +160,6 @@ if ($do == "add_groups") {
     $pagenum = 15;
     $page = $_REQUEST['page'] ?? 1;
     $page = ($page - 1) * $pagenum;
-    
     if ($gid && $uid) {
         // 变已读
         $sql = "update rv_groups_msg_details set is_du=1 where 1=1 and guid=? and gid=?";
@@ -205,6 +204,7 @@ if ($do == "add_groups") {
     $uid = $_REQUEST['uid'];
     $gid = $_REQUEST['gid'];
     $groups_room = $_REQUEST['groups_room'];
+
     $at_user_ids = $_REQUEST['at_user_ids'];
     $txt = $_REQUEST['txt'];
     $nowtime = date('m月d日 H:i');
@@ -218,7 +218,6 @@ if ($do == "add_groups") {
     ));
     $head=$db->fetchRow();
     $head_img=$head['head_img'];
- 
     $last_id=$db->insert(0, 2, "rv_groups_xiaoxi", array(
         "from_uid='$uid'",
         "togid='$gid'",
@@ -258,6 +257,7 @@ if ($do == "add_groups") {
         $uid
     ));
     $gids = $db->fetchAll();
+    
     if ($gids) {
         echo '{"code":"200","groups_gids":' . json_encode($gids) . '}';
         exit();
@@ -350,7 +350,6 @@ if ($do == "add_groups") {
     $id=$_REQUEST['xid'];
     $uid=$_REQUEST['uid'];
     $gid=$_REQUEST['gid'];
-   
     $groups_room = $_REQUEST['groups_room'];
     $cont=array(
         'sj'=>1,
@@ -384,3 +383,4 @@ if ($do == "add_groups") {
         exit();
     }
 }
+

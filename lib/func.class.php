@@ -182,6 +182,7 @@ function getverifycode()
 // 推送消息
 function to_msg($post_data)
 {
+
     $ch = curl_init('http://127.0.0.1:4002');
     curl_setopt_array($ch, array(
         CURLOPT_POST => TRUE,
@@ -192,7 +193,9 @@ function to_msg($post_data)
         CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
         CURLOPT_POSTFIELDS => http_build_query($post_data)
     ));
+    
     $aa = curl_exec($ch);
+   
     curl_close($ch);
     return $aa == 'ok' ? true : false;
 }

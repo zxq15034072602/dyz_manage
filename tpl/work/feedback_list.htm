@@ -25,16 +25,16 @@
 </div>
 <ul class="chengxiaojing_question_box">
  <{foreach from=$aArr item=answer}>
-	<li class="question_list_zn">
+	<li class="question_list_zn" >
 		<div class="question_list_box">
 			<p class="bigDcheng_answer_title"><{$answer.name}>的回答：</p>
-			<div class="bigDcheng_answer_con">
+			<div class="bigDcheng_answer_con" >
 					<{$answer.content}>			
 			</div>
 			<div class="follow_with_interest">
 				<p class="answer_right_zn">
 					<span class="num_interset_zn"><{$answer.replynum.count}></span>
-					<span class="click_big_zn" aid="<{$answer.aid}>"><img src="../../image/image_zn/message_zn.png" alt="" class="click_input_zn"></span>
+					<span class="click_big_zn" aid="<{$answer.aid}>" ><img src="../../image/image_zn/message_zn.png" alt="" class="click_input_zn"></span>
 				</p>
 				<p class="interset_left_zn">
 					<span class="num_interset_zn"><{$answer.ztnum.count}></span>
