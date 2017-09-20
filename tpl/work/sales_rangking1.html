@@ -1,0 +1,328 @@
+<ul class="sale_box_zn">
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$todaystart}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $day_key}>NO.<{$day_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>					
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$day_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$week_start}>-<{$week_end}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $week_key}>NO.<{$week_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$week_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$beginThismonth}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $month_key}>NO.<{$month_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$month_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$year_start}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $year_key}>NO.<{$year_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+					<{foreach from=$year_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>	
+					
+				</ul>
+			</li>
+		</ul>
+		
+<!-- 降序排行 -->		
+<ul class="sale_box_zn_zn">
+					<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$todaystart}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $day_key}>NO.<{$day_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>					
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$day1_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$week_start}>-<{$week_end}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $week_key}>NO.<{$week_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$week1_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$beginThismonth}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $month_key}>NO.<{$month_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+				<{foreach from=$month1_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>
+				</ul>
+			</li>
+			<li class="sale_list_zn">
+				<div class="dyz_qty">
+					<span class="time_qty"><{$year_start}></span>
+					<span class="tc_qty"><{$store_name}>总营业额排名</span>
+					<span class="math_qty"><{if $year_key}>NO.<{$year_key}><{else}>(暂无)<{/if}></span>
+				</div>
+				<div class="qbsaleBox_qty">
+					<select name="">
+						<option value="0">全部</option>
+						<{foreach from=$list item=row}>
+						<option value="<{$row.id}>"><{$row.name}></option>
+						<{/foreach}>
+					</select>
+					<span class="sxpmBox_qty">销售排名为<span>NO.1</span></span>
+				</div>
+				<div class="pmBox_qty">
+					<div class="pmSmallBox_qty">
+						<div class="pmfontt_qty">
+							<div class="pmFont_qty">排名</div>
+							<div class="pmImg_qty">
+								<img src="../../image/img_qty/tcc_qty.png" class="hide1_qty"/>
+								<img src="../../image/img_qty/tco_qty.png" class="show1_qty"/>
+								<img src="../../image/img_qty/xcc_qty.png" class="show2_qty"/>
+								<img src="../../image/img_qty/xco_qty.png" class="hide2_qty"/>
+							</div>
+						</div>
+						<div class="productName_qty">产品名称</div>
+						<div class="saleMath_qty">总销售额</div>
+					</div>
+				</div>
+				<ul class="mdBox_qty">
+					<{foreach from=$year1_list item=day key=key}>
+					<li gid="<{$day.goods_id}>">
+						<div class="pmcc_qty"><{$key+1}></div>
+						<div class="productNamecc_qty"><{$day.gname|truncate:9}></div>
+						<div class="saleMathcc_qty"><{$day.total}></div>
+					</li>
+				<{/foreach}>	
+					
+				</ul>
+			</li>
+		</ul>

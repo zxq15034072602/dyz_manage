@@ -1,7 +1,13 @@
 <{foreach from=$qdh item=row}>
-<div class="secret_chat_left">
+<div class="secret_chat_left" xid="<{$row.id}>">
     <div <{if $row.type==1}> class="icon_img_right" <{else}>class="icon_img" <{/if}>>
-        <img src="../../image/img_qty/rightper.png" alt="">
+       
+        <{if $row.type ==1 }>
+       <{if $row.from.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+       <img src="../../image/header_picture/<{$row.from.head_img}>" alt=""><{/if}><{else}>
+        <{if $row.from.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
+        <img src="../../image/header_picture/<{$row.from.head_img}>" alt=""><{/if}><{/if}>
+
         <p style="text-align: center;"><{$row.from.name}></p >
     </div>
     <{if $row.content_type==0}>
@@ -10,13 +16,15 @@
     </div>
     <{elseif $row.content_type==1}>
     <div <{if $row.type==1}> class="icon_chat_right_img" <{else}> class="icon_chat_left_img" <{/if}>>
-        <img src="<{$row.content}>" alt="" path="<{$row.content}>">
+        <img src="<{$row.content_s_img}>" alt="" <{if $row.content==''}> path="<{$row.content_s_img}>"<{else}> path="<{$row.content}>"<{/if}>>
     </div>
     <{elseif $row.content_type==2}>
     <div <{if $row.type==1}>class="icon_chat_right_yuyin"<{else}>class="icon_chat_left_yuyin"<{/if}> path="<{$row.content}>" style="width:<{$row.send_length}>">
-        <span class="yuyin_yyt_r" ></span>
+    <{if $row.type==1}>  <span  class="yuyin_yyt_r" ><img src="../../image/img_yyt/yuyin_right_yyt.png" ></span>
+    <{else}><span class="yuyin_yyt_l" ><img src="../../image/img_yyt/yuyin_left_yyt.png" ></span><{/if}>
     </div>
     <span  <{if $row.type==1}>class="yuyin_time_right"<{else}>class="yuyin_time_left"<{/if}>><{$row.time_length}></span>
     <{/if}>
 </div>
 <{/foreach}>
+<input type="hidden" value="<{$total}>"/>

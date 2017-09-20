@@ -1,0 +1,22 @@
+<div class="manager_box_zn">
+    <div class="icon_zn" onclick="api.closeWin()"></div>
+    <p class="training_title_zn"><{$videolist.0.name|truncate:10}></p>
+    <p class="training_teacher_zn">
+        <span>主讲人：<{$videolist.0.teacher}>/<{$videolist.0.learnnum.learnnum}>人学习</span>
+        <span><{$kcnum}>视频</span>
+      <!--   <span></span>
+        <span>134</span> -->
+    </p>
+</div>
+<div class="training_con_zn">
+  <{$videolist.0.content|truncate:30}>
+</div>
+<ul class="training_video_box">
+    <{foreach from=$videolist item=video key=k}>
+    <li class="training_video_list" sonurl="<{$video.url}>" vid="<{$video.id}>">
+        <img src="../../image/image_zn/traning_pic_zn.png" alt=""/>
+        <span class="list_num_zn"><{$k+1}></span>
+        <span class="list_title_zn"><{$video.title|truncate:10}></span>
+    </li>
+    <{/foreach}>  
+</ul>

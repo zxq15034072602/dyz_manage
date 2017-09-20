@@ -1,0 +1,27 @@
+<div class="header_box">
+    <iframe class="click_play_zn" height=498 width=510 src='http://player.youku.com/embed/<{$videoArr.url}>==' frameborder=0'allowfullscreen'></iframe>
+       <div class="header_title_zn">
+        <div class="click_back_box" onclick="api.closeWin()"><span class="click_back_zn"></span></div>
+        <span class="title_zn"><{$videoArr.title|truncate:10}></span>
+    </div>
+</div>
+<div class="video_intro_zn">
+    <p class="video_title">简介</p>
+    <p class="video_con_zn">
+		<{$videoArr.content|truncate:30}>
+    </p>
+</div>
+<div class="relative_video_zn">
+    <p class="relative_title_zn">相关视频</p>
+    <ul class="relative_box_zn">
+    <{foreach from=$xgvideo item=video key=k}>
+        <li class="relative_list_zn" vid="<{$video.id}>" videourl="http://player.youku.com/embed/<{$video.url}>==">
+            <span class="num_zn"><{$k+1}></span>
+            <span class="relative_title"><{$video.title|truncate:10}></span>
+            <span class="click_video"></span>
+            <span class="people_num"><{$video.learnnum.learnnum}></span>
+        </li>
+    <{/foreach}>
+       
+    </ul>
+</div>

@@ -20,6 +20,7 @@ if ($do == "dhk") {
     $dh = $db->fetchAll();
     foreach ($dh as &$k) {
         $k['wo'] = user($k['uid']);
+        
         $k['to'] = user($k['toid']);
     }
     // 模版
@@ -67,11 +68,19 @@ if ($do == "fasixin") {
     $toid = $_POST['toid'];
     $txt = $_POST['txt'];
     $nowtime = date('m月d日 H:i');
+    $sql="select * from rv_user where id=?";
+    $db->p_e($sql, array(
+        $uid
+    ));
+    $head=$db->fetchRow();
+    $head_img=$head['head_img'];
+    $send_name=$head['name'];
     $cont = array(
         'lx' => 0,
         'nr' => $txt,
         'time' => date('m月d日 H:i'),
-        "toid" => $uid
+        "toid" => $uid,
+        "head_img"=>$head_img
     );
     $cont = json_encode($cont);
     $sql = "insert into rv_xiaoxi(uid,toid,content,content_type,type,status,is_du) values(?,?,?,0,1,1,1)";

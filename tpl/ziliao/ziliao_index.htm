@@ -1,0 +1,65 @@
+<div class="product_reference_zn">
+    <p class="product_title">
+        <span></span>
+        <span>产品资料</span>
+    </p>
+    <ul class="product_box_zn">
+        <{foreach from=$pArr item=product}>
+        <li class="product_list_zn" gid="<{$product.id}>">
+            <img src="http://app.duyiwang.cn<{$product.good_img}>" alt=""/>
+            <p>独一张·<{$product.name}></p>
+        </li>
+        <{/foreach}>
+    </ul>
+</div>
+<div class="secrete_shop_zn">
+    <p class="product_title_secrete">
+        <span></span>
+        <span>营销秘籍</span>
+    </p>
+    <ul class="marketing_cheats_box">
+        <{foreach from=$mArr item=video}>
+        <li class="marketing_list_zn" vid="<{$video.id}>" videotype="<{$video.type}>" >
+            <p class="marketing_img_zn">
+
+                <img src="http://app.duyiwang.cn<{$video.video_img}>" alt=""/>
+            </p>
+            <div class="skill_box">
+                <p class="skill_title"><{$video.name|truncate:10}></p>
+                <p class="skill_con">
+                   <{$video.content|truncate:30:""}>
+                </p>
+                <p class="study_zn">
+                    <span><{$video.kcnum.kcnum}>门课/<{$video.learnnum.learnnum}>人学习</span>
+                </p>
+            </div>
+        </li>
+       <{/foreach}>    
+    </ul>
+</div>
+<div class="health_example_zn">
+    <p class="product_title_health">
+        <span></span>
+        <span>康复案例</span>
+    </p>
+    <ul class="marketing_cheats_box">
+        <{foreach from=$cArr item=case}>
+        <li class="marketing_list_zn" cid="<{$case.id}>">
+            <p class="marketing_img_zn">
+                <img src="http://app.duyiwang.cn/img/<{$case.img}>" alt=""/>
+            </p>
+            <div class="skill_box">
+                <p class="skill_title">来自：<{$case.mname|truncate:10}></p>
+                <p class="skill_con">
+                   <{$case.content|truncate:30}>
+                </p>
+                <p class="study_zn">
+                    <span>产品：独一张·<{$case.gname|truncate:10}></span>
+                    <span><{$case.addtime}></span>
+                </p>
+            </div>
+        </li>
+        <{/foreach}>
+      
+    </ul>
+</div>

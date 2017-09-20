@@ -1,0 +1,7 @@
+
+<{foreach from=$store_list item=store}>
+	<label><input name="Fruit" type="checkbox" value="<{$store.id}>" /><{$store.name|truncate:20:""}>
+       <img src="../../image/image_zn/checkbox_zn.png" alt=""/>
+</label>
+<{/foreach}>
+

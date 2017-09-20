@@ -1,0 +1,20 @@
+<div class="header_yyt">
+    <div class="header_back_yyt" onclick="api.closeWin()"></div>
+    <div class="header_con_yyt"><{$articlelist.0.name|truncate:10}></div>
+</div>
+<div class="teacher_yyt">
+    <span class="zjr_Mrzhang_yyt">主讲人：</span>
+    <span class="study_num_yyt"><{$articlelist.0.teacher}>/<{$articlelist.0.learnnum.learnnum}>人学习</span>
+    <span class="zj_num_yyt"><{$kcnum}>章节</span>
+    <!-- <span class="guanzhu_num_yyt">134</span>
+    <span class="guanzhu_yyt"></span> -->
+</div>
+<div class="jianjie_yyt"><{$articlelist.0.content|truncate:30}></div>
+<ul class="list_yyt">
+	<{foreach from=$articlelist item=article key=k}>
+    <li class="list_one_yyt" aid="<{$article.id}>">
+        <img src="http://app.duyiwang.cn<{$article.video_img}>" alt="" class="one_img_yyt">
+        <span class="one_title_yyt"><{$k}> <{$article.title|truncate:10}></span>
+    </li>
+    <{/foreach}>
+</ul>

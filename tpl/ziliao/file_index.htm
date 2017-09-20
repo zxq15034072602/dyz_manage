@@ -1,0 +1,26 @@
+<{foreach from=$fileArr item=file key=k}>
+<li class="download_zn_list" file_url="http://app.duyiwang.cn<{$file.file_url}>">
+        <img src="http://dyz.duyiwang.cn<{$file.file_img}>" alt=""/>
+        <div class="skill_zn_box">
+            <p class="skill_title"><{$file.filename|truncate:10}></p>
+            <p class="skill_time_zn">
+                <span class="skill_time">上传时间：<{$file.addtime}></span>
+                <span class="skill_size">大小：<{$file.size}>字节</span>
+            </p>
+            <div class="progress_zn">
+                <span class="progress_tiao"></span>
+                <span class="download_prompt">下载中...</span>
+            </div>
+            <div class="progress_zn_zn">
+			    <span class="progress_tiao"></span>
+			    <span class="download_prompt">下载完成</span>
+			</div>
+        </div>
+        <div class="click_download_zn">
+            <img src="../../image/image_zn/download_zn.png" alt=""/>
+        </div>
+        <div class="click_delete">
+            <img src="../../image/image_zn/delete_icon_zn.png" alt=""/>
+        </div>
+    </li>
+<{/foreach}>

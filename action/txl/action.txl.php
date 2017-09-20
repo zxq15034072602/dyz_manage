@@ -14,7 +14,7 @@ if ($do == "txl") {
         $txl = $db->fetchAll();
         foreach ($txl as &$k) {
             $k['admin'] = user($k['adminid']);
-            $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (3,5)";
+            $sql = "select id from rv_user where 1=1 and zz=? and status=1 ";
             $db->p_e($sql, array(
                 $k['id']
             ));
@@ -26,7 +26,6 @@ if ($do == "txl") {
     } else {
         $txl = array();
     }
-    
     // 模版
     $flag = $_REQUEST['flag'] ?? '0'; // 0未默认通信录 1群聊通讯录
     $smt = new smarty();

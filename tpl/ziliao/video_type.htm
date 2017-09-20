@@ -1,0 +1,17 @@
+<{foreach from=$mArr item=video}>
+<li class="marketing_list_zn" vid="<{$video.id}>" type="<{$video.type}>">
+        <p class="marketing_img_zn">
+            <img src="http://app.duyiwang.cn<{$video.video_img}>" alt=""/>
+        </p>
+        <div class="skill_box">
+            <p class="skill_title"><{$video.name|truncate:10:""}></p>
+            <p class="skill_con">
+				<{$video.content|truncate:30:""}>
+            </p>
+            <p class="study_zn">
+                <span><{if $video.type==0}><{$video.kcnum.kcnum}><{else}><{$video.twnum.twnum}><{/if}>门课/<{$video.learnnum.learnnum}>人学习</span>
+                <span><{if $video.type==0}><{$video.kcnum.kcnum}>视频<{else}><{$video.twnum.twnum}>图文<{/if}></span>
+            </p>
+        </div>
+ </li>
+ <{/foreach}>
