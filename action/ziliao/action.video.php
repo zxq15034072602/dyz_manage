@@ -21,6 +21,14 @@ if($do=='video_type'){//视频分类页
         ));
         $value['twnum']=$db->fetchRow();
         
+        $sql="select id from rv_video_list where vid=?";
+        $db->p_e($sql, array(
+            $value[id]
+        ));
+        $vidArr=$db->fetchAll();
+        foreach($vidArr as &$vv){
+            
+        }
         //点击数
         $value['learnnum']=$value['learnnum']??0;
         $sql="select count(*) as learnnum from rv_video_learn where 1=1 and vid=? and status=1";

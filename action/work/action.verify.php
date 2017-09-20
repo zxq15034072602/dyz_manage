@@ -229,6 +229,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
     $smt->display('verify_show.html');
     exit();
 }elseif($do == "wdstatus"){//未读审核状态
+    
     if(empty($store_id)){
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
@@ -238,6 +239,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
         $store_id,
     ));
    $verify=$db->fetch_count();
+   
    $sql1="select count(*) from rv_buy where 1=1 and mid=? and status=0";
    $db->p_e($sql1, array(
        $store_id

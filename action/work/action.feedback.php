@@ -120,6 +120,7 @@ if ($do == "question") {//提问
        $value['replynum']=$db->fetchRow();
     }
     //模板
+
     $smt=new Smarty();
     smarty_cfg($smt);
     $smt->assign('qArr',$qArr);
@@ -145,7 +146,6 @@ if ($do == "question") {//提问
 }elseif($do=='reply'){//回答
     $uid=$_REQUEST['uid'];
     $qid=$_REQUEST['qid'];
-    $q_uid=$_REQUEST['q_uid'];
     $content=$_REQUEST['content'];    
     //获取用户名
     $sql="select name from rv_user where 1=1 and id=?";
@@ -160,7 +160,7 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回答内容不能为空"}';
         exit();
     }
-    /*$sql="select addtime from rv_answer where 1=1 and uid=? order by id desc";
+    /* $sql="select addtime from rv_answer where 1=1 and uid=? order by id desc";
     $db->p_e($sql, array(
         $uid
     ));
@@ -171,22 +171,16 @@ if ($do == "question") {//提问
             echo '{"code":"500","msg":"对不起，不要频繁提交"}';
             exit();
         }
-    }*/
+    } */
     $addtime = date("Y-m-d H:i:s");
+    
     $last_id=$db->insert(0, 2, "rv_answer", array(
         "uid=$uid",
         "content='$content'",
         "addtime='$addtime'",
         "qid='$qid'"
-    )); 
-
-    if ($last_id) {
-        $cont = array(
-            "time" => date('m月d日 H:i'),
-            "msg" => $uname."回答了您的问题"
-        );
-        $cont = json_encode($cont);
-        to_msg(array('type'=>"reply_to_msg","cont"=>$cont,"to"=>$q_uid));
+    ));  
+    if($last_id) {
         echo '{"code":"200","msg":"回答成功","uname":"'.$uname.'","aid":"'.$last_id.'"}';//添加推送消息
         exit();
     }
@@ -196,12 +190,11 @@ if ($do == "question") {//提问
     $uid=$_REQUEST['uid'];
     $aid=$_REQUEST['aid'];
     $content=$_REQUEST['content'];
- 
     if(empty($content)){
         echo '{"code":"500","msg":"回复内容不能为空"}';
         exit();
     }
-   /* $sql="select addtime from rv_answer_reply where 1=1 and uid=? order by id desc";
+   /*  $sql="select addtime from rv_answer_reply where 1=1 and uid=? order by id desc";
     $db->p_e($sql, array(
         $uid
     ));
@@ -212,8 +205,7 @@ if ($do == "question") {//提问
             echo '{"code":"500","msg":"对不起，不要频繁提交"}';
             exit();
         }
-    }
-    */
+    } */
     $addtime = date("Y-m-d H:i:s");
     if($db->insert(0, 2, "rv_answer_reply", array(
         "uid=$uid",

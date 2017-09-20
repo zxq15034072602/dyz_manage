@@ -123,7 +123,19 @@ function user($uid)
 function get_time_buy($mid, $start, $end)
 {
     global $db;
-    $sql="select *,(num* money) as total_price from (select bg.id,bg.goods_id,bg.goods_type,g.name,g.money,g.dw,SUM(count) as num from rv_buy_goods as bg,rv_goods as g  where bg.goods_id=g.id and bg.buy_id in(select id from rv_buy where mid=? and status=1 and UNIX_TIMESTAMP(addtime)  BETWEEN ? AND ? ) and bg.goods_type=0 GROUP BY bg.goods_id ) as b ORDER BY num desc LIMIT 5";
+    $sql="select *,(num* money) as total_price from (select bg.id,bg.goods_id,bg.goods_type,g.name,g.money,g.dw,SUM(count) as num from rv_buy_goods as bg,rv_goods as g  where bg.goods_id=g.id and bg.buy_id in(select id from rv_buy where mid=? and status=1 and UNIX_TIMESTAMP(addtime)  BETWEEN ? AND ? ) and bg.goods_type=0 GROUP BY bg.goods_id ) as b ORDER BY num desc";
+    $db->p_e($sql, array(
+        $mid,
+        $start,
+        $end
+    ));
+    $list = $db->fetchAll();
+    return $list;
+}
+function get_time_buy_asc($mid, $start, $end)
+{
+    global $db;
+    $sql="select *,(num* money) as total_price from (select bg.id,bg.goods_id,bg.goods_type,g.name,g.money,g.dw,SUM(count) as num from rv_buy_goods as bg,rv_goods as g  where bg.goods_id=g.id and bg.buy_id in(select id from rv_buy where mid=? and status=1 and UNIX_TIMESTAMP(addtime)  BETWEEN ? AND ? ) and bg.goods_type=0 GROUP BY bg.goods_id ) as b ORDER BY num asc";
     $db->p_e($sql, array(
         $mid,
         $start,

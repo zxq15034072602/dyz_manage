@@ -55,6 +55,7 @@ if ($do == "add_groups") {
     $gid = $_REQUEST['gid']; // 群聊id
     $uid = $_REQUEST['uid'];
     $is_openwin = 0;
+    $pagenum=15;
     if ($gid) {
         if ($db->update(0, 1, "rv_user", array(
             "is_openwin=1"
@@ -71,7 +72,13 @@ if ($do == "add_groups") {
         $groups_info = json_encode($db->select(0, 1, "rv_users_groups", "ug_name,ug_notice,ug_img", array(
             "ug_id = $gid"
         ), ' ug_id desc')); // 群聊信息
-        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '"}';
+        $sql = "select count(*) from rv_groups_xiaoxi where 1=1 and togid =?";      
+        $db->p_e($sql, array(
+            $gid
+        ));
+        $total = $db->fetch_count();
+        $total = ceil($total / $pagenum);       
+        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '","total":"' . $total . '"}';
         exit();
     }
     echo '{"code":"500"}';
@@ -148,13 +155,11 @@ if ($do == "add_groups") {
     exit();
 } elseif ($do == "qldhk") { // 群聊对话框
     $gid = $_REQUEST['gid']; // 群聊id
-    $uid = $_REQUEST['uid']; // 用户id
-
-     //分页
+    $uid = $_REQUEST['uid']; // 用户id   
+    //分页
     $pagenum = 15;
     $page = $_REQUEST['page'] ?? 1;
     $page = ($page - 1) * $pagenum;
-
     if ($gid && $uid) {
         // 变已读
         $sql = "update rv_groups_msg_details set is_du=1 where 1=1 and guid=? and gid=?";
@@ -166,9 +171,9 @@ if ($do == "add_groups") {
         
         $db->p_e($sql, array(
             $gid
-        ));       
-        $qdh = $db->fetchAll();
-         $sort = array(
+        ));
+        $qdh = $db->fetchAll(); 
+        $sort = array(
          'direction' => 'SORT_ASC', //排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
          'field'     => 'id',       //排序字段
         );
@@ -230,15 +235,15 @@ if ($do == "add_groups") {
         "at_user_ids" => $at_user_ids,
         "gid" => $gid,
         "head_img"=>$head_img,
-        'xid'=>$last_id,
+        "xid"=>$last_id,
         "groups_room"=>$groups_room
     );
     $cont = json_encode($cont);
     if($last_id){
         to_msg(array(
-            'type' => 'sixin_to_groups',
-            'cont' => $cont,
-            'to' => $groups_room
+            'type' => 'sixin_to_groups',//mani.html socket事件名称
+            'cont' => $cont,//obj
+            'to' => $groups_room//群聊的房间号
         )); // 推送消息
         echo '{"code":"200","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '","head_img":"'.$head_img.'","xid":"'.$last_id.'"}';
         exit();
@@ -368,7 +373,7 @@ if ($do == "add_groups") {
             to_msg(array(
                 'type'=>'sixin_to_groups',
                 'cont'=>$cont,
-                'to'=>$groups_room
+                'to'=>$groups_room               
             ));
             echo '{"code":"200","msg":"撤回消息成功"}';
             exit();
@@ -378,3 +383,4 @@ if ($do == "add_groups") {
         exit();
     }
 }
+
