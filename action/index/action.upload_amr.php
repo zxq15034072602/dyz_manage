@@ -1,10 +1,10 @@
 <?php 
 if (! defined('CORE'))
     exit("error!"); // 检查某常量是否存在。
-  /*   $dir_name = "F:wamp/www/apptupian/amr/";
-    $save_url = "http://192.168.1.143/apptupian/amr/"; */
-    $save_url = "http://static.duyiwang.cn/amr/";
-    $dir_name = "E:/apptupian/amr/";
+   /*  $dir_name = "F:wamp/www/apptupian/amr/";
+    $save_url = "http://192.168.1.143/apptupian/amr/";  */
+     $save_url = "http://static.duyiwang.cn/amr/";
+    $dir_name = "E:/apptupian/amr/"; 
     
     $file_url="";
     if($_FILES['file']['size']>5242880){
