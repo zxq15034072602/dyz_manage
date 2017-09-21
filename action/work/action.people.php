@@ -14,7 +14,12 @@ if ($do == "index") { // 人员管理页面
         echo '{"code":"500","msg":"关键数据缺失！"}';
         exit();
     }
-    $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? ORDER BY u.roleid ";
+    $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? and u.roleid>5 and u.roleid<8 ORDER BY u.roleid ";
+    $db->p_e($sql, array(
+        $store_id
+    ));
+    $store_people = $db->fetchAll();
+    $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? and u.roleid<6 ORDER BY u.roleid ";
     $db->p_e($sql, array(
         $store_id
     ));
@@ -29,6 +34,7 @@ if ($do == "index") { // 人员管理页面
     $smt->assign("store_name", $store_name);
     $smt->assign("roleid", $user_roleid);
     $smt->assign("store_people_list", $store_people_list);
+    $smt->assign("store_people", $store_people);
     $smt->display("people_list.html");
     exit();
 } elseif ($do == 'delete_people') { // 删除店员

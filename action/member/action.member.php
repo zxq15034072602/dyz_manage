@@ -139,7 +139,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                 $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
                 $arr = array(
                     $uid,
-                    $_REQUEST['stroe_id'],
+                    '370',
                     4,
                     0
                 );

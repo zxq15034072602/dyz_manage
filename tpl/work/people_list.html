@@ -2,15 +2,36 @@
 <div class="shopBox_qty">
 	<div class="shopSmallBox_qty">
 		<ul class="shopSmallBox_qty_qty">
+			<{foreach from=$store_people item=row}>
+			<li>
+				<div class="personShop_qty">
+				<{if $row.head_img==null}>
+					<img src="../../image/img_qty/head.jpg" alt="">
+				<{else}>
+					<img src="../../image/header_picture/<{$row.user.head_img}>" alt="">
+				<{/if}>
+				</div>
+				<div class="shopPer_qty">
+					<div class="shopPerTop_qty"><{$row.name}></div>
+					<div class="shopPerB_qty"><{if $row.roleid ==
+						6}>董事长<{elseif $row.roleid ==7}>总经理<{/if}></div>
+				</div> 
+				<!-- <div class="shopMangment_qty">管理店员</div> -->
+			</li>
+			<{/foreach}>
 			<{foreach from=$store_people_list item=people}>
 			<li>
 				<div class="personShop_qty">
-					<img src="../../image/img_qty/shopperson_03.png" alt="">
+				<{if $people.head_img==null}>
+					<img src="../../image/img_qty/head.jpg" alt="">
+				<{else}>
+					<img src="../../image/header_picture/<{$people.head_img}>" alt="">
+				<{/if}>
 				</div>
 				<div class="shopPer_qty">
 					<div class="shopPerTop_qty"><{$people.name}></div>
 					<div class="shopPerB_qty"><{if $people.roleid ==
-						3}>店长<{else}>店员<{/if}></div>
+						3}>店长<{elseif $people.roleid ==5}>店员<{elseif $people.roleid ==1}>总部人员<{elseif $people.roleid ==2}>经销商<{elseif $people.roleid ==4}>加盟商<{elseif $people.roleid ==6}>董事长<{elseif $people.roleid ==7}>总经理<{/if}></div>
 				</div> <{if $roleid == 3 && $people.roleid == 3}>
 				<div class="shopMangment_qty">管理店员</div><{/if}>
 			</li> <{/foreach}>
