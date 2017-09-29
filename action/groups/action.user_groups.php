@@ -382,5 +382,34 @@ if ($do == "add_groups") {
         echo '{"code":"500","msg":"关键数据缺失"}';
         exit();
     }
+}elseif($do=='groups_user_remind'){//@功能  获取群成员接口
+    $gid=$_REQUEST['gid'];
+    $uid=$_REQUEST['uid'];
+    if($_REQUEST['name']){
+        $search .= "and gu_group_nick like ? ";
+        $arr1[]="%".$_REQUEST['name']."%";
+    }
+    $sql="select * from rv_group_to_users where gu_gid=$gid and 1=1 ".$search;
+    $db->p_e($sql, $arr1);
+    $list=$db->fetchAll();
+    $users=array();
+    foreach ($list as $k=>$v){
+        $sql="select * from rv_user where 1=1 and id=?";
+        $db->p_e($sql, array($v['gu_uid']));
+        $arr=$db->fetchRow();
+        $users[$k]=$arr;
+    } 
+    //查询当前用户信息
+    $sql="select * from rv_user where id=?";
+    $db->p_e($sql, array($uid));
+    $uidArr=$db->fetchAll();
+    //去掉用户本人操作
+    foreach($users as $kk=>$vv){
+        if(!in_array($vv, $uidArr)){
+            $arr3[]=$vv;
+        }
+    }
+    echo '{"users":'.json_encode($arr3).'}';
+    exit();
 }
 
