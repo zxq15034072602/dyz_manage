@@ -16,6 +16,9 @@
             </div>
             <{if $row.xiaoxi}>
             <div class="groupB_qty">
+            <{if $row.weidu}>
+            <span><{$row.xiaoxi.at_msg}></span>
+            <{/if}>
             <{if $row.xiaoxi.content_type==0}>
             <{$row.xiaoxi.from_name}> : <{$row.xiaoxi.content|truncate:14}>
             <{elseif  $row.xiaoxi.content_type==1}>

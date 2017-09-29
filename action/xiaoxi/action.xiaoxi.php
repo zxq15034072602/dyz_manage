@@ -80,6 +80,7 @@ if ($do == "xiaoxi") {
                 $groups['xiaoxi']['togid']
             ));
             $groups['weidu'] = $db->fetch_count();
+
             $sql = "select gu_group_nick from rv_group_to_users where 1=1 and gu_uid=?";
             $db->p_e($sql, array(
                 $groups['xiaoxi']['from_uid']
