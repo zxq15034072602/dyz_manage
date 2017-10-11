@@ -25,6 +25,9 @@ if ($do == "xiaoxi") {
             $k['toid']
         ));
         $k['user'] = $db->fetchRow();
+        if(stripos($k['user']['head_img'],"http://")===false && $k['user']['head_img']!=null){
+            $k['user']['head_img']="../../image/header_picture/".$k['user']['head_img'];
+        }
         if ($k['user']['roleid'] == 1) {
             $k['user']['zz'] = '总部';
         } elseif ($k['user']['roleid'] == 2 || $k['user']['roleid'] == 4) {

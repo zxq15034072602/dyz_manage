@@ -1,14 +1,19 @@
+<div class="time_zn_zn">
+	 <{if $qdh.0.addtime}>
+     <span><{$qdh.0.addtime1}></span>
+     <{/if}>
+</div>
 <{foreach from=$qdh item=row}>
 <div class="secret_chat_left" xid="<{$row.id}>">
     <div <{if $row.type==1}> class="icon_img_right" <{else}>class="icon_img" <{/if}>>
        
         <{if $row.type ==1 }>
        <{if $row.from.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
-       <img src="../../image/header_picture/<{$row.from.head_img}>" alt=""><{/if}><{else}>
+       <img src="<{$row.from.head_img}>" alt=""><{/if}><{else}>
         <{if $row.from.head_img==null}><img src="../../image/tc_log.png" alt="" class="press_on_zn" uid="<{$row.from_uid}>"><{else}>
-        <img src="../../image/header_picture/<{$row.from.head_img}>" alt="" class="press_on_zn" uid="<{$row.from_uid}>"><{/if}><{/if}>
+        <img src="<{$row.from.head_img}>" alt="" class="press_on_zn" uid="<{$row.from_uid}>"><{/if}><{/if}>
 
-        <p style="text-align: center;"><{$row.from.name}></p >
+        <p style="text-align: center;"><{$row.from.name}></p>
     </div>
     <{if $row.content_type==0}>
     <div <{if $row.type==1}> class="icon_chat_right" <{else}> class="icon_chat" <{/if}> > 

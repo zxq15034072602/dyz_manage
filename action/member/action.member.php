@@ -10,8 +10,35 @@ $user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健�
 if ($do == "userinfo") { // 用户中心个人信息
     $uid = $_REQUEST['uid']; // 用户id
     $user = user($uid); // 获取用户相关信息s
-    
+ 
     if ($_REQUEST['dosubmit']) { // 如果是提交修改用户资料
+        if($_POST['head_img']){
+            if(stripos($_POST['head_img'],"http://")===false){
+                $base64 = $_POST['head_img'];
+                $IMG = base64_decode($base64);
+                $save_url = "http://static.duyiwang.cn/image/";
+                $dir_name = "E:/apptupian/image/";
+                /* $save_url = "http://192.168.1.138/apptupian/headimg/";
+                 $dir_name = "F:/wamp/www/apptupian/headimg/"; */
+        
+                $ymd = date("Ymd");
+                $dir_name .= $ymd . "/";
+                $save_url .= $ymd . "/";
+                if (! file_exists($dir_name)) {
+                    mkdir($dir_name);
+                }
+                //缩略图文件名
+                $new_file_names = date("YmdHis") . '_' . mt_rand(10000, 99999) . '.jpg';
+                // 移动缩略图文件
+                $file_path_s = $dir_name . $new_file_names;
+                $file_url_s = $save_url . $new_file_names;
+                file_put_contents($file_path_s, $IMG);
+                $head_img=$file_url_s;
+            }else{
+                $head_img=$_POST['head_img'];
+            }
+        }
+        
         if (empty($_REQUEST['name'])) {
             echo '{"code":"500","msg":"姓名不能为空"}';
             exit();
@@ -57,7 +84,6 @@ if ($do == "userinfo") { // 用户中心个人信息
                 exit();
             }
         }
-
         if ($user['stroe_id'] != $_REQUEST['stroe_id']  || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录s
             if ($_REQUEST[roleid] == 5 && $user['roleid'] != 3) { // 如果是店员身份修改所属门店
                 $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
@@ -81,7 +107,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[name],
                         $_REQUEST[sex],
                         $_REQUEST[age],
-                        $_REQUEST[head_img],
+                        $head_img,
                         $uid
                     ));
                     echo '{"code":"200","msg":"更换门店提交成功！请等待店长审核！"}';
@@ -115,7 +141,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[name],
                         $_REQUEST[sex],
                         $_REQUEST[age],
-                        $_REQUEST[head_img],
+                        $head_img,
                         $uid
                     )); 
                     echo '{"code":"200","msg":"申请成为店长提交成功！请等待审核！"}';
@@ -126,7 +152,7 @@ if ($do == "userinfo") { // 用户中心个人信息
             }
         }
         
-        if(!empty(json_decode($_REQUEST['stroe_id'])) || $user['roleid'] != $_REQUEST['roleid']){
+        if(!empty(json_decode($_REQUEST['stroe_id'])) && $user['roleid'] != $_REQUEST['roleid']){
             if($_REQUEST[roleid]==1){//总部人员审核
                 $sql = "select * from rv_verify where 1=1 and uid=?  and type=4 and status=0";
                 $db->p_e($sql, array(
@@ -149,7 +175,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[name],
                         $_REQUEST[sex],
                         $_REQUEST[age],
-                        $_REQUEST[head_img],
+                        $head_img,
                         $uid
                     ));
                     echo '{"code":"200","msg":"申请成为总部人员提交成功！请等待审核！"}';
@@ -188,7 +214,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[name],
                         $_REQUEST[sex],
                         $_REQUEST[age],
-                        $_REQUEST[head_img],
+                        $head_img,
                         $uid
                     ));
                     echo '{"code":"200","msg":"申请成为经销商提交成功！请等待审核！"}';
@@ -229,7 +255,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         $_REQUEST[name],
                         $_REQUEST[sex],
                         $_REQUEST[age],
-                        $_REQUEST[head_img],
+                        $head_img,
                         $uid
                     ));
                     echo '{"code":"200","msg":"申请成为加盟商提交成功！请等待审核！"}';
@@ -240,13 +266,12 @@ if ($do == "userinfo") { // 用户中心个人信息
             }
         }
         
-
         $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
         if ($db->p_e($sql, array(
             $_REQUEST[name],
             $_REQUEST[sex],
             $_REQUEST[age],
-            $_REQUEST[head_img],
+            $head_img,
             $uid
         ))) {
             echo '{"code":"200","msg":"修改成功"}';
@@ -459,4 +484,64 @@ elseif($do=='info'){//获取用户个人信息
         $smt->display('mendian.html');
     }   
     exit();
+}elseif($do=='forget'){//忘记密码
+    $mobile = $_POST['mobile']; // 手机号
+    if (empty($mobile)) {
+        echo '{"code":"500","msg":"手机不能为空"}';
+        exit();
+    }
+    $sql="select * from rv_user where mobile=?";
+    $db->p_e($sql,array($mobile));
+    $row=$db->fetchRow();
+    if($mobile==$row['mobile']){
+        $password = md5($_POST['password']); // 密码
+        $confirmpass = md5($_POST['confirmpass']); // 确认密码
+        $code = $_POST['code']; // 验证码
+        $verifycode = $_POST['verifycode']; // 短信验证码
+        if (empty($password)) {
+            echo '{"code":"500","msg":"密码不能为空"}';
+            exit();
+        }
+        if (empty($confirmpass)) {
+            echo '{"code":"500","msg":"确认密码不能为空"}';
+            exit();
+        }
+        if (empty($code)) {
+            echo '{"code":"500","msg":"验证码不能为空"}';
+            exit();
+        }
+        if ($password != $confirmpass) {
+            echo '{"code":"500","msg":"两次密码不一致"}';
+            exit();
+        }
+        if ($code != $verifycode) {
+            echo '{"code":"500","msg":"验证码不正确"}';
+            exit();
+        }
+        if($db->update(0, 1, "rv_user", array(
+            "password='$password'"
+        ),array(
+            "id='$row[id]'" 
+        ))){
+            echo '{"code":"200","msg":"密码修改成功"}';
+        }else{
+            echo '{"code":"500","msg":"密码修改失败,请重试！"}';
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
