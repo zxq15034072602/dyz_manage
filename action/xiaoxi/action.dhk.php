@@ -20,8 +20,14 @@ if ($do == "dhk") {
     $dh = $db->fetchAll();
     foreach ($dh as &$k) {
         $k['wo'] = user($k['uid']);
+        if(stripos($k['wo']['head_img'],"http://")===false && $k['wo']['head_img']!=null){
+            $k['wo']['head_img']="../../image/header_picture/".$k['wo']['head_img'];
+        }
         
         $k['to'] = user($k['toid']);
+        if(stripos($k['to']['head_img'],"http://")===false && $k['to']['head_img']!=null){
+            $k['to']['head_img']="../../image/header_picture/".$k['to']['head_img'];
+        }
     }
     // 模版
     $smt = new smarty();

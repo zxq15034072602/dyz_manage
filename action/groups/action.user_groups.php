@@ -69,7 +69,7 @@ if ($do == "add_groups") {
             $gid
         ));
         $groups_users_count = $db->fetch_count();
-        $groups_info = json_encode($db->select(0, 1, "rv_users_groups", "ug_name,ug_notice,ug_img", array(
+        $groups_info = json_encode($db->select(0, 1, "rv_users_groups", "ug_name,ug_notice,ug_img,ug_notice_time,ug_notice_username", array(
             "ug_id = $gid"
         ), ' ug_id desc')); // 群聊信息
         $sql = "select count(*) from rv_groups_xiaoxi where 1=1 and togid =?";      
@@ -107,13 +107,20 @@ if ($do == "add_groups") {
                 echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[nick_name] . '"}';
                 exit();
             }
-        } elseif ($flag == "notice") { // 修改公告
+        }elseif ($flag == "notice") { // 修改公告
+            $time=date('Y.m.d H:i',time());
+            $uid=$_REQUEST['uid'];
+            $sql="select name from rv_user where id=?";
+            $db->p_e($sql, array($uid));
+            $name=$db->fetchRow()['name'];
             if ($db->update(0, 1, 'rv_users_groups', array(
-                "ug_notice='$_REQUEST[notice]'"
+                "ug_notice='$_REQUEST[notice]'",
+                "ug_notice_time='$time'",
+                "ug_notice_username='$name'"
             ), array(
                 "ug_id=$gid"
             ))) {
-                echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[notice] . '"}';
+                echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[notice] . '","name":"' . $name . '","time":"' . $time . '"}';
                 exit();
             }
         }elseif($flag=='groups_pic'){//修改群头像
@@ -191,6 +198,9 @@ if ($do == "add_groups") {
         foreach ($qdh as $key => &$value) {
             $value['from_uid'] == $uid ? $qdh[$key]['type'] = 1 : $qdh[$key]['type'] = 2; // 获取是收消息or发消息
             $qdh[$key]['from'] = user($value['from_uid']); // 获取发消息人
+            if(stripos($value['from']['head_img'],"http://")===false && $value['from']['head_img']!=null){
+                $value['from']['head_img']="../../image/header_picture/".$value['from']['head_img'];              
+            }
         }
         // 模版
         $smt = new smarty();

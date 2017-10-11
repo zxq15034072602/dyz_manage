@@ -19,11 +19,21 @@ if ($do == "index") { // 人员管理页面
         $store_id
     ));
     $store_people = $db->fetchAll();
+    foreach($store_people as &$vv){
+        if(stripos($vv['head_img'],"http://")===false && $vv['head_img']!=null){
+            $vv['head_img']="../../image/header_picture/".$vv['head_img'];
+        }
+    }
     $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? and u.roleid<6 ORDER BY u.roleid ";
     $db->p_e($sql, array(
         $store_id
     ));
     $store_people_list = $db->fetchAll();
+    foreach($store_people_list as &$v){
+        if(stripos($v['head_img'],"http://")===false && $v['head_img']!=null){
+            $v['head_img']="../../image/header_picture/".$v['head_img'];
+        }
+    }
     $sql = "select name from rv_mendian where 1=1 and id=?";
     $db->p_e($sql, array(
         $store_id

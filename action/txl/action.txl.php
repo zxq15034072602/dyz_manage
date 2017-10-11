@@ -21,6 +21,9 @@ if ($do == "txl") {
             $k['yh_user'] = $db->fetchAll();
             foreach ($k['yh_user'] as &$v) {
                 $v['user'] = user($v['id']);
+                if(stripos($v['user']['head_img'],"http://")===false && $v['user']['head_img']!=null){
+                    $v['user']['head_img']="../../image/header_picture/".$v['user']['head_img'];
+                }
             }
         }
     } else {
@@ -46,11 +49,16 @@ if ($do == "txl") {
     exit();
 } elseif ($do == "single_txl") { // 单聊通讯录
     $storeid = $_REQUEST['store_id'];
-    $sql = "select * from rv_user where 1=1 and zz=? and status=1 and roleid in (3,5)";
+    $sql = "select * from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5)";
     $db->p_e($sql, array(
         $storeid
     ));
     $txl = $db->fetchAll();
+    foreach($txl as &$v){
+        if(stripos($v['head_img'],"http://")===false && $v['head_img']!=null){
+            $v['head_img']="../../image/header_picture/".$v['head_img'];
+        }
+    }
     // 模版
     $flag = 0; // 0未默认通信录 1群聊通讯录
     $smt = new smarty();

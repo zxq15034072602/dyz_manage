@@ -3,7 +3,11 @@
 <li class="user_box_zn" onclick="talk_about(<{$user.id}>)">
     <div class="user_zn">
         <div class="user_picture_zn">
-            <img src="../../image/image_zn/user.png" alt="">
+            <{if $user.head_img==null}>
+           		<img src="../../image/img_qty/head.jpg" alt="">
+            <{else}>
+            	<img src="<{$user.head_img}>" alt="">
+            <{/if}>
         </div>
         <div class="user_name_zn">
         <{$user.name}>
@@ -30,12 +34,12 @@
 					<{if $row.user.head_img==null}>
 						<img src="../../image/img_qty/head.jpg" alt="">
 					<{else}>
-						<img src="../../image/header_picture/<{$row.user.head_img}>" alt="">
+						<img src="<{$row.user.head_img}>" alt="">
 					<{/if}>
 					</div>
 					<div class="groupLabel_qty">
 						<label><input type="checkbox" name="user_id" id="user_id"
-							value="<{$row.user.id}>"><{$row.user.name}><{if $row.user.roleid==3}> —— 店长<{elseif $row.user.roleid==5}> —— 店员<{elseif $row.user.roleid==1}> —— 总部人员<{elseif $row.user.roleid==2}> —— 经销商<{elseif $row.user.roleid==4}> —— 加盟商<{elseif $row.user.roleid==6}> —— 董事长<{elseif $row.user.roleid==7}> —— 总经理<{/if}></label>
+							value="<{$row.user.id}>"><span><{$row.user.name}></span><{if $row.user.roleid==3}> —— 店长<{elseif $row.user.roleid==5}> —— 店员<{elseif $row.user.roleid==1}> —— 总部人员<{elseif $row.user.roleid==2}> —— 经销商<{elseif $row.user.roleid==4}> —— 加盟商<{elseif $row.user.roleid==6}> —— 董事长<{elseif $row.user.roleid==7}> —— 总经理<{/if}></label>
 					</div>
 				</li> <{/foreach}>
 			</ul></li> <{/if}> <{/foreach}>

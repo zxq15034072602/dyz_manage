@@ -40,8 +40,10 @@
 <{foreach from=$xiaoxi item=row}>
 <li onclick="talk_about(<{$row.user.id}>)">
     <div class="groupImg_qty">
-          <{if $row.user.head_img==null}><img src="../../image/tc_log.png" alt=""><{else}>
-        <img src="../../image/header_picture/<{$row.user.head_img}>" alt="">
+        <{if $row.user.head_img==null}>
+            <img src="../../image/tc_log.png" alt="">
+        <{else}>
+            <img src="<{$row.user.head_img}>" alt="">
         <{/if}>
         <{if $row.weidu}><div class="math_qty"><{$row.weidu}></div><{/if}>
     </div>
