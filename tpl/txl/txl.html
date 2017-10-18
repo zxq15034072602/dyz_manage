@@ -16,6 +16,77 @@
 </li>
 <{/foreach}>
 <{else}> 
+<div class="groupChart_qty">
+	<ul class="groupChartSmall_qty">
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">太常集团</span>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$zongbu item=zb}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $zb.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$zb.head_img}>" alt="">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$zb.id}>"><span><{$zb.name}><{if $zb.roleid==3}> —— 店长<{elseif $zb.roleid==5}> —— 店员<{elseif $zb.roleid==1}> —— 总部人员<{elseif $zb.roleid==2}> —— 经销商<{elseif $zb.roleid==4}> —— 加盟商<{elseif $zb.roleid==6}> —— 董事长<{elseif $zb.roleid==7}> —— 总经理<{/if}></span>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+			</ul>
+		</li>
+
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">经销商</span>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$jingxiao item=jx}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $jx.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$jx.head_img}>" alt="">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$jx.id}>"><span><{$jx.name}></span>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+			</ul>
+		</li>
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">加盟商</span>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$jiameng item=jm}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $jm.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$jm.head_img}>" alt="">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$jm.id}>"><span><{$jm.name}></span>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+			</ul>
+		</li>
+	</ul>
+</div>
 <{foreach from=$szm item=s}>
 <div class="englishBox_qty">
 	<div class="english_qty"><{$s.szm}></div>

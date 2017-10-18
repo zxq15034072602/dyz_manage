@@ -5,7 +5,7 @@
 			<{foreach from=$store_people item=row}>
 			<li>
 				<div class="personShop_qty">
-				<{if $row.head_img==null || $row.head_img=='null'}>
+				<{if $row.head_img==null}>
 					<img src="../../image/img_qty/head.jpg" alt="">
 				<{else}>
 					<img src="<{$row.head_img}>" alt="">
@@ -29,7 +29,7 @@
 				<{/if}>
 				</div>
 				<div class="shopPer_qty">
-					<div class="shopPerTop_qty"><{$people.name}></div>
+					<div class="shopPerTop_qty"><{$people.name|truncate:7}></div>
 					<div class="shopPerB_qty"><{if $people.roleid ==
 						3}>店长<{elseif $people.roleid ==5}>店员<{elseif $people.roleid ==1}>总部人员<{elseif $people.roleid ==2}>经销商<{elseif $people.roleid ==4}>加盟商<{elseif $people.roleid ==6}>董事长<{elseif $people.roleid ==7}>总经理<{/if}></div>
 				</div> <{if $roleid == 3 && $people.roleid == 3}>
