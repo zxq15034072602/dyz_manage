@@ -86,7 +86,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         }
         if ($user['stroe_id'] != $_REQUEST['stroe_id']  || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录s
             if ($_REQUEST[roleid] == 5 && $user['roleid'] != 3) { // 如果是店员身份修改所属门店
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -120,7 +120,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                     echo '{"code":"500","msg":"请先选择所属门店"}';
                     exit();
                 }
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=1 and status=0";
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -150,7 +150,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                 echo '{"code":"500","msg":"申请店长失败！"}';
                 exit();
             }elseif($_REQUEST[roleid]==1){//总部人员审核
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=4 and status=0";
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -198,7 +198,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         echo '{"code":"500","msg":"请先选择所属门店"}';
                         exit();
                     }
-                    $sql = "select * from rv_verify where 1=1 and uid=?  and type=2 and status=0";
+                    $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                     $db->p_e($sql, array(
                         $uid
                     ));
@@ -233,7 +233,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         echo '{"code":"500","msg":"请先选择所属门店"}';
                         exit();
                     }
-                    $sql = "select * from rv_verify where 1=1 and uid=?  and type=3 and status=0";
+                    $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                     $db->p_e($sql, array(
                         $uid
                     ));

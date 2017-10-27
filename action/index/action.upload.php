@@ -3,6 +3,7 @@ if (! defined('CORE'))
     exit("error!"); // 检查某常量是否存在。
                                         // 首页
 $base64 = $_POST['path_s'];
+
 $IMG = base64_decode($base64);
 $save_url = "http://static.duyiwang.cn/image/";
 $dir_name = "E:/apptupian/image/";

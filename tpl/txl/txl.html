@@ -33,11 +33,12 @@
 					</div>
 					<div class="groupLabel_qty">
 						<label><input type="checkbox" name="user_id" id="user_id"
-							value="<{$zb.id}>"><span><{$zb.name}><{if $zb.roleid==3}> —— 店长<{elseif $zb.roleid==5}> —— 店员<{elseif $zb.roleid==1}> —— 总部人员<{elseif $zb.roleid==2}> —— 经销商<{elseif $zb.roleid==4}> —— 加盟商<{elseif $zb.roleid==6}> —— 董事长<{elseif $zb.roleid==7}> —— 总经理<{/if}></span>
+							value="<{$zb.id}>"><span><{$zb.name}></span><{if $zb.roleid==3}> —— 店长<{elseif $zb.roleid==5}> —— 店员<{elseif $zb.roleid==1}> —— 总部人员<{elseif $zb.roleid==2}> —— 经销商<{elseif $zb.roleid==4}> —— 加盟商<{elseif $zb.roleid==6}> —— 董事长<{elseif $zb.roleid==7}> —— 总经理<{/if}>
 						</label>
 					</div>
 				</li> 
 				<{/foreach}>
+				<br/>
 			</ul>
 		</li>
 

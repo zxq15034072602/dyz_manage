@@ -30,7 +30,7 @@ if ($do == "txl") {
         $txl = array();
     }
     //太常集团
-    $sql="select a.* from rv_user as a left join rv_mendian as b on a.zz=b.id where a.zz=370";
+    $sql="select a.* from rv_user as a left join rv_mendian as b on a.zz=b.id where a.zz=370 and a.status=1";
     $db->p_e($sql, array());
     $zongbu=$db->fetchAll();
     foreach ($zongbu as &$vvvv){
@@ -40,7 +40,7 @@ if ($do == "txl") {
     }
 
     //经销商
-    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=2";
+    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=2 and b.status=1";
     $db->p_e($sql, array());
     $jingxiao=$db->fetchAll();
     foreach ($jingxiao as &$vv){
@@ -49,7 +49,7 @@ if ($do == "txl") {
         }
     }
     //加盟商
-    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=4";
+    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=4 and b.status=1";
     $db->p_e($sql, array());
     $jiameng=$db->fetchAll();
     foreach($jiameng as $vvv){
@@ -98,6 +98,16 @@ if ($do == "txl") {
     $smt->assign("flag", $flag);
     $smt->assign('txl', $txl);
     $smt->display('txl.html');
+    exit();
+}elseif($do=='search'){//群聊通讯录搜索
+    $name=$_REQUEST['name'];
+    $search .= "and name like ? ";
+    $arr[]="%".$_REQUEST['name']."%";
+    
+    $sql="select * from rv_user where 1=1 and status=1 ".$search;
+    $db->p_e($sql, $arr);
+    $list=$db->fetchAll();
+    echo '{"list":'.json_encode($list).'}';
     exit();
 }
 

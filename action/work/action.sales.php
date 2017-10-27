@@ -27,10 +27,13 @@ if ($do == "index") { // 销售录入主页面
             }
         }
     }
+   
+
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("store_goods", $store_goods);
     $smt->display("sales_index.html");
+
     exit();
 } elseif ($do == "add_buy_cart"){ //添加销售商品到录入单
     $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id,商品名称,商品单价）

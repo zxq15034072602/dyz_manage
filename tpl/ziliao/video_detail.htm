@@ -15,7 +15,7 @@
     <p class="relative_title_zn">相关视频</p>
     <ul class="relative_box_zn">
     <{foreach from=$xgvideo item=video key=k}>
-        <li class="relative_list_zn" vid="<{$video.id}>" videourl="http://player.youku.com/embed/<{$video.url}>==">
+        <li class="relative_list_zn" vid="<{$video.id}>" videourl="http://player.youku.com/embed/<{$video.url}>==" style="cursor:pointer">
             <span class="num_zn"><{$k+1}></span>
             <span class="relative_title"><{$video.title|truncate:10}></span>
             <span class="click_video"></span>
