@@ -10,6 +10,22 @@ $user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健�
 if ($do == "userinfo") { // 用户中心个人信息
     $uid = $_REQUEST['uid']; // 用户id
     $user = user($uid); // 获取用户相关信息s
+    //获取经销商加盟商区域
+    if($user['roleid']==2 || $user['roleid']==4){
+        $sql="select * from rv_user_jingxiao_jiameng where uid=?";
+        $db->p_e($sql, array($uid));
+        $city=$db->fetchRow();
+        //获取城市
+        $sql="select * from rv_city where cityid=?";
+        $db->p_e($sql, array($city['cityid']));
+        $city_name=$db->fetchRow();
+        //获取省份
+        $sql="select * from rv_province where provinceid=?";
+        $db->p_e($sql, array($city_name['fatherid']));
+        $province=$db->fetchRow();
+        //连接省份和城市字符串
+        $user['region']=$province['province'].$city_name['city'];
+    }
  
     if ($_REQUEST['dosubmit']) { // 如果是提交修改用户资料
         if($_POST['head_img']){
@@ -86,7 +102,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         }
         if ($user['stroe_id'] != $_REQUEST['stroe_id']  || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录s
             if ($_REQUEST[roleid] == 5 && $user['roleid'] != 3) { // 如果是店员身份修改所属门店
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=0 and status=0";
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -120,7 +136,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                     echo '{"code":"500","msg":"请先选择所属门店"}';
                     exit();
                 }
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=1 and status=0";
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -149,12 +165,8 @@ if ($do == "userinfo") { // 用户中心个人信息
                 }
                 echo '{"code":"500","msg":"申请店长失败！"}';
                 exit();
-            }
-        }
-        
-        if(!empty(json_decode($_REQUEST['stroe_id'])) && $user['roleid'] != $_REQUEST['roleid']){
-            if($_REQUEST[roleid]==1){//总部人员审核
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=4 and status=0";
+            }elseif($_REQUEST[roleid]==1){//总部人员审核
+                $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
                 ));
@@ -183,87 +195,95 @@ if ($do == "userinfo") { // 用户中心个人信息
                 }
                 echo '{"code":"500","msg":"申请成为总部人员失败！"}';
                 exit();
-            }elseif($_REQUEST[roleid]==2){//经销商审核
-                if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请经销商
-                    echo '{"code":"500","msg":"请先选择所属门店"}';
-                    exit();
-                }
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=2 and status=0";
-                $db->p_e($sql, array(
-                    $uid
-                ));
-                if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
-                    echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
-                    exit();
-                }
-                //处理接收的门店id
-                $mid=$_REQUEST['stroe_id'];
-                $mid=rtrim($mid,']');
-                $mid=ltrim($mid,'[');
-                $mid=str_replace('"', "", $mid);
-                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
-                $arr = array(
-                    $uid,
-                    $mid,
-                    2,
-                    0
-                );
-                if ($db->p_e($sql, $arr)) {
-                    $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
-                    $db->p_e($sql, array(
-                        $_REQUEST[name],
-                        $_REQUEST[sex],
-                        $_REQUEST[age],
-                        $head_img,
-                        $uid
-                    ));
-                    echo '{"code":"200","msg":"申请成为经销商提交成功！请等待审核！"}';
-                    exit();
-                }
-                echo '{"code":"500","msg":"申请经销商失败！"}';
-                exit();
-            }elseif($_REQUEST[roleid]==4){//加盟商审核
-                if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请加盟商
-                    echo '{"code":"500","msg":"请先选择所属门店"}';
-                    exit();
-                }
-                $sql = "select * from rv_verify where 1=1 and uid=?  and type=3 and status=0";
-                $db->p_e($sql, array(
-                    $uid
-                ));
-                if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
-                    echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
-                    exit();
-                }
-                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,now(),?)";
-                 
-                //处理接收的门店id
-                $mid=$_REQUEST['stroe_id'];
-                $mid=rtrim($mid,']');
-                $mid=ltrim($mid,'[');
-                $mid=str_replace('"', "", $mid);
-                
-                $arr = array(
-                    $uid,
-                    $mid,
-                    3,
-                    0
-                );
-                if ($db->p_e($sql, $arr)) {
-                    $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
-                    $db->p_e($sql, array(
-                        $_REQUEST[name],
-                        $_REQUEST[sex],
-                        $_REQUEST[age],
-                        $head_img,
-                        $uid
-                    ));
-                    echo '{"code":"200","msg":"申请成为加盟商提交成功！请等待审核！"}';
-                    exit();
-                }
-                echo '{"code":"500","msg":"申请加盟商失败！"}';
-                exit();
             }
+        }
+        
+        if(!empty(json_decode($_REQUEST['stroe_id'])) || $user['roleid'] != $_REQUEST['roleid'] || $_REQUEST['cityid']){
+            //处理接收的门店id
+            $mid=$_REQUEST['stroe_id'];
+            $mid=rtrim($mid,']');
+            $mid=ltrim($mid,'[');
+            $mid=str_replace('"', "", $mid);
+            $sql="select * from rv_user_jingxiao_jiameng where uid=?";
+            $db->p_e($sql, array($uid));
+            $md=$db->fetchAll()['mid'];
+            
+            if($mid != $md || !empty($_REQUEST['cityid'])){
+                if($_REQUEST[roleid]==2){//经销商审核
+                    if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请经销商
+                        echo '{"code":"500","msg":"请先选择所属门店"}';
+                        exit();
+                    }
+                    $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
+                    $db->p_e($sql, array(
+                        $uid
+                    ));
+                    if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
+                        echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
+                        exit();
+                    }
+                
+                    $sql = "insert into rv_verify (uid,mid,type,addtime,status,cityid) VALUES (?,?,?,now(),?,?)";
+                    $arr = array(
+                        $uid,
+                        $mid,
+                        2,
+                        0,
+                        $_REQUEST['cityid']
+                    );
+                    if ($db->p_e($sql, $arr)) {
+                        $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
+                        $db->p_e($sql, array(
+                            $_REQUEST[name],
+                            $_REQUEST[sex],
+                            $_REQUEST[age],
+                            $head_img,
+                            $uid
+                        ));
+                        echo '{"code":"200","msg":"申请成为经销商提交成功！请等待审核！"}';
+                        exit();
+                    }
+                    echo '{"code":"500","msg":"申请经销商失败！"}';
+                    exit();
+                }elseif($_REQUEST[roleid]==4){//加盟商审核
+                    if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请加盟商
+                        echo '{"code":"500","msg":"请先选择所属门店"}';
+                        exit();
+                    }
+                    $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
+                    $db->p_e($sql, array(
+                        $uid
+                    ));
+                    if ($db->fetchRow()) { // 如果还有未处理的审核则不能提交职位变更申请
+                        echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
+                        exit();
+                    }
+                    $sql = "insert into rv_verify (uid,mid,type,addtime,status,cityid) VALUES (?,?,?,now(),?,?)";
+                
+                    $arr = array(
+                        $uid,
+                        $mid,
+                        3,
+                        0,
+                        $_REQUEST['cityid']
+                    );
+                    if ($db->p_e($sql, $arr)) {
+                        $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";
+                        $db->p_e($sql, array(
+                            $_REQUEST[name],
+                            $_REQUEST[sex],
+                            $_REQUEST[age],
+                            $head_img,
+                            $uid
+                        ));
+                        echo '{"code":"200","msg":"申请成为加盟商提交成功！请等待审核！"}';
+                        exit();
+                    }
+                    echo '{"code":"500","msg":"申请加盟商失败！"}';
+                    exit();
+                } 
+            }
+                       
         }
         
         $sql = "update rv_user set name=?,sex=?,age=?,head_img=? where id=?";

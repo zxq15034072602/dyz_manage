@@ -150,7 +150,6 @@ if($do=='video_type'){//视频分类页
     $uid=$_REQUEST['uid'];
     $vid=$_REQUEST['vid'];//视频分类id
     $vvid=$_REQUEST['vvid'];//视频id
-    file_put_contents('f:/error.txt', '视频分类id'.$vid.'///视频id'.$vvid);
     $sql="select uid from rv_video_learn where uid=? and vvid=? and vid=?";
     $db->p_e($sql, array(
         $uid,

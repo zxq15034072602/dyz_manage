@@ -37,7 +37,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
     exit();
 } elseif ($do == "agree_i_verify") { // 同意销售录入审核
     $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id,数量）
-    if (empty($_REQUEST['bid']) || empty($user_roleid) || empty($add_goods_list) || !is_array($add_goods_list)|| empty($store_id)) {
+    if (empty($_REQUEST['bid']) || empty($user_roleid) || empty($add_goods_list) || !is_array($add_goods_list)|| empty($stor_id)) {
         echo '{"code":"500","msg":"关键数据获取失败"}';
         exit();
     }

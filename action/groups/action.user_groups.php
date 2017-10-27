@@ -358,7 +358,7 @@ if ($do == "add_groups") {
             "kucun=100"
         ));
     }
-}elseif($do=='del_groups_xiaoxi'){
+}elseif($do=='del_groups_xiaoxi'){//撤回消息
     $id=$_REQUEST['xid'];
     $uid=$_REQUEST['uid'];
     $gid=$_REQUEST['gid'];
