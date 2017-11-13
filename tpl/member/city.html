@@ -1,0 +1,42 @@
+
+<{foreach from=$province item=row}>
+<{if $row.type}>
+	<div class="myDiv">
+	<span class="shengfen" data-proid="<{$row.provinceid}>"><{$row.province}></span>
+	<img src="../../image/img_qty/xiala.png" alt="" class="xiala">
+	</div>
+	<ul>
+
+		<{foreach from=$row.city item=city}>
+		  	<li >&nbsp;<{$city.city}>
+		              <div class="inputBox_qty">
+		              <label><input name="a" type="checkbox" 
+		              <{foreach from=$cids item=c}> 
+		              <{if $c==$city.cityid}>disabled="disabled"<{/if}> 
+		              <{/foreach}>
+		              class="woman_yyt" value="<{$city.cityid}>" id="duoxuan"/></label>
+		              </div>
+		    </li>	 
+		<{/foreach}>
+	</ul>
+<{else}>
+<div class="myDiv">
+<span class="shengfen" data-proid="<{$row.provinceid}>"><{$row.province}></span>
+<img src="../../image/img_qty/xiala.png" alt="" class="xiala">
+</div>
+<ul>
+	
+		<{foreach from=$row.city item=city}>
+	  		<li >&nbsp;<{$city.city}>
+	              <div class="inputBox_qty">
+	              <label><input name="b" type="radio" 
+	              <{foreach from=$cids item=c}>
+	              <{if $c==$city.cityid}>disabled="disabled"<{/if}> 
+	              <{/foreach}>
+	               class="woman_yyt" value="<{$city.cityid}>" id="danxuan"/></label>
+	              </div>
+	    	</li> 		
+	<{/foreach}>
+</ul>
+<{/if}>
+<{/foreach}>

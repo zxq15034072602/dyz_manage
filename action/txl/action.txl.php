@@ -107,6 +107,28 @@ if ($do == "txl") {
     $sql="select * from rv_user where 1=1 and status=1 ".$search;
     $db->p_e($sql, $arr);
     $list=$db->fetchAll();
+    foreach($list as &$v){
+        if($v['roleid']==2){
+            $sql="select b.city as cityname from rv_user_jingxiao_jiameng as a left join rv_city as b on a.cityid=b.cityid where a.id=?";
+            $db->p_e($sql, array($v['zz']));
+            $cityname=$db->fetchRow()['cityname'];
+            $v['position']=$cityname.'经销商';
+        }elseif($v['roleid']==4){
+            $sql="select b.city as cityname from rv_user_jingxiao_jiameng as a left join rv_city as b on a.cityid=b.cityid where a.id=?";
+            $db->p_e($sql, array($v['zz']));
+            $cityname=$db->fetchRow()['cityname'];
+            $v['position']=$cityname.'加盟商';
+        }else{
+            if($v['zz']){
+                $sql="select name as mdname from rv_mendian where id=?";
+                $db->p_e($sql, array($v['zz']));
+                $v['position']=$db->fetchRow()['mdname'];
+            }else{
+                $v['position']='该用户还未加入门店';
+            }
+            
+        }
+    }
     echo '{"list":'.json_encode($list).'}';
     exit();
 }
