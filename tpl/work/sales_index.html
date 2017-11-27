@@ -2,7 +2,7 @@
 <div class="saleEnteyFont_qty"><{$good.typename}></div>
 <ul class="productList_qty">
     <{foreach from=$good.goods item=g}>
-	<li value="<{$g.gid}>">
+	<li value="<{$g.gid}>" style="cursor:pointer">
 		<div class="productBox_qty">
 			<div class="productName_qty"><{$g.name|truncate:5:""}></div>
 			<div class="productMoney_qty"><{$g.money}> <span>(￥)</span></div>

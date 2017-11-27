@@ -9,7 +9,7 @@
  	<ul>
  		<li>
  		<{foreach from=$p.area  item=city}>
- 			<span class="city_qty" value="" id="<{$city.cityid}>" onclick="open_store_list(<{$city.cityid}>,'<{$city.city}>')"><{$city.city|truncate:5:""}></span>
+ 			<span class="city_qty" value=""  id="<{$city.cityid}>" onclick="open_store_list(<{$city.cityid}>,'<{$city.city}>')"><{$city.city|truncate:5:""}></span>
  	    <{/foreach}>
  		</li>
  		

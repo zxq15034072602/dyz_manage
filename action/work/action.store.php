@@ -56,7 +56,6 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
     $sql="select * from rv_mendian where cityid=? and status=1 and type=0";
     $db->p_e($sql, array($cityid));
     $store=$db->fetchAll();
- 
     foreach($store as &$val){
         $sql="select a.*,b.name from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=4";
         $db->p_e($sql, array());
@@ -68,6 +67,7 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
             }
         }
     }    
+
     echo '{"code":"200","dealer_info":'.json_encode($dealer_info).',"store":'.json_encode($store).'}';
     exit();
 }elseif($do=='city_storenum'){//城市下经销商数、加盟商数、门店数量

@@ -3,8 +3,8 @@
 <li class="user_box_zn" onclick="talk_about(<{$user.id}>)">
     <div class="user_zn">
         <div class="user_picture_zn">
-        	<{if $user.head_img==null}>
-            	<img src="../../image/img_qty/head.jpg" alt="">
+            <{if $user.head_img==null}>
+           		<img src="../../image/img_qty/head.jpg" alt="">
             <{else}>
             	<img src="<{$user.head_img}>" alt="">
             <{/if}>
@@ -18,7 +18,6 @@
 <{else}> 
 <div class="groupChart_qty">
 	<ul class="groupChartSmall_qty">
-
 		<li class="groupParent_qty"><a> <span class="grouplist_qty">太常集团</span>
 				<span class="arrowTop_qty"></span>
 		</a>
@@ -26,7 +25,7 @@
 				<{foreach from=$zongbu item=zb}>
 				<li>
 					<div class="groupImg_qty">
-					<{if $jx.head_img==null}>
+					<{if $zb.head_img==null}>
 						<img src="../../image/img_qty/head.jpg" alt="">
 					<{else}>
 						<img src="<{$zb.head_img}>" alt="">
@@ -39,8 +38,10 @@
 					</div>
 				</li> 
 				<{/foreach}>
+				<br/>
 			</ul>
 		</li>
+
 		<li class="groupParent_qty"><a> <span class="grouplist_qty">经销商</span>
 				<span class="arrowTop_qty"></span>
 		</a>

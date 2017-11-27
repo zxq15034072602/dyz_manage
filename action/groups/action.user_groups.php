@@ -16,6 +16,7 @@ if ($do == "add_groups") {
         $ug_id = $db->insert(0, 2, "rv_users_groups", array(
             "ug_admin_id = $admin_id"
         )); // 如果插入成功，则返回群组id
+        file_put_contents('e:/error7.txt', $ug_id);
         if ($ug_id) { // 如果创建群聊成功，则往群成员表插入群成员
             $sql = "INSERT INTO rv_group_to_users(gu_gid,gu_uid,gu_group_nick) VALUES";
             $item_list_tmp = '';
@@ -107,8 +108,8 @@ if ($do == "add_groups") {
                 echo '{"code":"200","msg":"修改成功","value":"' . $_REQUEST[nick_name] . '"}';
                 exit();
             }
-        } elseif ($flag == "notice") { // 修改公告
-            $time=date('Y.m.d H:s',time());
+        }elseif ($flag == "notice") { // 修改公告
+            $time=date('Y.m.d H:i',time());
             $uid=$_REQUEST['uid'];
             $sql="select name from rv_user where id=?";
             $db->p_e($sql, array($uid));
@@ -197,7 +198,7 @@ if ($do == "add_groups") {
         $total = ceil($total / $pagenum);
         foreach ($qdh as $key => &$value) {
             $value['from_uid'] == $uid ? $qdh[$key]['type'] = 1 : $qdh[$key]['type'] = 2; // 获取是收消息or发消息
-            $qdh[$key]['from'] = user($value['from_uid']); // 获取发消息人    
+            $qdh[$key]['from'] = user($value['from_uid']); // 获取发消息人
             if(stripos($value['from']['head_img'],"http://")===false && $value['from']['head_img']!=null){
                 $value['from']['head_img']="../../image/header_picture/".$value['from']['head_img'];              
             }

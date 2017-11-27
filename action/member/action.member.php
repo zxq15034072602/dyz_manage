@@ -295,12 +295,15 @@ if ($do == "userinfo") { // 用户中心个人信息
             $db->p_e($sql, array($v));
             $name=$db->fetchRow();
             $stroe['name'].=$name['name'].'&nbsp;&nbsp;';
+            $stroe['store'][]=array('id'=>$v,'name'=>$name['name']);
         } 
+        
         //处理接收的区域
         if($stroe['areaid']){
             $sql="select * from rv_city where cityid=?";
             $db->p_e($sql, array($stroe['cityid']));
             $cityname=$db->fetchRow();
+            $stroe['position'].=$cityname['city'];
             $stroe['areaid']=explode(",", $stroe['areaid']);
             foreach($stroe['areaid'] as $kk=>$vv){
                 $sql="select * from rv_area where areaid=?";
@@ -444,7 +447,7 @@ if ($do == "userinfo") { // 用户中心个人信息
 }else if ($do == "find_store_list1") { // 获得 指定市级门店
     $type=$_REQUEST[type]??0;
     $cityid=$_REQUEST['cityid'];//城市id
-    $sql="select * from rv_mendian where 1=1 and cityid=? and type=?";
+    $sql="select * from rv_mendian where 1=1 and cityid=? and status=1 and type=?";
     $db->p_e($sql, array($cityid,$type));
     $store_list=$db->fetchAll();
     $smt = new smarty();
@@ -567,7 +570,6 @@ elseif($do=='info'){//获取用户个人信息
     }else{
         $cids=array();
     }
-
     
     //获取省份与城市
     $sql="select * from rv_province";
@@ -590,7 +592,7 @@ elseif($do=='info'){//获取用户个人信息
     smarty_cfg($smt);
     $smt->assign('province', $province);
     $smt->assign('cids', $cids);
-    $smt->display('city.html'); 
+    $smt->display('city.html');    
 }
 
 

@@ -19,7 +19,8 @@ if ($do == "txl") {
         $txl = $db->fetchAll();
         foreach ($txl as &$k) {
             $k['admin'] = user($k['adminid']);
-            $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5,6,7) and zz!=370";
+          //  $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5,6,7) and zz!=370";
+            $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5)";
             $db->p_e($sql, array(
                 $k['id']
             ));
@@ -35,32 +36,34 @@ if ($do == "txl") {
         $txl = array();
     }
     //太常集团
-        $sql="select a.* from rv_user as a left join rv_mendian as b on a.zz=b.id where a.zz=370 and a.status=1";
-        $db->p_e($sql, array());
-        $zongbu=$db->fetchAll();
-        foreach ($zongbu as &$vvvv){
-            if(stripos($vvvv['head_img'],"http://")===false && $vvvv['head_img']!=null){
-                $vvvv['head_img']="../../image/header_picture/".$vvvv['head_img'];
-            }
+    $sql="select a.* from rv_user as a left join rv_mendian as b on a.zz=b.id where a.zz=370 and a.status=1";
+    $db->p_e($sql, array());
+    $zongbu=$db->fetchAll();
+    foreach ($zongbu as &$vvvv){
+        if(stripos($vvvv['head_img'],"http://")===false && $vvvv['head_img']!=null){
+            $vvvv['head_img']="../../image/header_picture/".$vvvv['head_img'];
         }
+    }
+
     //经销商
-        $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=2 and b.status=1";
-        $db->p_e($sql, array());
-        $jingxiao=$db->fetchAll();
-        foreach ($jingxiao as &$vv){
-            if(stripos($vv['head_img'],"http://")===false && $vv['head_img']!=null){
-                 $vv['head_img']="../../image/header_picture/".$vv['head_img'];
-            }
+    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=2 and b.status=1";
+    $db->p_e($sql, array());
+    $jingxiao=$db->fetchAll();
+    foreach ($jingxiao as &$vv){
+        if(stripos($vv['head_img'],"http://")===false && $vv['head_img']!=null){
+             $vv['head_img']="../../image/header_picture/".$vv['head_img'];
         }
+    }
     //加盟商
-        $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=4 and b.status=1";
-        $db->p_e($sql, array());
-        $jiameng=$db->fetchAll();
-        foreach($jiameng as $vvv){
-            if(stripos($vvv['head_img'],"http://")===false && $vvv['head_img']!=null){
-                $vvv['head_img']="../../image/header_picture/".$vvv['head_img'];
-            }
+    $sql="select b.* from rv_user_jingxiao_jiameng as a left join rv_user as b on a.id=b.zz where b.roleid=4 and b.status=1";
+    $db->p_e($sql, array());
+    $jiameng=$db->fetchAll();
+    foreach($jiameng as $vvv){
+        if(stripos($vvv['head_img'],"http://")===false && $vvv['head_img']!=null){
+            $vvv['head_img']="../../image/header_picture/".$vvv['head_img'];
         }
+    }
+
     // 模版
     $flag = $_REQUEST['flag'] ?? '0'; // 0未默认通信录 1群聊通讯录
     $smt = new smarty();
