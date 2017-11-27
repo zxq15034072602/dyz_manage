@@ -1,0 +1,56 @@
+<!-- 未完成的订单 -->
+<div class="wwc_box">
+<{foreach from=$unfinished_info item=unfinished}>
+    <div class="wwc_one">
+        <div class="jinhuo">
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;进&nbsp;&nbsp;货&nbsp;&nbsp;人</span>
+          <span class="shuxian1">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+          <span><{$unfinished.name}></span>
+        </div>
+        <div class="dianhua">
+          <span >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话</span>
+          <span class="shuxian">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+          <span class="nub"><{$unfinished.mobile}></span>
+        </div>
+        <div class="zhuangtai">
+          <span >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订单状态</span>
+          <span class="shuxian">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+          <span class="hong"><{$unfinished.order_status}></span>
+        </div>
+        <div class="bott_box">
+          <span class="shijian"><{$unfinished.starttime}></span>
+          <div class="xiangqing" onclick="open_wwc(<{$unfinished.id}>)">查看详情</div>
+        </div>
+   	</div>
+   	<{/foreach}>
+   	<input type="hidden" value="<{$total}>" name="total"/>
+</div>
+
+
+<!-- 已完成的订单 -->
+<div class="ywc_box">
+	<{foreach from=$finish_info item=finish}>
+     <div class="ywc_one">
+         <div class="jinhuo">
+           <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;进&nbsp;&nbsp;货&nbsp;&nbsp;人</span>
+           <span class="shuxian1">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+           <span><{$finish.name}></span>
+         </div>
+         <div class="dianhua">
+           <span >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话</span>
+           <span class="shuxian">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+           <span class="nub"><{$finish.mobile}></span>
+         </div>
+         <div class="zhuangtai">
+           <span >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订单状态</span>
+           <span class="shuxian">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+           <span class="hong"><{$finish.order_status}></span>
+         </div>
+         <div class="bott_box">
+           <span class="shijian"><{$finish.starttime}></span>
+           <div class="yxiangqing" onclick="open_wwc(<{$finish.id}>)">查看详情</div>
+         </div>
+     </div>
+     <{/foreach}>
+     <input type="hidden" value="<{$total1}>" name="total1"/>
+</div>
