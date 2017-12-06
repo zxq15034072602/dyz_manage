@@ -16,7 +16,6 @@ if ($do == "add_groups") {
         $ug_id = $db->insert(0, 2, "rv_users_groups", array(
             "ug_admin_id = $admin_id"
         )); // 如果插入成功，则返回群组id
-        file_put_contents('e:/error7.txt', $ug_id);
         if ($ug_id) { // 如果创建群聊成功，则往群成员表插入群成员
             $sql = "INSERT INTO rv_group_to_users(gu_gid,gu_uid,gu_group_nick) VALUES";
             $item_list_tmp = '';
@@ -299,12 +298,14 @@ if ($do == "add_groups") {
             $gid
         ));
         $guids = $db->fetchAll();
+
         foreach ($guids as $key => $value) {
             $guids[$key] = $value[gu_uid];
         }
         foreach ($groups_users as $key => $user) {
             if (in_array($user[0], $guids)) { // 如果已存在，则剔除
-                array_splice($groups_users, $key, 1);
+                unset($groups_users[$key]);
+                //array_splice($groups_users, $key, 1);
             }
         }
 

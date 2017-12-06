@@ -6,7 +6,7 @@
             <{if $user.head_img==null}>
            		<img src="../../image/img_qty/head.jpg" alt="">
             <{else}>
-            	<img src="<{$user.head_img}>" alt="">
+            	<img src="<{$user.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
             <{/if}>
         </div>
         <div class="user_name_zn">

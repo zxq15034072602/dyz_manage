@@ -511,7 +511,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
         exit();
     }
     
-    $sql = "select g.id,g.name,g.good_img,g.dw,g.money,k.kucun from rv_goods as g,rv_kucun as k where g.id = k.gid and k.mid=? and k.kucun < 101";
+    $sql = "select g.id,g.name,g.good_img,g.dw,g.money,k.kucun from rv_goods as g,rv_kucun as k where g.id = k.gid and k.mid=?";
     $db->p_e($sql, array(
         $store_id
     ));

@@ -24,7 +24,7 @@ if ($do == "index") { // 人员管理页面
             $vv['head_img']="../../image/header_picture/".$vv['head_img'];
         }
     }
-    $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? and u.roleid<6 and u.status=1 ORDER BY u.roleid ";
+    $sql = "select  u.id as uid,m.id as mid ,u.username,u.name,u.head_img, u.roleid from rv_mendian as m,rv_user as u where u.zz=m.id and m.id=? and u.roleid in (1,3,5) and u.status=1 ORDER BY u.roleid ";
     $db->p_e($sql, array(
         $store_id
     ));
