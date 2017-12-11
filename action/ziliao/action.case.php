@@ -6,7 +6,10 @@ if($do=='clist'){//案例列表页
     $db->p_e($sql, array());
     $cArr=$db->fetchAll();
     foreach($cArr as $k=>&$v){     
-        $cArr[$k]['img']=explode(",", $v['case_img']);    
+        $cArr[$k]['img']=explode(",", $v['case_img']);  
+        //$v['content']=htmlspecialchars_decode($v['content']);  
+                $v['content']=strip_tags(html_entity_decode($v['content']));
+                $v['content']=substr($v['content'], 48);
     }
     $smt=new Smarty();
     smarty_cfg($smt);

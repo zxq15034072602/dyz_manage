@@ -6,7 +6,7 @@ $role=$_REQUEST['roleid'];//权限id
 
 //经销商 加盟商门店列表 以及产品
 if($do=='index'){
-    if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
+       if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
         $type=$_REQUEST[type]??0;//0独一张/1食维健
         $good_type = $db->select(0, 0, "rv_type","*","and type=$type");
         if($role==2 || $role==4){
@@ -73,7 +73,7 @@ if($do=='index'){
             ));
             if($order_storeid){
                 foreach($vv as $val){
-                    //产品数量
+                     //产品数量
                     if($val[0]==1){$num=$val[1]*10;}elseif($val[0]==2){$num=$val[1]*40;
                     }elseif($val[0]==3){$num=$val[1]*10;}elseif($val[0]==4){ $num=$val[1]*10;
                     }elseif($val[0]==6){$num=$val[1];
@@ -230,8 +230,8 @@ if($do=='index'){
         }elseif($order_info['status']==1){
             $order_info['order_status']='已完成';
         }
-        
-        //物流单号
+
+         //物流单号
         $order_info['order_number']=explode("，", $order_info['order_number']);
         
         //查询门店信息以及产品信息

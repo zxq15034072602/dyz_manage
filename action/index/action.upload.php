@@ -20,7 +20,10 @@ $new_file_names = date("YmdHis") . '_' . mt_rand(100, 999) . '.jpg';
 // 移动缩略图文件
 $file_path_s = $dir_name . $new_file_names;
 $file_url_s = $save_url . $new_file_names;
-file_put_contents($file_path_s, $IMG);
+
+$fp=fopen($file_path_s, "w");//打开缩略图文件流
+fwrite($fp, $IMG);
+fclose($fp);
 
 
 if(!empty($_POST['path'])){
@@ -40,7 +43,10 @@ if(!empty($_POST['path'])){
     //移动原图
     $file_path=$dir_name . $new_file_name;
     $file_url=$save_url . $new_file_name;
-    file_put_contents($file_path, $Y_IMG);
+    //file_put_contents($file_path, $Y_IMG);
+    $forigin=fopen($file_path, "w");//打开原图文件流
+    fwrite($forigin, $Y_IMG);
+    fclose($forigin);
 }
 
 

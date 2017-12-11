@@ -63,7 +63,6 @@ if($do=='video_type'){//视频分类页
         $vid
     ));
     $kcnum=$db->fetch_count();
-
     $smt=new Smarty();
     smarty_cfg($smt);
     $smt->assign('videolist',$videolist);
@@ -102,7 +101,7 @@ if($do=='video_type'){//视频分类页
     
 }elseif($do=='videodetail'){//秘籍详情页
     $vid=$_REQUEST['vid'];
-    $sql="select a.title,a.url,a.vid,b.content,b.type from rv_video_list as a left join rv_video_type as b on a.vid=b.id where a.id=?";
+    $sql="select a.title,a.url,a.vid,a.video_url,b.content,b.type from rv_video_list as a left join rv_video_type as b on a.vid=b.id where a.id=?";
     $db->p_e($sql, array(
         $vid
     ));
@@ -128,6 +127,36 @@ if($do=='video_type'){//视频分类页
     $smt->assign('xgvideo',$xgvideo);
     $smt->display('video_detail.htm');
     exit();
+}elseif($do=='videodetail1'){//秘籍详情页
+    $vid=$_REQUEST['vid'];
+    if($vid){
+        $sql="select a.title,a.url,a.vid,a.video_url,b.content,b.type from rv_video_list as a left join rv_video_type as b on a.vid=b.id where a.id=?";
+        $db->p_e($sql, array(
+            $vid
+        ));
+        $videoArr=$db->fetchRow();
+        
+        //相关视频
+        $sql="select a.* from rv_video_list as a left join rv_video_type as b on a.vid=b.id where 1=1 and vid=?";
+        $db->p_e($sql, array(
+            $videoArr['vid']
+        ));
+        $xgvideo=$db->fetchAll();
+        foreach($xgvideo as &$value){
+            $value['learnnum']=$value['learnnum']??0;
+            $sql="select count(*) as learnnum from rv_video_learn where 1=1 and vvid=? and status=1";
+            $db->p_e($sql, array(
+                $value[id]
+            ));
+            $value['learnnum']=$db->fetchRow();
+        }
+        echo '{"code":"200","videoArr":' . json_encode($videoArr) . ',"xgvideo":' . json_encode($xgvideo) . '}';
+        exit();
+    }else{
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
+    }
+    
 }elseif($do=='article_list'){//图文列表
     $vid=$_REQUEST['vid'];
     $sql="select a.*,b.name,b.content,b.video_img,b.type from rv_article_list as a left join rv_video_type as b on a.vid=b.id where vid=?";

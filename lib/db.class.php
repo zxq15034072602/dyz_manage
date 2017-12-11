@@ -24,7 +24,7 @@ class pdo_mysql
     /* 数据库连接 */
     public function connect()
     {
-        $this->pdo = new PDO($this->Config['dsn'], $this->Config['name'], $this->Config['password']);
+        $this->pdo = new PDO($this->Config['dsn'], $this->Config['name'], $this->Config['password'],array(PDO::ATTR_PERSISTENT => true));
         $this->pdo->query('set names utf8mb4;');
         // 把结果序列化成stdClass
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -111,6 +111,7 @@ class pdo_mysql
                 '?' => '%s'
             )), $arr);
         }
+        
     }
 
     /**
@@ -177,6 +178,7 @@ class pdo_mysql
                 exit();
             }
         }
+        
     }
 
     /**
@@ -228,6 +230,7 @@ class pdo_mysql
                 exit();
             }
         }
+        
     }
 
     /**
@@ -283,6 +286,7 @@ class pdo_mysql
                 exit();
             }
         }
+        
     }
 
     /**
@@ -323,7 +327,10 @@ class pdo_mysql
                 exit();
             }
         }
+        
     }
+   
+
 }
 
 ?>

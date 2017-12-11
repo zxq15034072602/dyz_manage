@@ -48,7 +48,10 @@ if ($do == "userinfo") { // 用户中心个人信息
                 // 移动缩略图文件
                 $file_path_s = $dir_name . $new_file_names;
                 $file_url_s = $save_url . $new_file_names;
-                file_put_contents($file_path_s, $IMG);
+               // file_put_contents($file_path_s, $IMG);
+                $fhead=fopen($file_path_s, "w");
+                fwrite($fhead, $IMG);
+                fclose($fhead);
                 $head_img=$file_url_s;
             }else{
                 $head_img=$_POST['head_img'];
@@ -175,7 +178,6 @@ if ($do == "userinfo") { // 用户中心个人信息
             $sql="select * from rv_user_jingxiao_jiameng where uid=?";
             $db->p_e($sql, array($uid));
             $md=$db->fetchRow()['mid'];
-            
             //处理接收的区域
             if(strpos($_REQUEST['cityid'], ",")){
                 $area=$_REQUEST['cityid'];
@@ -325,7 +327,6 @@ if ($do == "userinfo") { // 用户中心个人信息
         ));
         $stroe = $db->fetchRow();
     }
-    
    
     echo '{"userinfo":' . json_encode($user) . ',"stroe":' . json_encode($stroe) . ',"area":'.json_encode($area).'}';
     exit();
@@ -370,7 +371,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         }
     }
       
-    echo '{"code":"500","msg":"登陆信息有误"}';
+    echo '{"code":"500","msg":"您输入的账号或密码有误"}';
     exit();
 } elseif ($do == "register") { // 用户注册
     $mobile = $_POST['mobile']; // 手机号
@@ -463,7 +464,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                  echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"' . $user['zz'] . '","type":"' . $user['type'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
                  exit();
             }else{
-                echo '{"code":"500","msg":"操作错误"}';
+                echo '{"code":"500","msg":"您输入的账号或密码有误"}';
                 exit();
             }
         }else{
@@ -474,7 +475,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         echo '{"code":"500","msg":"手机号错误"}';
         exit();
     }
-}elseif ($do == "area") { // 门店省级联动页面
+} elseif ($do == "area") { // 门店省级联动页面
     $sql = "select  GET_SZM(province) as szm from rv_province group by szm";
     $db->p_e($sql, array());
     $szm = $db->fetchAll();
@@ -569,6 +570,7 @@ elseif($do=='info'){//获取用户个人信息
         $arr2=$db->fetchRow();
         $list[$k]=$arr2;
     }
+
     if($list[0]){
         $smt=new Smarty();
         smarty_cfg($smt);
@@ -630,7 +632,6 @@ elseif($do=='info'){//获取用户个人信息
             $v['city']=$db->fetchAll();
         }
     }
-
     $smt=new Smarty();
     smarty_cfg($smt);
     $smt->assign('province', $province);
