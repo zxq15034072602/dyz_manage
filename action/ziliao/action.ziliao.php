@@ -39,6 +39,8 @@ if($do=='index'){//资料模块首页
      foreach($cArr as $k=>&$v){
         $imgArr=explode(",", $v['case_img']);
         $cArr[$k]['img']=$imgArr['0'];
+        $v['content']=strip_tags(html_entity_decode($v['content']));
+        $v['process']=strip_tags(html_entity_decode($v['process']));
     }
     $cArr=array_slice($cArr,0,4);
     
@@ -59,6 +61,7 @@ if($do=='index1'){//资料模块首页
     $mArr=$db->fetchAll();
 
     foreach($mArr as &$value){
+        
         $value['kcnum']=$value['kcnum']??0;
         $sql="select count(*) as kcnum from rv_video_list where vid=?";
         $db->p_e($sql, array(
@@ -84,6 +87,10 @@ if($do=='index1'){//资料模块首页
     foreach($cArr as $k=>&$v){
         $imgArr=explode(",", $v['case_img']);
         $cArr[$k]['img']=$imgArr['0'];
+        $v['content']=strip_tags(html_entity_decode($v['content']));
+        $v['process']=strip_tags(html_entity_decode($v['process']));
+        $v['content']=substr($v['content'], 0,48);
+        $v['process']=substr($v['process'], 0,48);
     }
     $cArr=array_slice($cArr,0,4);
     //模板

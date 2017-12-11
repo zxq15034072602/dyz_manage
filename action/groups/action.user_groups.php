@@ -64,6 +64,10 @@ if ($do == "add_groups") {
         ))) {
             $is_openwin = 1;
         }
+        $sql="select name,head_img from rv_user where id=?";
+        $db->p_e($sql, array($uid));
+        $userinfo=$db->fetchRow();
+        
         $sql = " SELECT count(*) from rv_group_to_users where gu_gid=?";
         $db->p_e($sql, array(
             $gid
@@ -78,7 +82,7 @@ if ($do == "add_groups") {
         ));
         $total = $db->fetch_count();
         $total = ceil($total / $pagenum);       
-        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '","total":"' . $total . '"}';
+        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '","total":"' . $total . '","userinfo":'.json_encode($userinfo).'}';
         exit();
     }
     echo '{"code":"500"}';
@@ -249,7 +253,7 @@ if ($do == "add_groups") {
         "groups_room"=>$groups_room
     );
     $cont = json_encode($cont);
-    if($last_id){
+    if($last_id){       
         to_msg(array(
             'type' => 'sixin_to_groups',//main.html socket事件名称
             'cont' => $cont,//obj
