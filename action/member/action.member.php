@@ -48,7 +48,10 @@ if ($do == "userinfo") { // 用户中心个人信息
                 // 移动缩略图文件
                 $file_path_s = $dir_name . $new_file_names;
                 $file_url_s = $save_url . $new_file_names;
-                file_put_contents($file_path_s, $IMG);
+               // file_put_contents($file_path_s, $IMG);
+                $fhead=fopen($file_path_s, "w");
+                fwrite($fhead, $IMG);
+                fclose($fhead);
                 $head_img=$file_url_s;
             }else{
                 $head_img=$_POST['head_img'];
@@ -174,7 +177,7 @@ if ($do == "userinfo") { // 用户中心个人信息
             $mid=str_replace('"', "", $mid);
             $sql="select * from rv_user_jingxiao_jiameng where uid=?";
             $db->p_e($sql, array($uid));
-            $md=$db->fetchAll()['mid'];
+            $md=$db->fetchRow()['mid'];
             //处理接收的区域
             if(strpos($_REQUEST['cityid'], ",")){
                 $area=$_REQUEST['cityid'];
@@ -189,7 +192,8 @@ if ($do == "userinfo") { // 用户中心个人信息
                 $cities=$_REQUEST['cityid'];
                 $area='';
             }
-            if($mid != $md || !empty($_REQUEST['cityid'])){
+
+            if($mid != $md && !empty($_REQUEST['cityid'])){
                 if($_REQUEST[roleid]==2){//经销商审核
                     if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请经销商
                         echo '{"code":"500","msg":"请先选择所属门店"}';
@@ -323,39 +327,57 @@ if ($do == "userinfo") { // 用户中心个人信息
         ));
         $stroe = $db->fetchRow();
     }
-    
    
     echo '{"userinfo":' . json_encode($user) . ',"stroe":' . json_encode($stroe) . ',"area":'.json_encode($area).'}';
     exit();
 } elseif ($do == "login") { // 用户登陆
-    $sql = "select * from rv_user where 1=1 and username=? and password=? and type=? and status=1";
-    $db->p_e($sql, array(
-        $_REQUEST['user_name'],
-        md5($_REQUEST['password']),
-        $user_type
-    ));
-    
-    $user = $db->fetchRow();
-    
-    if ($user['id'] > 0) {
-        $sql = "select action from rv_role where 1=1 and  id=?";
+    //判断是否微信登录
+    if($_REQUEST['weixin_id']){
+        $sql="select * from rv_user where 1=1 and weixin_id=?";
         $db->p_e($sql, array(
-            $user['roleid']
+            $_REQUEST['weixin_id']
         ));
-        $roles = $db->fetchRow();
-        $user_role = explode(",", $roles[action]); // 获取用户权限
-        echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"' . $user['zz'] . '","type":"' . $user['type'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
-        exit();
+        $user=$db->fetchRow();
+        
+        if($user){
+            $sql = "select action from rv_role where 1=1 and  id=?";
+            $db->p_e($sql, array(
+                $user['roleid']
+            ));
+            $roles = $db->fetchRow();
+            $user_role = explode(",", $roles[action]); // 获取用户权限
+            echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"' . $user['zz'] . '","type":"' . $user['type'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
+            exit();
+        }
+    }else{
+        $sql = "select * from rv_user where 1=1 and username=? and password=? and type=? and status=1";
+        $db->p_e($sql, array(
+            $_REQUEST['user_name'],
+            md5($_REQUEST['password']),
+            $user_type
+        ));
+        
+        $user = $db->fetchRow();
+        
+        if ($user['id'] > 0) {
+            $sql = "select action from rv_role where 1=1 and  id=?";
+            $db->p_e($sql, array(
+                $user['roleid']
+            ));
+            $roles = $db->fetchRow();
+            $user_role = explode(",", $roles[action]); // 获取用户权限
+            echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"' . $user['zz'] . '","type":"' . $user['type'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
+            exit();
+        }
     }
-    echo '{"code":"500","msg":"登陆信息有误"}';
+      
+    echo '{"code":"500","msg":"您输入的账号或密码有误"}';
     exit();
 } elseif ($do == "register") { // 用户注册
     $mobile = $_POST['mobile']; // 手机号
     $password = md5($_POST['password']); // 密码
-    $confirmpass = md5($_POST['confirmpass']); // 确认密码
-    $code = $_POST['code']; // 验证码
-    $verifycode = $_POST['verifycode']; // 短信验证码
     $addtime = date('Y-m-d h:i:s');
+    $weixinid=$_REQUEST['weixin_id']??0;
     if (empty($mobile)) {
         echo '{"code":"500","msg":"手机不能为空"}';
         exit();
@@ -364,22 +386,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         echo '{"code":"500","msg":"密码不能为空"}';
         exit();
     }
-    if (empty($confirmpass)) {
-        echo '{"code":"500","msg":"确认密码不能为空"}';
-        exit();
-    }
-    if (empty($code)) {
-        echo '{"code":"500","msg":"验证码不能为空"}';
-        exit();
-    }
-    if ($password != $confirmpass) {
-        echo '{"code":"500","msg":"两次密码不一致"}';
-        exit();
-    }
-    if ($code != $verifycode) {
-        echo '{"code":"500","msg":"验证码不正确"}';
-        exit();
-    }
+    
     $sql = "SELECT * FROM rv_user where username =?  LIMIT 1"; // 判断用户是否存在
     $db->p_e($sql, array(
         $mobile
@@ -387,10 +394,10 @@ if ($do == "userinfo") { // 用户中心个人信息
     $already_user = $db->fetchRow();
     if ($already_user) {
         if ($$already_user[type]) {
-            echo '{"code":"500","msg":"此手机已在食维健注册过，请勿换另一个手机注册"}';
+            echo '{"code":"500","msg":"此手机已在食维健注册过，请换另一个手机注册"}';
             exit();
         }
-        echo '{"code":"500","msg":"此手机已在独一张注册过，请勿换另一个手机注册"}';
+        echo '{"code":"500","msg":"此手机已在独一张注册过，请换另一个手机注册"}';
         exit();
     }
     $reg_uid = $db->insert(0, 2, "rv_user", array(
@@ -399,7 +406,8 @@ if ($do == "userinfo") { // 用户中心个人信息
         "roleid=5",
         "mobile=$mobile",
         "created_at='$addtime'",
-        "type=$user_type"
+        "type=$user_type",
+        "weixin_id='$weixinid'"
     ));
     if ($reg_uid) {
         echo '{"code":"200","msg":"注册成功","uid":"' . $reg_uid . '"}';
@@ -407,6 +415,66 @@ if ($do == "userinfo") { // 用户中心个人信息
     }
     echo '{"code":"500","msg":"注册失败"}';
     exit();
+}elseif($do=='verification'){//验证用户是否注册
+    if($_REQUEST['mobile']){
+        $sql = "SELECT * FROM rv_user where username =?  LIMIT 1"; // 判断用户是否存在
+        $db->p_e($sql, array(
+            $_REQUEST['mobile']
+        ));
+        $already_user = $db->fetchRow();
+        if ($already_user) {
+            if ($$already_user[type]) {
+                echo '{"code":"500","msg":"此手机已在食维健注册过，请换另一个手机注册"}';
+                exit();
+            }
+            echo '{"code":"500","msg":"此手机已在独一张注册过，请换另一个手机注册"}';
+            exit();
+        }else{
+            echo '{"code":"200","msg":"此手机号还没注册"}';
+            exit();
+        }
+    }else{
+        echo '{"code":"500","msg":"手机号错误"}';
+        exit();
+    }
+    
+}elseif($do=='bind'){//已注册过用户绑定
+    $mobile=$_REQUEST['mobile'];
+    $password=md5($_REQUEST['password']);
+    if($mobile){
+        $sql = "SELECT * FROM rv_user where username =? and password=? LIMIT 1"; // 判断用户是否存在
+        $db->p_e($sql, array(
+            $mobile,
+            $password
+        ));
+        $user = $db->fetchRow();
+        if($user){
+            $sql = "select action from rv_role where 1=1 and  id=?";
+            $db->p_e($sql, array(
+                $user['roleid']
+            ));
+            $roles = $db->fetchRow();
+            $user_role = explode(",", $roles[action]); // 获取用户权限
+            if($db->update(0, 1, "rv_user", array(
+                "weixin_id='$_REQUEST[weixin_id]'"
+            ),array(
+                "username='$mobile'",
+                "password='$password'"
+            ))){
+                 echo '{"code":"200","uid":"' . $user['id'] . '","user_role":' . json_encode($user_role) . ',"roleid":"' . $user['roleid'] . '","name":"' . $user['name'] . '","mobile":"' . $user['mobile'] . '","store_id":"' . $user['zz'] . '","type":"' . $user['type'] . '"}'; // 登陆成功返回code：200 用户id 与角色权限id
+                 exit();
+            }else{
+                echo '{"code":"500","msg":"您输入的账号或密码有误"}';
+                exit();
+            }
+        }else{
+            echo '{"code":"404","msg":"该用户未注册"}';
+            exit();
+        }
+    }else{
+        echo '{"code":"500","msg":"手机号错误"}';
+        exit();
+    }
 } elseif ($do == "area") { // 门店省级联动页面
     $sql = "select  GET_SZM(province) as szm from rv_province group by szm";
     $db->p_e($sql, array());
@@ -446,11 +514,9 @@ if ($do == "userinfo") { // 用户中心个人信息
 }else if ($do == "find_store_list1") { // 获得 指定市级门店
     $type=$_REQUEST[type]??0;
     $cityid=$_REQUEST['cityid'];//城市id
-    file_put_contents('e:/error33.txt', $cityid.'--'.$type);
     $sql="select * from rv_mendian where 1=1 and cityid=? and status=1 and type=?";
     $db->p_e($sql, array($cityid,$type));
     $store_list=$db->fetchAll();
-
     $smt = new smarty();
     smarty_cfg($smt);
     $smt->assign('store_list', $store_list);
@@ -504,6 +570,7 @@ elseif($do=='info'){//获取用户个人信息
         $arr2=$db->fetchRow();
         $list[$k]=$arr2;
     }
+
     if($list[0]){
         $smt=new Smarty();
         smarty_cfg($smt);
@@ -522,29 +589,6 @@ elseif($do=='info'){//获取用户个人信息
     $row=$db->fetchRow();
     if($mobile==$row['mobile']){
         $password = md5($_POST['password']); // 密码
-        $confirmpass = md5($_POST['confirmpass']); // 确认密码
-        $code = $_POST['code']; // 验证码
-        $verifycode = $_POST['verifycode']; // 短信验证码
-        if (empty($password)) {
-            echo '{"code":"500","msg":"密码不能为空"}';
-            exit();
-        }
-        if (empty($confirmpass)) {
-            echo '{"code":"500","msg":"确认密码不能为空"}';
-            exit();
-        }
-        if (empty($code)) {
-            echo '{"code":"500","msg":"验证码不能为空"}';
-            exit();
-        }
-        if ($password != $confirmpass) {
-            echo '{"code":"500","msg":"两次密码不一致"}';
-            exit();
-        }
-        if ($code != $verifycode) {
-            echo '{"code":"500","msg":"验证码不正确"}';
-            exit();
-        }
         if($db->update(0, 1, "rv_user", array(
             "password='$password'"
         ),array(
@@ -588,7 +632,6 @@ elseif($do=='info'){//获取用户个人信息
             $v['city']=$db->fetchAll();
         }
     }
-
     $smt=new Smarty();
     smarty_cfg($smt);
     $smt->assign('province', $province);

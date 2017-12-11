@@ -11,13 +11,13 @@
             <{if $row.from.head_img==null}>
                 <img src="../../image/tc_log.png" alt="">
             <{else}>
-                <img src="<{$row.from.head_img}>" alt="">
+                <img src="<{$row.from.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
             <{/if}>
         <{else}>
             <{if $row.from.head_img==null}>
                 <img src="../../image/tc_log.png" alt="" class="press_on_zn" uid="<{$row.from_uid}>">
             <{else}>
-                <img src="<{$row.from.head_img}>" alt="" class="press_on_zn" uid="<{$row.from_uid}>">
+                <img src="<{$row.from.head_img}>" alt="" class="press_on_zn" uid="<{$row.from_uid}>" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
             <{/if}>
         <{/if}>
 

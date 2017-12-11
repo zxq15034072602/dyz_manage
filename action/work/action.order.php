@@ -6,35 +6,56 @@ $role=$_REQUEST['roleid'];//权限id
 
 //经销商 加盟商门店列表 以及产品
 if($do=='index'){
-    if(!empty($uid) && !empty($role) && ($role==2 || $role==4)){
+       if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
         $type=$_REQUEST[type]??0;//0独一张/1食维健
         $good_type = $db->select(0, 0, "rv_type","*","and type=$type");
-        
-        //查询登录用户门店
-        $sql="select * from rv_user_jingxiao_jiameng where uid=?";
-        $db->p_e($sql, array($uid));
-        $userinfo=$db->fetchRow();
-        $userinfo['mid']=explode(",", $userinfo['mid']);
-        foreach($userinfo['mid'] as $v){
-            $sql="select name from rv_mendian where id=?";
-            $db->p_e($sql, array($v));
+        if($role==2 || $role==4){
+            //查询登录用户门店
+            $sql="select * from rv_user_jingxiao_jiameng where uid=?";
+            $db->p_e($sql, array($uid));
+            $userinfo=$db->fetchRow();
+            $userinfo['mid']=explode(",", $userinfo['mid']);
+            foreach($userinfo['mid'] as $v){
+                $sql="select name from rv_mendian where id=?";
+                $db->p_e($sql, array($v));
+                $name=$db->fetchRow();
+                $store[]=array('id'=>$v,'mbname'=>$name['name']);
+            }
+            $good=array();
+            foreach($store as &$val){
+                foreach ($good_type as $key => $type) {
+                    $sql = "select * from rv_goods where fatherid=?";
+                    $db->p_e($sql, array(
+                        $type[id]
+                    ));
+                    $goods = $db->fetchAll();
+                    if ($goods) {
+                        $good[$key][typename] = $type[name];
+                        $good[$key][goods] = $goods;
+                    }
+                }
+            }
+        }elseif($role==1 ||$role==6 ||$role==7){
+            $sql="select b.id,b.name from rv_user as a left join rv_mendian as b on a.zz=b.id where a.id=?";
+            $db->p_e($sql, array($uid));
             $name=$db->fetchRow();
-            $store[]=array('id'=>$v,'mbname'=>$name['name']);
-        }
-        $good=array();
-        foreach($store as &$val){
-            foreach ($good_type as $key => $type) {
-                $sql = "select * from rv_goods where fatherid=?";
-                $db->p_e($sql, array(
-                    $type[id]
-                ));
-                $goods = $db->fetchAll();
-                if ($goods) {
-                    $good[$key][typename] = $type[name];
-                    $good[$key][goods] = $goods;
+            $store[]=array('id'=>$name['id'],'mbname'=>$name['name']);
+            $good=array();
+            foreach($store as &$val){
+                foreach ($good_type as $key => $type) {
+                    $sql = "select * from rv_goods where fatherid=?";
+                    $db->p_e($sql, array(
+                        $type[id]
+                    ));
+                    $goods = $db->fetchAll();
+                    if ($goods) {
+                        $good[$key][typename] = $type[name];
+                        $good[$key][goods] = $goods;
+                    }
                 }
             }
         }
+       
         echo '{"code":"200","store":'.json_encode($store).',"good":'.json_encode($good).'}';
         exit();
     }else{
@@ -42,15 +63,9 @@ if($do=='index'){
         exit();
     }
 }elseif($do=='order_add'){//接收订单详情
-    $str='';
     $add_list=json_decode($_REQUEST['add_list']);
-//     $arr=array('370'=>array(0=>array('goods_id'=>'1','count'=>'10','price'=>'1000'),1=>array('goods_id'=>'2','count'=>'10','price'=>'1000')),'400'=>array(0=>array('goods_id'=>'2','count'=>'2','price'=>'2000')));
-//     var_dump($arr);
-//     exit();
-
     foreach($add_list as $key=>$value){
         foreach($value as $k=>&$vv){
-            file_put_contents('error4.txt', $k);
             $order_storeid=$db->insert(0,2,"rv_order_stores",array(
                 "fid='$uid'",
                 "mid='$k'",
@@ -58,15 +73,34 @@ if($do=='index'){
             ));
             if($order_storeid){
                 foreach($vv as $val){
+                     //产品数量
+                    if($val[0]==1){$num=$val[1]*10;}elseif($val[0]==2){$num=$val[1]*40;
+                    }elseif($val[0]==3){$num=$val[1]*10;}elseif($val[0]==4){ $num=$val[1]*10;
+                    }elseif($val[0]==6){$num=$val[1];
+                    }elseif($val[0]==7){$num=$val[1]*300;
+                    }elseif($val[0]==8){$num=$val[1]*20;
+                    }elseif($val[0]==9){$num=$val[1]*50;
+                    }elseif($val[0]==10){$num=$val[1]*20;
+                    }elseif($val[0]==11){$num=$val[1]*20;
+                    }elseif($val[0]==12){$num=$val[1]*50;
+                    }elseif($val[0]==13){$num=$val[1]*5;
+                    }elseif($val[0]==14){$num=$val[1]*5;
+                    }elseif($val[0]==15){$num=$val[1]*40;
+                    }elseif($val[0]==16){$num=$val[1]*40;
+                    }elseif($val[0]==17){$num=$val[1]*40;
+                    }elseif($val[0]==18){$num=$val[1];
+                    }elseif($val[0]==19){$num=$val[1];
+                    }elseif($val[0]==20){$num=$val[1];
+                    }
                     $order_goodsid=$db->insert(0, 2,"rv_order_goods",array(
                         "fid='$order_storeid'",
                         "goods_id='$val[0]'",
                         "count='$val[1]'",
-                        "goods_price='$val[2]'"
+                        "goods_price='$val[2]'",
+                        "number='$num'"
                     ));
                     if($order_goodsid){
-                        echo '{"code":"200","msg":"提交成功","str":"'.$str.'"}';
-                        $str+=$val['2'];
+                        
                     }else{
                         echo '{"code":"500","msg":"提交失败"}';
                         exit();
@@ -78,7 +112,7 @@ if($do=='index'){
             }
         }              
     }
-    //echo '{"code":"200","msg":"提交成功","str":"'.$str.'"}';
+    echo '{"code":"200","msg":"提交成功"}';
     exit();
 }elseif($do=='order_person_info'){//获取接受的订单信息
     $time=time();   
@@ -103,7 +137,7 @@ if($do=='index'){
             echo '{"code":"500","msg":"关键数据缺失"}';
             exit();
         }
-        if(!empty($uid) && !empty($role) && ($role==2 || $role==4)){
+        if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
             $orderid=$db->insert(0, 2, "rv_order", array(
                 "uid='$uid'",
                 "name='$_REQUEST[name]'",
@@ -155,7 +189,7 @@ if($do=='index'){
             }elseif(!empty($v['voucher_image']) && $v['status']==0){
                 $v['order_status']='未完成';
             }elseif(!empty($v['voucher_image']) && $v['status']==2){
-                $v['order_status']='已发货';
+                $v['order_status']='已发货，请确认收货';
             }
         }
         //已完成订单
@@ -196,6 +230,9 @@ if($do=='index'){
         }elseif($order_info['status']==1){
             $order_info['order_status']='已完成';
         }
+
+         //物流单号
+        $order_info['order_number']=explode("，", $order_info['order_number']);
         
         //查询门店信息以及产品信息
         $sql="select a.id,a.mid,b.name from rv_order_stores as a left join rv_mendian as b on a.mid=b.id where a.fid=?";
@@ -217,10 +254,10 @@ if($do=='index'){
     if(!empty($uid) && !empty($orderid)){
         $base64 = $_POST['voucher_image'];
         $IMG = base64_decode($base64);
-//      $save_url = "http://static.duyiwang.cn/credentials_image/";
-//      $dir_name = "E:/apptupian/credentials_image/";
-        $save_url = "http://192.168.1.106/apptupian/credentials_image/";
-        $dir_name = "E:wamp/wamp/www/apptupian/credentials_image/"; 
+        $save_url = "http://static.duyiwang.cn/credentials_image/";
+        $dir_name = "E:/apptupian/credentials_image/";
+        // $save_url = "http://192.168.1.106/apptupian/credentials_image/";
+        // $dir_name = "E:wamp/wamp/www/apptupian/credentials_image/"; 
         
         $ymd = date("Ymd");
         $dir_name .= $ymd . "/";
@@ -262,7 +299,28 @@ if($do=='index'){
                 "id='$orderid'",
                 "uid='$uid'"
             ))){
-                echo '{"code":"200","msg":"确认成功,订单完成"}';
+             //确认收货后添加库存
+            $sql="select * from rv_order_stores where fid=?";
+            $db->p_e($sql, array($orderid));
+            $stores=$db->fetchAll();
+            foreach($stores as &$v){
+                $sql='select * from rv_order_goods where fid=?';
+                $db->p_e($sql, array($v['id']));
+                $v['goods']=$db->fetchAll();
+                foreach($v['goods'] as $vv){
+                    $sql="select kucun from rv_kucun where mid=? and gid=?";
+                    $db->p_e($sql, array($v['mid'],$vv['goods_id']));
+                    $count=$db->fetchRow()['kucun'];
+                    $total=$count+$vv['number'];
+                    $db->update(0, 1, "rv_kucun", array(
+                        "kucun='$total'"
+                    ),array(
+                        "mid='$v[mid]'",
+                        "gid='$vv[goods_id]'",
+                    ));
+                } 
+            } 
+                echo '{"code":"200","msg":"确认收货成功,库存添加成功,订单完成"}';
                 exit();
             }
         }

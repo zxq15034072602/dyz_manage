@@ -16,7 +16,6 @@ if ($do == "add_groups") {
         $ug_id = $db->insert(0, 2, "rv_users_groups", array(
             "ug_admin_id = $admin_id"
         )); // 如果插入成功，则返回群组id
-        file_put_contents('e:/error7.txt', $ug_id);
         if ($ug_id) { // 如果创建群聊成功，则往群成员表插入群成员
             $sql = "INSERT INTO rv_group_to_users(gu_gid,gu_uid,gu_group_nick) VALUES";
             $item_list_tmp = '';
@@ -29,6 +28,7 @@ if ($do == "add_groups") {
             }
             $sql .= $item_list_tmp;
             $db->p_e($sql, $params);
+            
             echo '{"code":"200","msg":"创建群聊成功","gid":"' . $ug_id . '"}';
         } else {
             echo '{"code":"500","msg":"创建群聊有误"}';
@@ -58,6 +58,9 @@ if ($do == "add_groups") {
     $is_openwin = 0;
     $pagenum=15;
     if ($gid) {
+        $sql="select name,head_img from rv_user where id=?";
+        $db->p_e($sql, array($uid));
+        $userinfo=$db->fetchRow();
         if ($db->update(0, 1, "rv_user", array(
             "is_openwin=1"
         ), array(
@@ -78,8 +81,8 @@ if ($do == "add_groups") {
             $gid
         ));
         $total = $db->fetch_count();
-        $total = ceil($total / $pagenum);       
-        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '","total":"' . $total . '"}';
+        $total = ceil($total / $pagenum);   
+        echo '{"code":"200","gid":"' . $gid . '","groups_info":' . $groups_info . ',"groups_users_count":"' . $groups_users_count . '","is_openwin":"' . $is_openwin . '","total":"' . $total . '","userinfo":'.json_encode($userinfo).'}';
         exit();
     }
     echo '{"code":"500"}';
@@ -256,6 +259,7 @@ if ($do == "add_groups") {
             'cont' => $cont,//obj
             'to' => $groups_room//群聊的房间号
         )); // 推送消息
+        
         echo '{"code":"200","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '","head_img":"'.$head_img.'","xid":"'.$last_id.'"}';
         exit();
     }
@@ -278,13 +282,16 @@ if ($do == "add_groups") {
 } elseif ($do == "get_at_user_list") { // 获取群内用户
     $gid = $_REQUEST['gid'];
     $uid = $_REQUEST['uid'];
-    $sql = "select * from rv_group_to_users  where gu_gid= ? and gu_uid != ?";
-    $db->p_e($sql, array(
-        $gid,
-        $uid
-    ));
+    $arr1=array($gid,$uid);
+    if($_REQUEST['name']){
+        $search .= " and gu_group_nick like ? ";
+        $arr1[]="%".$_REQUEST['name']."%";
+    }
+    $sql = "select * from  rv_user LEFT JOIN rv_group_to_users on gu_uid=id where gu_gid= ? and gu_uid != ?".$search;
+    $db->p_e($sql,$arr1);
     $at_user_list = $db->fetchAll();
     if ($at_user_list) {
+        
         echo '{"code":"200","at_user_list":' . json_encode($at_user_list) . '}';
         exit();
     }
@@ -304,8 +311,10 @@ if ($do == "add_groups") {
         }
         foreach ($groups_users as $key => $user) {
             if (in_array($user[0], $guids)) { // 如果已存在，则剔除
-                array_splice($groups_users, $key, 1);
+                unset($groups_users[$key]);
+               // array_splice($groups_users, $key, 1);
             }
+            
         }
         if (empty($groups_users)) {
             echo '{"code":"500","msg":"更新联系人成功"}';
@@ -321,6 +330,7 @@ if ($do == "add_groups") {
         }
         $sql .= $item_list_tmp;
         if ($db->p_e($sql, $params)) {
+            
             echo '{"code":"200","msg":"更新联系人成功"}';
             exit();
         }
@@ -393,34 +403,5 @@ if ($do == "add_groups") {
         echo '{"code":"500","msg":"关键数据缺失"}';
         exit();
     }
-}elseif($do=='groups_user_remind'){//@功能  获取群成员接口
-    $gid=$_REQUEST['gid'];
-    $uid=$_REQUEST['uid'];
-    if($_REQUEST['name']){
-        $search .= "and gu_group_nick like ? ";
-        $arr1[]="%".$_REQUEST['name']."%";
-    }
-    $sql="select * from rv_group_to_users where gu_gid=$gid and 1=1 ".$search;
-    $db->p_e($sql, $arr1);
-    $list=$db->fetchAll();
-    $users=array();
-    foreach ($list as $k=>$v){
-        $sql="select * from rv_user where 1=1 and id=?";
-        $db->p_e($sql, array($v['gu_uid']));
-        $arr=$db->fetchRow();
-        $users[$k]=$arr;
-    } 
-    //查询当前用户信息
-    $sql="select * from rv_user where id=?";
-    $db->p_e($sql, array($uid));
-    $uidArr=$db->fetchAll();
-    //去掉用户本人操作
-    foreach($users as $kk=>$vv){
-        if(!in_array($vv, $uidArr)){
-            $arr3[]=$vv;
-        }
-    }
-    echo '{"users":'.json_encode($arr3).'}';
-    exit();
 }
 

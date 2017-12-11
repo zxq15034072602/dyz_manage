@@ -9,14 +9,14 @@
     </p>
 </div>
 <div class="training_con_zn">
-  <{$videolist.0.content|truncate:30}>
+  <{$videolist.0.content|truncate:60}>
 </div>
 <ul class="training_video_box">
     <{foreach from=$videolist item=video key=k}>
     <li class="training_video_list" sonurl="<{$video.url}>" vid="<{$video.id}>" style="cursor:pointer">
         <img src="../../image/image_zn/traning_pic_zn.png" alt=""/>
         <span class="list_num_zn"><{$k+1}></span>
-        <span class="list_title_zn"><{$video.title|truncate:10}></span>
+        <span class="list_title_zn"><{$video.title|truncate:16}></span>
     </li>
     <{/foreach}>  
 </ul>
