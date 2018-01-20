@@ -3,7 +3,7 @@ if (! defined('CORE')) exit("error!");
 
 if($do=='index'){//资料模块首页
     //获取产品资料
-    $sql="select a.*,b.gid  from rv_goods as a left join rv_product_detail as b on a.id=b.gid where a.id in(13,17,2,12)";
+    $sql="select *  from rv_goods where id in(13,17,2,12)";
     $db->p_e($sql, array());
     $pArr=$db->fetchAll();   
     $pArr=array_slice($pArr,0,4);
@@ -41,6 +41,7 @@ if($do=='index'){//资料模块首页
     $db->p_e($sql, array());
     $cArr=$db->fetchAll(); 
      foreach($cArr as $k=>&$v){
+        $v['mname']=$v['mid'];
         $imgArr=explode(",", $v['case_img']);
         $cArr[$k]['img']=$imgArr['0'];
         $v['content']=htmlspecialchars_decode($v['content']);
@@ -59,7 +60,7 @@ if($do=='index'){//资料模块首页
 
 if($do=='index1'){//资料模块首页
     //获取产品资料
-    $sql="select a.*,b.gid  from rv_goods as a left join rv_product_detail as b on a.id=b.gid where a.id in(13,17,2,12)";
+    $sql="select *  from rv_goods where id in(13,17,2,12)";
     $db->p_e($sql, array());
     $pArr=$db->fetchAll();   
     $pArr=array_slice($pArr,0,4);
@@ -91,20 +92,11 @@ if($do=='index1'){//资料模块首页
 
     $sql="select a.*,b.name as gname,c.name as mname from (rv_case as a left join rv_goods as b on a.gid=b.id)left join rv_mendian as c on a.mid=c.id order by a.id desc";
     $db->p_e($sql, array());
-    $cArr=$db->fetchAll(); 
-     foreach($cArr as $k=>&$v){
-        $imgArr=explode(",", $v['case_img']);
-        $cArr[$k]['img']=$imgArr['0'];
-        $v['content']=strip_tags(html_entity_decode($v['content']));
-        $v['process']=strip_tags(html_entity_decode($v['process']));
-        $v['content']=substr($v['content'], 48);
-        $v['process']=substr($v['process'], 48);
-        //$v['content']=htmlspecialchars($v['content']);
-        //$v['process']=htmlspecialchars($v['process']);
-
-    }
-    $cArr=array_slice($cArr,0,4);
-    echo '{"pArr":' . json_encode($pArr) . ',"mArr":' . json_encode($mArr) . ',"cArr":' . json_encode($cArr) . '}';
+    //获取康复案例分类
+    $sql="select * from rv_case_disease_class where status=1 order by id desc";
+    $db->p_e($sql, array());
+    $case_class=$db->fetchAll();
+    echo '{"pArr":' . json_encode($pArr) . ',"mArr":' . json_encode($mArr) . ',"case_class":'.json_encode($case_class).'}';
     exit();
 }
 

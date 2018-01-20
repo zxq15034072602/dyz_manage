@@ -17,7 +17,7 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
     $db->p_e($sql, array($provinceid));
     $franchiseeConut =$db->fetch_count();
     //省下门店数量
-    $sql="select count(*) from rv_mendian where provinceid=?";
+    $sql="select count(*) from rv_mendian where provinceid=?  and status=1";
     $db->p_e($sql, array($provinceid));
     $storeCount=$db->fetch_count();    
     echo '{"dealerConut":"'.$dealerConut.'","franchiseeConut":"'.$franchiseeConut.'","storeCount":"'.$storeCount.'"}';

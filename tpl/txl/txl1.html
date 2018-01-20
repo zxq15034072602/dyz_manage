@@ -1,0 +1,137 @@
+<{if $flag ==0}> 
+<{foreach from=$txl item=user}>
+<li class="user_box_zn" onclick="talk_about(<{$user.id}>)">
+    <div class="user_zn">
+        <div class="user_picture_zn">
+            <{if $user.head_img==null}>
+           		<img src="../../image/img_qty/head.jpg" alt="">
+            <{else}>
+            	<img src="<{$user.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
+            <{/if}>
+        </div>
+        <div class="user_name_zn">
+        <{$user.name}>
+        </div>
+    </div>
+</li>
+<{/foreach}>
+<{else}> 
+<div class="groupChart_qty">
+	<ul class="groupChartSmall_qty">
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">太常集团</span>
+					<div class="select_all">
+							<p>全选</p>
+					</div>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$zongbu item=zb}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $zb.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$zb.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$zb.id}>"><span><{$zb.name}></span><{if $zb.roleid==3}> —— 店长<{elseif $zb.roleid==5}> —— 店员<{elseif $zb.roleid==1}> —— 总部人员<{elseif $zb.roleid==2}> —— 经销商<{elseif $zb.roleid==4}> —— 加盟商<{elseif $zb.roleid==6}> —— 董事长<{elseif $zb.roleid==7}> —— 总经理<{/if}>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+				<br/>
+			</ul>
+		</li>
+
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">经销商</span>
+					<div class="select_all">
+							<p>全选</p>
+					</div>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$jingxiao item=jx}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $jx.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$jx.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$jx.id}>"><span><{$jx.name}></span>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+			</ul>
+		</li>
+		<li class="groupParent_qty"><a> <span class="grouplist_qty">加盟商</span>
+					<div class="select_all">
+							<p>全选</p>
+					</div>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$jiameng item=jm}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $jm.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$jm.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$jm.id}>"><span><{$jm.name}></span>
+						</label>
+					</div>
+				</li> 
+				<{/foreach}>
+			</ul>
+		</li>
+	</ul>
+</div>
+<div class="outer_layer">
+			<div class="select_box">
+				<p>全选</p>
+			</div>
+<{foreach from=$szm item=s}>
+<div class="englishBox_qty">
+	<div class="english_qty"><{$s.szm}></div>
+</div>
+<div class="groupChart_qty">
+	<ul class="groupChartSmall_qty">
+
+		<{foreach from=$txl item=txlrow}> 
+		<{if $txlrow.szm==$s.szm and count($txlrow.yh_user)>0}>
+		<li class="groupParent_qty"><a> <span class="grouplist_qty"><{$txlrow.name}></span>
+				<span class="arrowTop_qty"></span>
+		</a>
+			<ul class="groupNavBox_qty">
+				<{foreach from=$txlrow.yh_user item=row}>
+				<li>
+					<div class="groupImg_qty">
+					<{if $row.user.head_img==null}>
+						<img src="../../image/img_qty/head.jpg" alt="">
+					<{else}>
+						<img src="<{$row.user.head_img}>" alt="" onerror="javascript:this.src='../../image/header_picture/tc_log.png'">
+					<{/if}>
+					</div>
+					<div class="groupLabel_qty">
+						<label><input type="checkbox" name="user_id" id="user_id"
+							value="<{$row.user.id}>"><span><{$row.user.name}></span><{if $row.user.roleid==3}> —— 店长<{elseif $row.user.roleid==5}> —— 店员<{elseif $row.user.roleid==1}> —— 总部人员<{elseif $row.user.roleid==2}> —— 经销商<{elseif $row.user.roleid==4}> —— 加盟商<{elseif $row.user.roleid==6}> —— 董事长<{elseif $row.user.roleid==7}> —— 总经理<{/if}></label>
+					</div>
+				</li> <{/foreach}>
+			</ul></li> <{/if}> 
+		<{/foreach}>
+	</ul>
+</div>
+<{/foreach}>
+<{/if}>
+</div>

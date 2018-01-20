@@ -32,11 +32,46 @@
         <img src="<{$row.content_s_img}>" alt="" <{if $row.content==''}> path="<{$row.content_s_img}>"<{else}> path="<{$row.content}>"<{/if}>>
     </div>
     <{elseif $row.content_type==2}>
-    <div <{if $row.type==1}>class="icon_chat_right_yuyin"<{else}>class="icon_chat_left_yuyin"<{/if}> path="<{$row.content}>" style="width:<{$row.send_length}>">
+    <div <{if $row.type==1}>class="voice_box self_left" <{else}> class="voice_box" <{/if}>>
+        <{if $row.type==1}><!-- right-->
+        <div class="voice_gif">
+            <img src="../../image/voice_play.gif" alt="">
+        </div>
+        <div class="voice_player" record_url="<{$row.content}>" id="voice_player_<{$row.id}>">
+            <div class="play_button" onclick="palay_record(<{$row.id}>,<{$row.time_length}>)" id="play_key_<{$row.id}>">
+                <div class='voice_but play_voice'></div>
+            </div>
+            <div class="voice_time">
+                <div class="total_tiao"></div>
+                <div class="played" id="<{$row.id}>"></div>
+                
+            </div>
+            <div class="show_time"><{$row.send_length}></div>
+        </div>
+        <{else}> <!-- left-->
+        <div class="voice_player" record_url="<{$row.content}>" id="voice_player_<{$row.id}>">
+            <div class="play_button" onclick="palay_record(<{$row.id}>,<{$row.time_length}>)" id="play_key_<{$row.id}>">
+                <div class='voice_but play_voice'></div>
+            </div>
+            <div class="voice_time">
+                <div class="total_tiao"></div>
+                <div class="played" id="<{$row.id}>"></div>
+                
+            </div>
+            <div class="show_time"><{$row.send_length}></div>
+        </div>
+        <div class="voice_gif">
+            <img src="../../image/voice_play.gif" alt="">
+        </div>
+        <{/if}>
+    </div>
+
+
+   <!--  <div <{if $row.type==1}>class="icon_chat_right_yuyin"<{else}>class="icon_chat_left_yuyin"<{/if}> path="<{$row.content}>" style="width:<{$row.send_length}>">
     <{if $row.type==1}>  <span  class="yuyin_yyt_r" ><img src="../../image/img_yyt/yuyin_right_yyt.png" ></span>
     <{else}><span class="yuyin_yyt_l" ><img src="../../image/img_yyt/yuyin_left_yyt.png" ></span><{/if}>
     </div>
-    <span  <{if $row.type==1}>class="yuyin_time_right"<{else}>class="yuyin_time_left"<{/if}>><{$row.time_length}></span>
+    <span  <{if $row.type==1}>class="yuyin_time_right"<{else}>class="yuyin_time_left"<{/if}>><{$row.time_length}></span> -->
     <{/if}>
 </div>
 <{/foreach}>

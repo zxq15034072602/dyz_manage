@@ -8,7 +8,7 @@ $role=$_REQUEST['roleid'];//权限id
 if($do=='index'){
        if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
         $type=$_REQUEST[type]??0;//0独一张/1食维健
-        $good_type = $db->select(0, 0, "rv_type","*","and type=$type");
+        $good_type = $db->select(0, 0, "rv_type","*","and type=$type and id<5");
         if($role==2 || $role==4){
             //查询登录用户门店
             $sql="select * from rv_user_jingxiao_jiameng where uid=?";
@@ -74,20 +74,20 @@ if($do=='index'){
             if($order_storeid){
                 foreach($vv as $val){
                      //产品数量
-                    if($val[0]==1){$num=$val[1]*10;}elseif($val[0]==2){$num=$val[1]*40;
-                    }elseif($val[0]==3){$num=$val[1]*10;}elseif($val[0]==4){ $num=$val[1]*10;
+                    if($val[0]==1){$num=$val[1];}elseif($val[0]==2){$num=$val[1]*40;
+                    }elseif($val[0]==3){$num=$val[1];}elseif($val[0]==4){ $num=$val[1];
                     }elseif($val[0]==6){$num=$val[1];
                     }elseif($val[0]==7){$num=$val[1]*300;
-                    }elseif($val[0]==8){$num=$val[1]*20;
+                    }elseif($val[0]==8){$num=$val[1];
                     }elseif($val[0]==9){$num=$val[1]*50;
-                    }elseif($val[0]==10){$num=$val[1]*20;
-                    }elseif($val[0]==11){$num=$val[1]*20;
+                    }elseif($val[0]==10){$num=$val[1];
+                    }elseif($val[0]==11){$num=$val[1];
                     }elseif($val[0]==12){$num=$val[1]*50;
                     }elseif($val[0]==13){$num=$val[1]*5;
                     }elseif($val[0]==14){$num=$val[1]*5;
                     }elseif($val[0]==15){$num=$val[1]*40;
                     }elseif($val[0]==16){$num=$val[1]*40;
-                    }elseif($val[0]==17){$num=$val[1]*40;
+                    }elseif($val[0]==17){$num=$val[1];
                     }elseif($val[0]==18){$num=$val[1];
                     }elseif($val[0]==19){$num=$val[1];
                     }elseif($val[0]==20){$num=$val[1];
@@ -232,7 +232,7 @@ if($do=='index'){
         }
 
          //物流单号
-        $order_info['order_number']=explode("，", $order_info['order_number']);
+        $order_info['order_number']=explode("；", $order_info['order_number']);
         
         //查询门店信息以及产品信息
         $sql="select a.id,a.mid,b.name from rv_order_stores as a left join rv_mendian as b on a.mid=b.id where a.fid=?";
@@ -328,4 +328,278 @@ if($do=='index'){
         echo '{"code":"500","msg":"关键数据缺失"}';
         exit();
     }
+}elseif($do=='store_ranking'){//经销商门店的进货排行
+    $uid=$_REQUEST['uid'];
+    $roleid=$_REQUEST['roleid'];
+    $pagenum = 10;
+    $page = $_REQUEST['page'] ?? 1;
+    $page = ($page - 1) * $pagenum;
+    if($roleid==2 || $roleid==1 || $roleid==6 || $roleid==7){
+        $md=array();
+        if($roleid==2){
+            $sql="select mid from rv_user_jingxiao_jiameng where uid=?";
+            $db->p_e($sql, array($uid));
+            $store=$db->fetch_count();
+            $store=explode(",", $store);
+            $total = count($store);
+            $total = ceil($total / $pagenum);
+            foreach($store as $v){
+                $sql="select a.name,b.head_img from rv_mendian as a left join rv_user as b on a.person_id=b.id where a.id=?";
+                $db->p_e($sql, array($v));
+                $info=$db->fetchRow();
+                $info['head_img']=$info['head_img']??'http://static.duyiwang.cn/tc_log.jpg';
+                $sql="select c.name,sum(b.price) as sum from (rv_order_stores as a left join rv_order as b on a.fid=b.id) left join rv_mendian as c on a.mid=c.id where b.status=1 and a.mid=$v";
+                $db->p_e($sql, array());
+                $mname=$db->fetchRow();
+                $mname['sum']=$mname['sum']??0;
+                $md[]=array('id'=>$v,'name'=>$info['name'],'sum'=>$mname['sum'],'head_img'=>$info['head_img']);
+            }
+        }else{
+            //总页数
+            $sql="select b.mid from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 group by b.mid ";
+            $db->p_e($sql, array());
+            $store=$db->fetchAll();
+            $total = count($store);
+            $total = ceil($total / $pagenum);
+            //门店分页
+            $sql="select b.mid from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 group by b.mid limit ". $page . "," . $pagenum;
+            $db->p_e($sql, array());
+            $store=$db->fetchAll();
+
+            foreach($store as $v){
+                $sql="select sum(b.price) as sum,c.name,c.person_id from (rv_order_stores as a left join rv_order as b on a.fid=b.id) left join rv_mendian as c on a.mid=c.id where  a.mid=$v[mid]";
+                $db->p_e($sql, array());
+                $mname=$db->fetchRow();
+                $sql="select head_img from rv_user where id=?";
+                $db->p_e($sql, array($mname['person_id']));
+                $head_img=$db->fetch_count();
+                $head_img=$head_img??'http://static.duyiwang.cn/tc_log.jpg';
+                if($mname['sum']){
+                    $md[]=array('id'=>$v['mid'],'name'=>$mname['name'],'sum'=>$mname['sum'],"head_img"=>$head_img);
+                }
+            }
+        }
+        $sort = array(
+                     'direction' => 'SORT_DESC', //排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
+                     'field'     => 'sum',       //排序字段
+             );
+         $arrSort = array();
+         foreach($md AS $uniqid => $row){
+             foreach($row AS $key=>$value){
+                    $arrSort[$key][$uniqid] = $value;
+             }
+         }
+         if($sort['direction']){
+                  array_multisort($arrSort[$sort['field']], constant($sort['direction']), $md);
+         }
+         
+         echo '{"code":"200","md":'.json_encode($md).',"total":'.json_encode($total).'}';
+         exit();        
+    }else{
+        echo '{"code":"500","msg":"身份信息有误"}';
+        exit();
+    }
+}elseif($do=='search'){//搜索门店查询
+    $name=$_REQUEST['name'];
+    $search .= "and a.name like ? ";
+    $arr[]="%".$_REQUEST['name']."%";
+
+    $sql="select a.id,a.name,b.head_img from rv_mendian as a left join rv_user as b on a.person_id=b.id where a.status=1 and a.type=0 ".$search;
+    
+    $db->p_e($sql, $arr);
+    $store=$db->fetchAll();
+    foreach($store as &$v){
+        $v['head_img']=$v['head_img']??'http://static.duyiwang.cn/tc_log.jpg';
+    }
+    echo '{"code":"200","store":'.json_encode($store).'}';
+    exit();
+}elseif($do=='store_sales'){//单店销售记录
+    $mid=$_REQUEST['mid'];
+    if(empty($mid)){
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
+    }
+    //今天门店销售记录
+    $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
+    $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id) where 1=1 and a.goods_type=0 and c.mid=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $db->p_e($sql, array($mid,$todaystart,$todayend));
+    $day_list=$db->fetchAll();
+    
+    //门店本周销售记录
+    $sdefaultDate = date("Y-m-d"); // 当前日期
+    $first = 1; // $first =1 表示每周星期一为开始日期 0表示每周日为开始日期
+    $w = date('w', strtotime($sdefaultDate)); // 获取当前周的第几天 周日是 0 周一到周六是 1 - 6
+    $week_s = date('Y-m-d', strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days')); // 获取本周开始日期，如果$w是0，则表示周日，减去 6 天
+    $week_start = strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days');
+    $week_end = strtotime("$week_s +6 days"); // 本周结束日期
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id) where 1=1 and a.goods_type=0 and c.mid=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $db->p_e($sql, array($mid,$week_start,$week_start));
+    $week_list=$db->fetchAll();
+    
+    //门店本月销售记录
+    $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
+    $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id) where 1=1 and a.goods_type=0 and c.mid=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $db->p_e($sql, array($mid,$beginThismonth,$endThismonth));
+    $month_list=$db->fetchAll();
+    
+    //门店本年销售记录
+    $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
+    $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id) where 1=1 and a.goods_type=0 and c.mid=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $db->p_e($sql, array($mid,$year_start,$year_end));
+    $year_list=$db->fetchAll();
+    
+    echo '{"code":"200","day":'.json_encode($day_list).',"week":'.json_encode($week_list).',"month":'.json_encode($month_list).',"year":'.json_encode($year_list).'}';
+    exit();
+}elseif($do=='store_order'){//单店进货记录
+    $mid=$_REQUEST['mid'];
+    if(empty($mid)){
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
+    }
+    //门店最近一次的进货记录
+    $sql="select starttime from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? order by a.starttime desc";
+    $db->p_e($sql, array($mid));
+    $times=$db->fetch_count();
+    if($times){
+        $times=date('Y-m-d',$times);
+        $daystart=strtotime($times);
+        $dayend=($daystart+3600*24);
+        $sql="select a.price,b.id from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? and a.starttime between ? and ?";
+        $db->p_e($sql, array($mid,$daystart,$dayend));
+        $day_order=$db->fetchAll();
+        foreach($day_order as &$d){
+            $day_fid[]=$d['id'];
+        }
+        $day_fid=implode(",", $day_fid);
+        $sql="select sum(a.goods_price) as price,sum(a.number) as num,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid in ($day_fid) group by a.goods_id";
+        $db->p_e($sql, array());
+        $day=$db->fetchAll();       
+    }else{
+        $day=array();
+    }
+    
+    //门店本周的进货记录
+    $sdefaultDate = date("Y-m-d"); // 当前日期
+    $first = 1; // $first =1 表示每周星期一为开始日期 0表示每周日为开始日期
+    $w = date('w', strtotime($sdefaultDate)); // 获取当前周的第几天 周日是 0 周一到周六是 1 - 6
+    $week_s = date('Y-m-d', strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days')); // 获取本周开始日期，如果$w是0，则表示周日，减去 6 天
+    $week_start = strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days');
+    $week_end = strtotime("$week_s +6 days"); // 本周结束日期
+    $sql="select a.price,b.id from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? and a.starttime between ? and ?";
+    $db->p_e($sql, array($mid,$week_start,$week_end));
+    $week_order=$db->fetchAll();
+    foreach($week_order as $w){
+        $week_fid[]=$w['id'];
+    }
+    if($week_fid){
+        $week_fid=implode(",", $week_fid);
+    }else{
+        $week_fid=0;
+    }    
+    $sql="select sum(a.goods_price) as price,sum(a.number) as num,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid in ($week_fid) group by a.goods_id";
+    $db->p_e($sql, array());
+    $week=$db->fetchAll();
+    //门店本月的进货记录
+    $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
+    $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
+    $sql="select a.price,b.id from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? and a.starttime between ? and ?";
+    $db->p_e($sql, array($mid,$beginThismonth,$endThismonth));
+    $month_order=$db->fetchAll();
+    foreach($month_order as $m){
+        $month_fid[]=$m['id'];
+    }
+    if($month_fid){
+        $month_fid=implode(",", $month_fid);
+    }else{
+        $month_fid=0;
+    }
+    $sql="select sum(a.goods_price) as price,sum(a.number) as num,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid in ($month_fid) group by a.goods_id";
+    $db->p_e($sql, array());
+    $month=$db->fetchAll();
+    
+    //门店本年的进货记录
+    $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
+    $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
+    $sql="select a.price,b.id from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? and a.starttime between ? and ?";
+    $db->p_e($sql, array($mid,$year_start,$year_end));
+    $year_order=$db->fetchAll();
+    foreach($year_order as $y){
+        $year_fid[]=$y['id'];
+    }
+    if($year_fid){
+        $year_fid=implode(",", $year_fid);
+    }else{
+        $year_fid=0;
+    }
+    $sql="select sum(a.goods_price) as price,sum(a.number) as num,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid in($year_fid) group by a.goods_id";
+    //$sql="select a.goods_price,a.number,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid=?";
+    $db->p_e($sql, array());
+    $year=$db->fetchAll();
+    
+    echo '{"code":"200","day":'.json_encode($day).',"week":'.json_encode($week).',"month":'.json_encode($month).',"year":'.json_encode($year).',"times":'.json_encode($times).'}';
+    exit();
+}elseif($do=='store_date'){//门店进货日期
+    $mid=$_REQUEST['mid'];
+    if(empty($mid)){
+        echo '{"code":"500"}';
+    }
+    $sql="select a.starttime from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=?";
+    $db->p_e($sql, array($mid));
+    $datetime=$db->fetchAll();
+    foreach($datetime as &$v){
+        $v['starttime']=date('Y-m-d',$v['starttime']);
+    }
+    echo '{"code":"200","datetime":'.json_encode($datetime).'}';
+    exit();
+}elseif($do=='sale_time'){//按照销售日期进行查询
+    $starttime=strtotime($_REQUEST['search_time']);
+    $endtime=($starttime+3600*24);
+    $mid=$_REQUEST['mid'];
+    if(empty($mid) || empty($starttime)){
+        echo '{"code":"500"}';
+        exit();
+    }
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id) where 1=1 and a.goods_type=0 and c.mid=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $db->p_e($sql, array($mid,$starttime,$endtime));
+    $info=$db->fetchAll();
+    echo '{"code":"200","info":'.json_encode($info).'}';
+    exit();
+}elseif($do=='order_time'){//进货记录按日期查询
+    $starttime=strtotime($_REQUEST['search_time']);
+    $endtime=($starttime+3600*24);
+    $mid=$_REQUEST['mid'];
+    if(empty($mid) || empty($starttime)){
+        echo '{"code":"500"}';
+        exit();
+    }
+    $sql="select a.price,b.id from rv_order as a left join rv_order_stores as b on a.id=b.fid where a.status=1 and b.mid=? and a.starttime between ? and ?";
+    $db->p_e($sql, array($mid,$starttime,$endtime));
+    $info_order=$db->fetchAll();
+    foreach($info_order as $v){
+        $fidA[]=$v['id'];
+    }
+    $fidA=implode(",", $fidA);
+    $sql="select sum(a.goods_price) as price,sum(a.number) as num,b.name from rv_order_goods as a left join rv_goods as b on a.goods_id=b.id where a.fid in ($fidA) group by a.goods_id";
+    $db->p_e($sql, array());
+    $info=$db->fetchAll();  
+    echo '{"code":"200","info":'.json_encode($info).'}';
+}elseif($do=='salestime'){//销售记录日期
+    $mid=$_REQUEST['mid'];
+    if(empty($mid)){
+        echo '{"code":"500","msg":"关键数据缺失"}';
+        exit();
+    }
+    $end=time();
+    $start=($end-3600*24*60);
+    $sql="select addtime1 from rv_buy where mid=? and addtime1 BETWEEN ? AND ?";
+    $db->p_e($sql, array($mid,$start,$end));
+    $datetime=$db->fetchAll();
+    foreach($datetime as &$v){
+        $v['addtime1']=date('Y-m-d',$v['addtime1']);
+    }
+    echo '{"code":"200","datetime":'.json_encode($datetime).'}';
+    exit();
 }

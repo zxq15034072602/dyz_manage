@@ -6,12 +6,14 @@
  */
 if (! defined("CORE"))
     exit("error");
+$time=time();
+    
 $store_id = $_REQUEST["store_id"]; // 所属门店Id
 $uid = $_REQUEST['uid']; // 登陆用户id
 $user_roleid = $_REQUEST['roleid']; // 用户权限id
 if ($do == "index") { // 销售录入主页面
     $type=$_REQUEST[type]??0;//0独一张/1食维健
-    $good_type = $db->select(0, 0, "rv_type","*","and type=$type");
+    $good_type = $db->select(0, 0, "rv_type","*","and type=$type","id asc");
     $store_goods = array();
     if ($good_type) { // 获取商品品牌，并获取所属门店的商品
         foreach ($good_type as $key => $type) {
@@ -84,7 +86,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $sale_price = $_REQUEST['sale_price']??$total_price;//实际自定义的活动价格
     $sex = $_REQUEST['sex'] ?? 1;
     $address = $_REQUEST['address'] ?? "传国医精粹,布健康功德";
-    $addtime = date('Y-m-d h:i:s');
+    $addtime1 = date('Y-m-d h:i:s');
     $status = ($user_roleid == 3 || $user_roleid == 1) ? 1 : 0; // 录入状态
     if(empty($add_goods_list)&&!is_array($add_goods_list)){
         echo '{"code":"500","msg":"商品信息有误"}';
@@ -107,7 +109,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
         exit();
     }
     foreach ($add_goods_list as $good){//循环全部商品 判断库存
-        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
+        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=?";
         $db->p_e($sql, array(
             $good[0],
             $store_id
@@ -127,7 +129,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
         "sex=$sex",
         "age=$_REQUEST[age]",
         "tel=$_REQUEST[mobile]",
-        "addtime='$addtime'",
+        "addtime1='$time'",
         "address='$address'",
         "sale_price=$sale_price",
         "total_price=$total_price",
@@ -185,19 +187,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$todaystart,$todayend));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and  d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and  d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($todaystart,$todayend));
     }         
     $day_list=$db->fetchAll();
     //产品销售记录按天排行(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$todaystart,$todayend));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($todaystart,$todayend));
     }   
     $day1_list=$db->fetchAll();
@@ -211,19 +213,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     //产品销售排行按周排行(从高到低)
     if($_REQUEST['mendian']){
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($week_start,$week_end));
     }   
     $week_list=$db->fetchAll();
     //产品销售排行按周排行(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($week_start,$week_end));
     }  
     $week1_list=$db->fetchAll();
@@ -234,19 +236,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
     //产品销售排行按月排行(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$beginThismonth,$beginThismonth));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($beginThismonth,$beginThismonth));
     }   
     $month_list=$db->fetchAll();
     //产品销售排行按月排行(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$beginThismonth,$beginThismonth));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($beginThismonth,$beginThismonth));
     }  
     $month1_list=$db->fetchAll();
@@ -257,19 +259,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
     //产品销售排行按年排行(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$year_start,$year_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($year_start,$year_end));
     }  
     $year_list=$db->fetchAll();    
     //产品销售排行按年排行(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$year_start,$year_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id in ($stroe[mid])  and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($year_start,$year_end));
     }   
     $year1_list=$db->fetchAll();
@@ -308,11 +310,11 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
     //店员店长所属门店销售排行按天排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$todaystart,$todayend));   
     $day_list = $db->fetchAll();
     //店员店长所属门店销售排行按天排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$todaystart,$todayend));   
     $day1_list = $db->fetchAll();  
     $todaystart=date("Y年m月d日",$todaystart);
@@ -324,11 +326,11 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $week_start = strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days');
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     //店员店长所属门店销售排行按周排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$week_start,$week_end));
     $week_list = $db->fetchAll();
     //店员店长所属门店销售排行按周排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$week_start,$week_end));
     $week1_list = $db->fetchAll();
     $week_start=date("Y年m月d日",$week_start);
@@ -337,11 +339,11 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
     //店员店长所属门店销售排行按月排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$beginThismonth,$endThismonth));
     $month_list = $db->fetchAll();
     //店员店长所属门店销售排行按月排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$beginThismonth,$endThismonth));
     $month1_list = $db->fetchAll();
     $beginThismonth=date("Y年m月",$beginThismonth);
@@ -350,12 +352,12 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
     //店员店长所属门店销售排行按年排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$year_start,$year_end));
     $year_list = $db->fetchAll();
     
     //店员店长所属门店销售排行按年排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where a.goods_type=0 and d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$year_start,$year_end));
     $year1_list = $db->fetchAll();
     $year_start=date("Y年",$year_start);
@@ -380,7 +382,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     exit();
 }elseif($do=='sales_history3'){//董事长、总经理、总部人员销售记录页面
     //查询所有门店生成下拉列表
-    $sql="select id,name from rv_mendian";
+    $sql="select id,name from rv_mendian where status=1 and type=0";
     $db->p_e($sql, array());
     $list=$db->fetchAll();
     
@@ -394,19 +396,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
     //产品销售按天排序(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$todaystart,$todayend));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc";
         $db->p_e($sql, array($todaystart,$todayend));
     } 
     $day_list=$db->fetchAll();
     //产品销售按天排序(从低高高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$todaystart,$todayend));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($todaystart,$todayend));
     }   
     $day1_list=$db->fetchAll();
@@ -420,19 +422,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     //产品销售按周排序(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc";
         $db->p_e($sql, array($week_start,$week_end));
     }     
     $week_list=$db->fetchAll();
     //产品销售按周排序(从低到高)
     if($_REQUEST['mendian']){
-               $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+               $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($week_start,$week_end));
     }
     $week1_list=$db->fetchAll();
@@ -443,19 +445,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
     //产品销售按月排序(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$beginThismonth,$endThismonth));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc";
         $db->p_e($sql, array($beginThismonth,$endThismonth));
     } 
     $month_list=$db->fetchAll();
     //产品销售按月排序(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$beginThismonth,$endThismonth));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($beginThismonth,$endThismonth));
     }
     $month1_list=$db->fetchAll();
@@ -466,19 +468,19 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
     //产品销售按年排序(从高到低)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
         $db->p_e($sql, array($arr['mid'],$year_start,$year_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc";
         $db->p_e($sql, array($year_start,$year_end));
     } 
     $year_list=$db->fetchAll();
     //产品销售按年排序(从低到高)
     if($_REQUEST['mendian']){
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where 1=1 and a.goods_type=0 ".$search." and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($arr['mid'],$year_start,$year_end));
     }else{
-        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+        $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,b.money,(sum(a.count)*b.money) as total  from (rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id where a.goods_type=0 and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
         $db->p_e($sql, array($year_start,$year_end));
     }
     $year1_list=$db->fetchAll();
@@ -547,7 +549,7 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
     //门店按天排名数字(从高到低)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($todaystart, $todayend));
     $day_list=$db->fetchAll();
     $arr=array();
@@ -557,11 +559,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $day_key=array_search($store_name, $arr);
            
     //门店产品销售排行按天排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$todaystart,$todayend));
     $day_list = $db->fetchAll();
     //门店产品销售排行按天排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$todaystart,$todayend));
     $day1_list = $db->fetchAll();
     $todaystart=date("Y年m月d日",$todaystart);
@@ -573,7 +575,7 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $week_start = strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days');
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($week_start,$week_end));
     $week_list=$db->fetchAll();
     $arr=array();
@@ -583,11 +585,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $week_key=array_search($store_name, $arr);
     
     //门店产品销售排行按周排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$week_start,$week_end));
     $week_list = $db->fetchAll();
     //门店产品销售排行按周排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$week_start,$week_end));
     $week1_list = $db->fetchAll();
     $week_start=date("Y年m月d日",$week_start);
@@ -596,7 +598,7 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
     
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($beginThismonth, $endThismonth));
     $month_list=$db->fetchAll();
     $arr=array();
@@ -606,11 +608,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $month_key=array_search($store_name, $arr);
     
     //门店产品销售排行按月排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$beginThismonth,$endThismonth));
     $month_list = $db->fetchAll();
     //门店产品销售排行按月排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$beginThismonth,$endThismonth));
     $month1_list = $db->fetchAll();
     $beginThismonth=date("Y年m月",$beginThismonth);
@@ -619,7 +621,7 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
     
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($year_start, $year_end));
     $year_list=$db->fetchAll();
     $arr=array();
@@ -629,11 +631,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $year_key=array_search($store_name, $arr);
     
     //门店产品销售排行按年排序(从高到低)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total desc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total desc ";
     $db->p_e($sql, array($store_id,$year_start,$year_end));
     $year_list = $db->fetchAll();
     //门店产品销售排行按年排序(从低到高)
-    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and UNIX_TIMESTAMP(c.addtime) BETWEEN ? AND ? group by a.goods_id order by total asc ";
+    $sql="select a.goods_id,sum(a.count) as sum,b.name as gname,(sum(a.count)*b.money) as total from ((rv_buy_goods as a left join rv_goods as b on a.goods_id=b.id)left join rv_buy as c on a.buy_id=c.id)left join rv_mendian as d on c.mid=d.id where d.id=? and c.addtime1 BETWEEN ? AND ? group by a.goods_id order by total asc ";
     $db->p_e($sql, array($store_id,$year_start,$year_end));
     $year1_list = $db->fetchAll();
     $year_start=date("Y年",$year_start);
@@ -663,7 +665,7 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     exit();
 }elseif($do=='sales_ranking2'){//全国门店销量排行
     
-    $sql="select id,name from rv_mendian";
+    $sql="select id,name from rv_mendian where status=1 and type=0";
     $db->p_e($sql, array());
     $list=$db->fetchAll();
     
@@ -678,20 +680,20 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($arr['mid'],$todaystart, $todayend));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($todaystart, $todayend));
     }
     $day_list=$db->fetchAll();
     
     //门店按天排行(销售额从低到高)
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($arr['mid'],$todaystart, $todayend));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($todaystart, $todayend));
     }
     $day1_list=$db->fetchAll(); 
@@ -705,19 +707,19 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     //门店按周排行(销售额从高到低)
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($week_start,$week_end));
     }
     $week_list=$db->fetchAll();
     //门店按周排行(销售额从低到高)
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($arr['mid'],$week_start,$week_end));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($week_start,$week_end));
     }
     $week1_list=$db->fetchAll();
@@ -728,19 +730,19 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($arr['mid'],$beginThismonth, $endThismonth));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($beginThismonth, $endThismonth));
     }
     $month_list=$db->fetchAll();
     //门店按月排行(销售额从低到高)
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($arr['mid'],$beginThismonth, $endThismonth));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($beginThismonth, $endThismonth));
     }
     $month1_list=$db->fetchAll();
@@ -751,19 +753,19 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($arr['mid'],$year_start, $year_end));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
         $db->p_e($sql, array($year_start, $year_end));
     }
     $year_list=$db->fetchAll();
     //门店按年排行(销售额从低到高)
     if($_REQUEST['mendian']){
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 ".$search." and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($arr['mid'],$year_start, $year_end));
     }else{
-        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+        $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
         $db->p_e($sql, array($year_start, $year_end));
     }
     $year1_list=$db->fetchAll();   
@@ -802,11 +804,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     //门店按天排行(销售额从高到低)
     $todaystart = strtotime(date('Y-m-d' . '00:00:00', time())); // 获取今天00:00
     $todayend = strtotime(date('Y-m-d' . '00:00:00', time() + 3600 * 24)); // 今日结束时间
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($todaystart, $todayend));  
     $day_list=$db->fetchAll();    
     //门店按天排行(销售额从低到高)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
     $db->p_e($sql, array($todaystart, $todayend));  
     $day1_list=$db->fetchAll();
     $todaystart=date("Y年m月d日",$todaystart);
@@ -818,11 +820,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     $week_start = strtotime("$sdefaultDate -" . ($w ? $w - $first : 6) . ' days');
     $week_end = strtotime("$week_s +6 days"); // 本周结束日期
     //门店按周排行(销售额从高到低)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($week_start,$week_end));
     $week_list=$db->fetchAll();
     //门店按周排行(销售额从低到高)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
     $db->p_e($sql, array($week_start,$week_end));
     $week1_list=$db->fetchAll();
     $week_start=date("Y年m月d日",$week_start);
@@ -831,11 +833,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     //门店按月排行(销售额从高到低)
     $beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y')); // 本月开始时间
     $endThismonth = mktime(23, 59, 59, date('m'), date('t'), date('Y')); // 本月结束时间
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($beginThismonth, $endThismonth));
     $month_list=$db->fetchAll();
     //门店按月排行(销售额从低到高)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
     $db->p_e($sql, array($beginThismonth, $endThismonth));
     $month1_list=$db->fetchAll();
     $beginThismonth=date("Y年m月",$beginThismonth);
@@ -844,11 +846,11 @@ if($do=='sales_ranking1'){//店员店长所属门店销售排行
     //门店按年排行(销售额从高到低)
     $year_start = strtotime(date("Y", time()) . "-1" . "-1"); // 本年开始
     $year_end = strtotime(date("Y", time()) . "-12" . "-31"); // 本年结束
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum desc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum desc";
     $db->p_e($sql, array($year_start, $year_end));
     $year_list=$db->fetchAll();
     //门店按年排行(销售额从低到高)
-    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and UNIX_TIMESTAMP(a.addtime) BETWEEN ? AND ? group by a.mid order by sum asc";
+    $sql="select sum(a.total_price) as sum,b.name as mdname,b.id as mid from rv_buy as a left join rv_mendian as b on a.mid=b.id where 1=1 and b.id in ($stroe[mid]) and a.addtime1 BETWEEN ? AND ? group by a.mid order by sum asc";
     $db->p_e($sql, array($year_start, $year_end));
     $year1_list=$db->fetchAll();
     $year_start=date("Y年",$year_start);
