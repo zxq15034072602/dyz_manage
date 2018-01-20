@@ -57,6 +57,7 @@ if($do == "send_voice"){//发送语音（单聊）
     $local_url=$_REQUEST["local_url"];
     $time_length=$_REQUEST['time_length'];
     $send_length=$_REQUEST['send_length'];
+    $addtime=time();
     $send_name = $db->select(0, 1, "rv_user", "name", array(
         "id=$uid"
        
@@ -74,7 +75,8 @@ if($do == "send_voice"){//发送语音（单聊）
         "local_url='$local_url'",
         "time_length='$time_length'",
         "send_length='$send_length'",
-        "content_type=2"
+        "content_type=2",
+        "addtime='$addtime'"
     ));
     $cont = array(
         'sj'=>0,//语音添加事件 0

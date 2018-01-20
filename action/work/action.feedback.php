@@ -19,7 +19,7 @@ if ($do == "question") {//提问
     $db->p_e($sql, array(
         $uid
     ));
-    $last_time = strtotime($db->fetchRow()[addtime]);
+    $last_time = $db->fetchRow()['addtime'];
    
     if ($last_time) {
         $cil = time() - $last_time;
@@ -29,7 +29,7 @@ if ($do == "question") {//提问
         }
     }
    
-    $addtime = date("Y-m-d H:i:s");
+    $addtime = time();
     if ($db->insert(0, 2, "rv_feedback", array(
         "uid=$uid",
         "content='$content'",
@@ -54,7 +54,8 @@ if ($do == "question") {//提问
         $total = $db->fetch_count();
         $total = ceil($total / $pagenum);
         foreach ($question as &$value){
-            $value['answerid']=$value['answerid']??0;
+            $value['addtime']=date('Y-m-d H:i:s',$value['addtime']);
+            $value['answerid']=$value['answerid']??0;            
             $sql="select a.id,a.uid,a.qid,a.content,a.addtime,count(g.id) as count,u.name from (rv_answer as a LEFT JOIN rv_answer_greet as g on a.id=g.aid)left join rv_user as u on a.uid=u.id where a.id in ($value[answerid]) GROUP BY id ORDER BY count desc LIMIT 1";
             $db->p_e($sql,array());
             $value['answer']=$db->fetchRow();
@@ -90,6 +91,9 @@ if ($do == "question") {//提问
     ));
     //问题
     $qArr=$db->fetchAll();
+    foreach($qArr as &$v){
+        $v['addtime']=date('Y-m-d H:i:s',$v['addtime']);
+    }
 
     $sql1="select a.id as aid,a.uid,a.qid,a.content,a.addtime,b.name from rv_answer as a left join rv_user as b on a.uid=b.id where qid=?";
     $db->p_e($sql1, array(
@@ -137,6 +141,9 @@ if ($do == "question") {//提问
     ));
     //回复列表
     $rArr=$db->fetchAll();
+    foreach($rArr as &$v){
+        $v['addtime']=date('Y-m-d H:i:s',$v['addtime']);
+    }
     //模板
     $smt=new Smarty();
     smarty_cfg($smt);
@@ -160,19 +167,8 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回答内容不能为空"}';
         exit();
     }
-    /* $sql="select addtime from rv_answer where 1=1 and uid=? order by id desc";
-    $db->p_e($sql, array(
-        $uid
-    ));
-    $last_time = strtotime($db->fetchRow()[addtime]);
-    if ($last_time) {
-        $cil = time() - $last_time;
-        if ($cil < 10) {
-            echo '{"code":"500","msg":"对不起，不要频繁提交"}';
-            exit();
-        }
-    } */
-    $addtime = date("Y-m-d H:i:s");
+   
+    $addtime = time();
     
     $last_id=$db->insert(0, 2, "rv_answer", array(
         "uid=$uid",
@@ -194,19 +190,7 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回复内容不能为空"}';
         exit();
     }
-   /*  $sql="select addtime from rv_answer_reply where 1=1 and uid=? order by id desc";
-    $db->p_e($sql, array(
-        $uid
-    ));
-    $last_time = strtotime($db->fetchRow()[addtime]);
-    if ($last_time) {
-        $cil = time() - $last_time;
-        if ($cil < 10) {
-            echo '{"code":"500","msg":"对不起，不要频繁提交"}';
-            exit();
-        }
-    } */
-    $addtime = date("Y-m-d H:i:s");
+    $addtime = time();
     if($db->insert(0, 2, "rv_answer_reply", array(
         "uid=$uid",
         "content='$content'",

@@ -150,6 +150,7 @@ if ($do == 'fasixin_img') {
     ));
     $head=$db->fetchRow();
     $head_img=$head['head_img'];
+    $addtime=time();
     $cont = array(
         'lx' => 1,
         "sj" => 0,//事件添加 1
@@ -177,11 +178,12 @@ if ($do == 'fasixin_img') {
              exit();
         }
     }else{
-        $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content_s_img,content_type) values(?,?,?,1)";
+        $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content_s_img,content_type,addtime) values(?,?,?,1,?)";
         if ($db->p_e($sql, array(
             $uid,
             $gid,
-            $img
+            $img,
+            $addtime
         ))) { // 成功后像socket 服务端推送数据
             to_msg(array(
                 'type' => 'sixin_to_groups',

@@ -32,27 +32,7 @@ if ($do == "index") { // 销售录入主页面
     $smt->assign("store_goods", $store_goods);
     $smt->display("sales_index.html");
     exit();
-} elseif ($do == "add_buy_cart"){ //添加销售商品到录入单
-    $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id,商品名称,商品单价）
-    $number=$_REQUEST['number']??1;//添加的商品数量
-    if(empty($store_id)&&empty($add_goods_list)&&!is_array($add_goods_list)&&empty($uid)){
-       echo '{"code":"500","msg":"关键数据获取失败！"}';
-       exit();
-    }
-    $add_type=$_REQUEST['add_type']??0;//添加类型:0 添加普通商品/1 添加赠品
-    foreach($add_goods_list as $good){
-        $sql="select * from rv_buy_cart where buyer_id=? and store_id=? and goods_id =? and bl_id=?";
-        $db->p_e($sql, array($uid,$store_id,$good[id],$add_type));
-        $row=$db->fetchRow();
-        if($row){//如果已存在，则更新数据
-            
-        }else{
-          
-        }
-    }
-
-}
-elseif ($do == "sales_view") { // 获取销售录入信息
+}elseif ($do == "sales_view") { // 获取销售录入信息
     $type=$_REQUEST[type]??0;//0独一张/1食维健
     $add_goods_list=json_decode($_REQUEST['goods_list']);//要入单的商品 （要求商品id）
     if(empty($store_id)||empty($add_goods_list)||!is_array($add_goods_list)){
@@ -84,7 +64,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
     $sale_price = $_REQUEST['sale_price']??$total_price;//实际自定义的活动价格
     $sex = $_REQUEST['sex'] ?? 1;
     $address = $_REQUEST['address'] ?? "传国医精粹,布健康功德";
-    $addtime = date('Y-m-d h:i:s');
+    $addtime = time();
     $status = ($user_roleid == 3 || $user_roleid == 1) ? 1 : 0; // 录入状态
     if(empty($add_goods_list)&&!is_array($add_goods_list)){
         echo '{"code":"500","msg":"商品信息有误"}';
@@ -107,7 +87,7 @@ elseif ($do == "sales_view") { // 获取销售录入信息
         exit();
     }
     foreach ($add_goods_list as $good){//循环全部商品 判断库存
-        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=? ";
+        $sql = "select * from rv_kucun  where 1=1 and gid=? and mid=?";
         $db->p_e($sql, array(
             $good[0],
             $store_id
@@ -148,7 +128,6 @@ elseif ($do == "sales_view") { // 获取销售录入信息
             foreach($add_goods_list as $good){
                 $new_kuncun = $sales_kucun['kucun'] - $good[1];
                 $db->update(0, 1, "rv_kucun", array("kucun=$new_kuncun"), array( "mid=$store_id","gid=$good[0]"));
-                  
             }
             echo '{"code":"200","msg":"录入成功"}';
             exit();

@@ -9,6 +9,7 @@ if (! defined("CORE"))
 $store_id = $_REQUEST["store_id"]; // 所属门店Id
 $user_roleid = $_REQUEST['roleid']; // 用户权限id
 $uid = $_REQUEST['uid']; // 登陆用户id
+$time=time();
 
 if ($do == "input_verify_list") // 销售录入列表页面
 {
@@ -22,6 +23,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
     $verify_list = $db->fetchAll();
     
     foreach ($verify_list as &$values){
+        $values['addtime']=date($values['addtime']);
         $sql="select g.id,b.count from rv_buy_goods as b,rv_goods as g where b.goods_id=g.id and buy_id=?";
         $db->p_e($sql, array($values[id]));
         $values['goods_list']=$db->fetchAll();
@@ -57,8 +59,8 @@ if ($do == "input_verify_list") // 销售录入列表页面
             exit();
         }
     }  
-    $sql = "update rv_buy set status=1,endtime=now() where id=?";
-    if ($db->p_e($sql, array($_REQUEST['bid']))) { // 如果同意成功则，sokect推送数据
+    $sql = "update rv_buy set status=1,endtime=? where id=?";
+    if ($db->p_e($sql, array($time,$_REQUEST['bid']))) { // 如果同意成功则，sokect推送数据
         
         foreach($add_goods_list as $good){
             $new_kuncun = $sales_kucun['kucun'] - $good[1];
@@ -89,9 +91,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"对不起，你不是店长"}';
         exit();
     }
-    $sql = "update rv_buy set status=2,endtime=now() where id=?";
+    $sql = "update rv_buy set status=2,endtime=? where id=?";
     if ($db->p_e($sql, array(
-        $_REQUEST['bid']
+        $time,$_REQUEST['bid']
     ))) { // 如果同意成功则，sokect推送数据
         $cont = array(
             "time" => date('m月d日 H:i'),
@@ -120,6 +122,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
     ));
     $verify_info = $db->fetchRow();
     if($verify_info){
+        $verify_info['addtime']=date('Y-m-d H:i:s',$verify_info['addtime']);
         $sql="select * from rv_buy_goods as bg, rv_goods as g where bg.goods_id=g.id and bg.goods_id and buy_id=?";
         $db->p_e($sql, array($verify_info[id]));
         $verify_info['goods']=$db->fetchAll();
@@ -141,6 +144,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
         $store_id
     ));
     $verify_list = $db->fetchAll();
+    foreach($verify_list as $v){
+        $v['addtime']=date('Y-m-d H:i:s',$v['addtime']);
+    }
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("verify_list", $verify_list);
@@ -157,9 +163,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"对不起，你不是店长"}';
         exit();
     }
-    $sql = "update rv_verify set status=1,updatetime=now() where id=?";
+    $sql = "update rv_verify set status=1,updatetime=? where id=?";
     if ($db->p_e($sql, array(
-        $_REQUEST[vid]
+        $time,$_REQUEST[vid]
     ))) { // 如果同意成功则，sokect推送数据
         $sql = "update rv_user set zz=? where id=?";
         $db->p_e($sql, array(
@@ -192,9 +198,9 @@ if ($do == "input_verify_list") // 销售录入列表页面
         echo '{"code":"500","msg":"对不起，你不是店长"}';
         exit();
     }
-    $sql = "update rv_verify set status=2,updatetime=now() where id=?";
+    $sql = "update rv_verify set status=2,updatetime=? where id=?";
     if ($db->p_e($sql, array(
-        $_REQUEST['bid']
+        $time,$_REQUEST['bid']
     ))) { // 如果同意成功则，sokect推送数据
         $cont = array(
             "time" => date('m月d日 H:i'),
@@ -222,6 +228,7 @@ if ($do == "input_verify_list") // 销售录入列表页面
         $vid
     ));
     $verify_info = $db->fetchRow();
+    $verify_info['addtime']=date('Y-m-d H:i:s',$verify_info['addtime']);
     $smt = new Smarty();
     smarty_cfg($smt);
     $smt->assign("verify_info", $verify_info);
