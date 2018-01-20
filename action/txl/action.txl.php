@@ -4,13 +4,7 @@ if (! defined('CORE'))
 // 通讯录
 $type=$_REQUEST["type"];
 if ($do == "txl") {
-
     // 门店
-    if($_REQUEST['name']){
-        $search .= "and gu_group_nick like ? ";
-        $arr1[]="%".$_REQUEST['name']."%";
-    }
-   
     $sql = "select GET_SZM(a.name) as szm from rv_mendian as a left join rv_fengongsi as b on a.fid=b.id   where 1=1 and a.status=1  group by szm";
     $db->p_e($sql, array());
     $szm = $db->fetchAll();
@@ -19,7 +13,7 @@ if ($do == "txl") {
         $db->p_e($sql, array($type));
         $txl = $db->fetchAll();
         foreach ($txl as &$k) {
-          //  $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5,6,7) and zz!=370";
+            $k['admin'] = user($k['adminid']);
             $sql = "select id from rv_user where 1=1 and zz=? and status=1 and roleid in (1,3,5)";
             $db->p_e($sql, array(
                 $k['id']
@@ -136,7 +130,6 @@ if ($do == "txl") {
             $vvv['head_img']="../../image/header_picture/".$vvv['head_img'];
         }
     }
-    
     // 模版
     $flag = $_REQUEST['flag'] ?? '0'; // 0未默认通信录 1群聊通讯录
     $smt = new smarty();
@@ -149,7 +142,7 @@ if ($do == "txl") {
     $smt->assign('zongbu',$zongbu);
     $smt->display('txl1.html');
     exit();
-}elseif ($do == "get_store") { // 获取省份对应门店
+} elseif ($do == "get_store") { // 获取省份对应门店
     $cityid = $_REQUEST['cityid'] ?? 0;
     $sql = "select id,name from rv_mendian where cityid=? and status=1 and type=? ";
     $db->p_e($sql, array(

@@ -2,7 +2,7 @@
 if (! defined('CORE')) exit("error!");
 
 if($do=='glist'){//产品列表页
-    $sql="select g.* from rv_goods as g left join rv_type as t on g.fatherid=t.id where t.type=0";
+    $sql="select g.* from rv_goods as g left join rv_type as t on g.fatherid=t.id where t.type=0 and g.fatherid<5";
     $db->p_e($sql, array());
     $gArr=$db->fetchAll();
     $smt=new Smarty();

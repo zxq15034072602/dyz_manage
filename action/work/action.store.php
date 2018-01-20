@@ -17,7 +17,7 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
     $db->p_e($sql, array($provinceid));
     $franchiseeConut =$db->fetch_count();
     //省下门店数量
-    $sql="select count(*) from rv_mendian where status=1 and provinceid=?";
+    $sql="select count(*) from rv_mendian where provinceid=?  and status=1";
     $db->p_e($sql, array($provinceid));
     $storeCount=$db->fetch_count();    
     echo '{"dealerConut":"'.$dealerConut.'","franchiseeConut":"'.$franchiseeConut.'","storeCount":"'.$storeCount.'"}';
@@ -37,7 +37,7 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
         //获取经销商门店
         $v['mid']=explode(",", $v['mid']);
         foreach($v['mid'] as &$value){
-            $sql="select name from rv_mendian where status=1 and id=?";
+            $sql="select name from rv_mendian where id=?";
             $db->p_e($sql, array($value));
             $md=$db->fetchRow()['name'];
             $v['mdname'][]=$md;
@@ -66,8 +66,8 @@ if($do=='store_num'){//店面分布获取省份下的经销商数量、加盟商
                 $val['username'].=$vvv['name'].'&nbsp;';
             }
         }
-    }    
-
+        
+    }
     echo '{"code":"200","dealer_info":'.json_encode($dealer_info).',"store":'.json_encode($store).'}';
     exit();
 }elseif($do=='city_storenum'){//城市下经销商数、加盟商数、门店数量

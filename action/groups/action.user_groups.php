@@ -1,6 +1,7 @@
 <?php
 if (! defined('CORE'))
     exit("error!");
+$time=time();
 // 加入群聊
 if ($do == "add_groups") {
     $admin_id = $_REQUEST['admin_id']; // 群主用户id
@@ -16,7 +17,7 @@ if ($do == "add_groups") {
         )); // 将自己加入到群组数组中
         $ug_id = $db->insert(0, 2, "rv_users_groups", array(
             "ug_admin_id = $admin_id",
-            "ug_create_time=$addtime"
+            "ug_create_time=$time"
         )); // 如果插入成功，则返回群组id
         if ($ug_id) { // 如果创建群聊成功，则往群成员表插入群成员
             $sql = "INSERT INTO rv_group_to_users(gu_gid,gu_uid,gu_group_nick) VALUES";
@@ -30,8 +31,14 @@ if ($do == "add_groups") {
             }
             $sql .= $item_list_tmp;
             $db->p_e($sql, $params);
-            
+            to_msg(array(
+                'type' => 'update_msg',//mani.html socket事件名称
+                'cont' => "",//obj
+                'to' => $groups_users//群聊的房间号
+            )); // 推送消息
             echo '{"code":"200","msg":"创建群聊成功","gid":"' . $ug_id . '"}';
+            
+            exit();
         } else {
             echo '{"code":"500","msg":"创建群聊有误"}';
         }
@@ -46,11 +53,11 @@ if ($do == "add_groups") {
             $gid
         ));
         $groups_users_list = json_encode($db->fetchAll()); // 群聊组员
-        $groups_info = $db->select(0, 1, "rv_users_groups", "*", array(
+        $groups_info = $db->select(0, 1, "rv_users_groups", "*,date_format(ug_create_time,'m月d日 H:i') as ug_create_time_format", array(
             "ug_id = $gid"
         ), ' ug_id desc'); // 群聊信息
         foreach($groups_info as &$v){
-            $v['ug_create_time_format']=date('%m月%d日 %H:%i',$v['ug_create_time']);
+            $v['ug_create_time_format']=date('m月d日 H:i',$v['ug_create_time1']);
         }
         echo '{"code":"200","gid":"' . $gid . '","groups_info":' . json_encode($groups_info) . ',"groups_users_list":' . $groups_users_list . '}';
         exit();
@@ -63,9 +70,19 @@ if ($do == "add_groups") {
     $is_openwin = 0;
     $pagenum=15;
     if ($gid) {
+
+        $sql="delete from rv_groups_msg_details where 1=1 and guid=? and gid=?";
+        $db->p_e($sql, array(
+            $uid,
+            $gid
+        ));
+
         $sql="select name,head_img from rv_user where id=?";
         $db->p_e($sql, array($uid));
         $userinfo=$db->fetchRow();
+        if(empty($userinfo['head_img'])){
+                $head_img='http://static.duyiwang.cn/tc_log.jpg';
+        }
         if ($db->update(0, 1, "rv_user", array(
             "is_openwin=1"
         ), array(
@@ -182,19 +199,14 @@ if ($do == "add_groups") {
     $page = ($page - 1) * $pagenum;
     if ($gid && $uid) {
         // 变已读
-       // $sql = "update rv_groups_msg_details set is_du=1 where 1=1 and guid=? and gid=?";
-        $sql="delete from rv_groups_msg_details where 1=1 and guid=? and gid=?";
-        $db->p_e($sql, array(
-            $uid,
-            $gid
-        ));
-        $sql="select * from rv_groups_xiaoxi where 1=1 and togid =? order by id desc limit " . $page . "," . $pagenum;
+        $sql = "select * from rv_groups_xiaoxi where 1=1 and togid =? order by id desc limit " . $page . "," . $pagenum;
+        $sql="select *,date_format(addtime,'m月d日 H:i') as addtime1 from rv_groups_xiaoxi where 1=1 and togid =? order by id desc limit " . $page . "," . $pagenum;
         $db->p_e($sql, array(
             $gid
         ));
         $qdh = $db->fetchAll(); 
         foreach($qdh as &$val){
-            $val['addtime1']=$val['addtime'];
+            $val['addtime1']=date('m月d日 H:i',$val['addtime1']);
         }
         $sort = array(
          'direction' => 'SORT_ASC', //排序顺序标志 SORT_DESC 降序；SORT_ASC 升序
@@ -251,7 +263,7 @@ if ($do == "add_groups") {
         "content='$txt'",
         "content_type=0",
         "at_user_ids='$at_user_ids'",
-        "addtime='$time'"
+        "addtime1=$time"
     ));
     $cont = array(
         'sj'=>0,
@@ -347,7 +359,11 @@ if ($do == "add_groups") {
         }
         $sql .= $item_list_tmp;
         if ($db->p_e($sql, $params)) {
-            
+            to_msg(array(
+                'type' => 'update_msg',//mani.html socket事件名称
+                'cont' => "",//obj
+                'to' => $groups_users//群聊的房间号
+            )); // 推送消息
             echo '{"code":"200","msg":"更新联系人成功"}';
             exit();
         }
@@ -424,12 +440,12 @@ if ($do == "add_groups") {
     $gid=$_REQUEST['gid'];
     if($gid){
         //查询该群最后一条消息的时间
-        $sql="select addtime from rv_groups_xiaoxi where togid=? order by addtime desc ";
+        $sql="select addtime1 from rv_groups_xiaoxi where togid=? order by addtime1 desc limit 1";
         $db->p_e($sql, array($gid));
         $addtime=$db->fetch_count();
         $end=$addtime;//最后一条消息时间戳
         $start=($end-3600*72);//三天前时间
-        $sql="select a.*,b.name,b.head_img from rv_groups_xiaoxi as a left join rv_user as b on a.from_uid=b.id where togid=? and UNIX_TIMESTAMP(addtime) BETWEEN ? AND ?";
+        $sql="select a.*,b.name,b.head_img from rv_groups_xiaoxi as a left join rv_user as b on a.from_uid=b.id where togid=? and addtime1 BETWEEN ? AND ?";
         $db->p_e($sql, array($gid,$start,$end));
         $xiaoxi=$db->fetchAll();
         echo '{"code":"200","xiaoxi":'.json_encode($xiaoxi).'}';

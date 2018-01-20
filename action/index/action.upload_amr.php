@@ -1,11 +1,13 @@
 <?php 
 if (! defined('CORE'))
     exit("error!"); // 检查某常量是否存在。
-   /*  $dir_name = "F:wamp/www/apptupian/amr/";
-    $save_url = "http://192.168.1.143/apptupian/amr/";  */
-     $save_url = "http://static.duyiwang.cn/amr/";
-    $dir_name = "E:/apptupian/amr/"; 
-    
+
+    $time=time();
+     $dir_name = "F:wamp/www/apptupian/amr/";
+    $save_url = "http://192.168.1.143/apptupian/amr/"; 
+  /*  $save_url = "http://static.duyiwang.cn/amr/";
+    $dir_name = "E:/apptupian/amr/";*/
+    $upload_flag=false;
     $file_url="";
     if($_FILES['file']['size']>5242880){
         echo '{"code":"404","msg":"文件过大"}';
@@ -13,10 +15,14 @@ if (! defined('CORE'))
     }
     if(is_uploaded_file($_FILES['file']['tmp_name'])){
         // 新文件名
-        $new_file_name = date("YmdHis") . '_' . mt_rand(10000, 99999) . '.amr';
+        //file_put_contents("e://houzhui.txt",substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.')+1));
+        $suffix=substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.')+1);
+        $new_file_name = date("YmdHis") . '_' . mt_rand(10000, 99999) . '.'.$suffix;
         $file_url = $save_url . $new_file_name;
         $file_path = $dir_name . $new_file_name;
-        move_uploaded_file($_FILES['file']['tmp_name'], $file_path);
+        if(move_uploaded_file($_FILES['file']['tmp_name'], $file_path)){
+            $upload_flag=true;
+        }
     }
    
 if($do == "send_voice"){//发送语音（单聊）
@@ -49,56 +55,58 @@ if($do == "send_voice"){//发送语音（单聊）
     }
     exit();
 }elseif ($do == "send_voice_groups"){//发送语音群聊
-    $uid = $_REQUEST['uid'];
-    $gid = $_REQUEST['gid'];
-    $groups_room = $_REQUEST['groups_room'];
-    $amr = $file_url;
-    $nowtime = date('m月d日 H:i');
-    $local_url=$_REQUEST["local_url"];
-    $time_length=$_REQUEST['time_length'];
-    $send_length=$_REQUEST['send_length'];
-    $addtime=time();
-    $send_name = $db->select(0, 1, "rv_user", "name", array(
-        "id=$uid"
-       
-    ), "id desc");
-    $sql="select head_img from rv_user where 1=1 and id=?";
-    $db->p_e($sql,array(
-        $uid
-    ));
-    $head=$db->fetchRow();
-    $head_img=$head['head_img'];
-    $last_id=$db->insert(0, 2, "rv_groups_xiaoxi", array(
-        "from_uid='$uid'",
-        "togid='$gid'",
-        "content='$amr'",
-        "local_url='$local_url'",
-        "time_length='$time_length'",
-        "send_length='$send_length'",
-        "content_type=2",
-        "addtime='$addtime'"
-    ));
-    $cont = array(
-        'sj'=>0,//语音添加事件 0
-        'lx' =>2,
-        'nr' => $file_url,
-        'time' => date('m月d日 H:i'),
-        "from_id" => $uid,
-        "send_name" =>$send_name[name],
-        'time_length'=>$time_length,
-        'send_length'=>$send_length,
-        "head_img"=>$head_img,
-        'xid'=>$last_id,
-        "groups_room"=>$groups_room
-    );
-    
-    $cont = json_encode($cont);
-    if($last_id){
-        to_msg(array('type' => 'sixin_to_groups','cont' => $cont,'to' => $groups_room)); // 推送消息
+    if($upload_flag){
+        $uid = $_REQUEST['uid'];
+        $gid = $_REQUEST['gid'];
+        $groups_room = $_REQUEST['groups_room'];
+        $amr = $file_url;
+        $nowtime = date('m月d日 H:i');
+        $local_url=$_REQUEST["local_url"];
+        $time_length=$_REQUEST['time_length'];
+        $send_length=$_REQUEST['send_length'];
+        $send_name = $db->select(0, 1, "rv_user", "name", array(
+            "id=$uid"
+           
+        ), "id desc");
+        $sql="select head_img from rv_user where 1=1 and id=?";
+        $db->p_e($sql,array(
+            $uid
+        ));
+        $head=$db->fetchRow();
+        $head_img=$head['head_img'];
+        $last_id=$db->insert(0, 2, "rv_groups_xiaoxi", array(
+            "from_uid='$uid'",
+            "togid='$gid'",
+            "content='$amr'",
+            "local_url='$local_url'",
+            "time_length='$time_length'",
+            "send_length='$send_length'",
+            "content_type=2",
+            "addtime1=$time"
+        ));
+        $cont = array(
+            'sj'=>0,//语音添加事件 0
+            'lx' =>2,
+            'nr' => $file_url,
+            'time' => date('m月d日 H:i'),
+            "from_id" => $uid,
+            "send_name" =>$send_name[name],
+            'time_length'=>$time_length,
+            'send_length'=>$send_length,
+            "head_img"=>$head_img,
+            'xid'=>$last_id,
+            'gid'=>$gid,
+            "groups_room"=>$groups_room
+        );
         
-        echo '{"code":"200","url":"' . $file_url . '","time":"' . $nowtime . '","send_name":"' . $send_name[name] . '","head_img":"'.$head_img.'","xid":"'.$last_id.'"}';
-        exit();
-    } 
+        $cont = json_encode($cont);
+        if($last_id){
+            to_msg(array('type' => 'sixin_to_groups','cont' => $cont,'to' => $groups_room)); // 推送消息
+            
+            echo '{"code":"200","url":"' . $file_url . '","time":"' . $nowtime . '","send_name":"' . $send_name[name] . '","head_img":"'.$head_img.'","xid":"'.$last_id.'"}';
+            exit();
+        } 
+    }
     echo '{"code":"500"}';
     exit();
 }elseif($do=='del_groups_amr'){

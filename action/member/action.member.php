@@ -6,8 +6,8 @@
  */
 if (! defined("CORE"))
     exit("error");
-$user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健）
 $time=time();
+$user_type = $_REQUEST['type'] ?? 0; // 所屬用戶 （0独一张，1食维健）
 if ($do == "userinfo") { // 用户中心个人信息
     $uid = $_REQUEST['uid']; // 用户id
     $user = user($uid); // 获取用户相关信息s
@@ -70,9 +70,11 @@ if ($do == "userinfo") { // 用户中心个人信息
         if (empty($_REQUEST['roleid'])) {
             echo '{"code":"500","msg":"程序错误"}';
             exit();
-        }   
+        }
+
         if ($user['stroe_id'] != $_REQUEST['stroe_id']  || $user['roleid'] != $_REQUEST['roleid']) { // 如果用户修改了所属门店，则插入未审核人员记录,或者如果用户修改了职位，则插入未审核店长记录s
-            if ($_REQUEST[roleid] == 5 && $user['roleid'] != 3) { // 如果是店员身份修改所属门店
+
+            if ($_REQUEST[roleid] == 5) { // 如果是店员身份修改所属门店
                 $sql = "select * from rv_verify where 1=1 and uid=? and status=0";
                 $db->p_e($sql, array(
                     $uid
@@ -81,7 +83,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                     echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                     exit();
                 }
-                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,$time,?)";
+                $sql = "insert into rv_verify (uid,mid,type,addtime1,status) VALUES (?,?,?,$time,?)";
                 $arr = array(
                     $uid,
                     $_REQUEST['stroe_id'],
@@ -115,7 +117,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                     echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                     exit();
                 }
-                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,$time,?)";
+                $sql = "insert into rv_verify (uid,mid,type,addtime1,status) VALUES (?,?,?,$time,?)";
                 $arr = array(
                     $uid,
                     $_REQUEST['stroe_id'],
@@ -145,7 +147,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                     echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                     exit();
                 }
-                $sql = "insert into rv_verify (uid,mid,type,addtime,status) VALUES (?,?,?,$time,?)";
+                $sql = "insert into rv_verify (uid,mid,type,addtime1,status) VALUES (?,?,?,$time,?)";
                 $arr = array(
                     $uid,
                     '370',
@@ -169,7 +171,7 @@ if ($do == "userinfo") { // 用户中心个人信息
             }
         }
         
-        if(!empty(json_decode($_REQUEST['stroe_id'])) || $user['roleid'] != $_REQUEST['roleid'] || $_REQUEST['cityid']){
+        if(!empty(json_decode($_REQUEST['stroe_id'])) || $user['roleid'] != $_REQUEST['roleid'] || !empty($_REQUEST['cityid'])){
             //处理接收的门店id
             $mid=$_REQUEST['stroe_id'];
             $mid=rtrim($mid,']');
@@ -192,7 +194,8 @@ if ($do == "userinfo") { // 用户中心个人信息
                 $cities=$_REQUEST['cityid'];
                 $area='';
             }
-            if($mid != $md && !empty($_REQUEST['cityid'])){
+
+            if($user['roleid'] != $_REQUEST['roleid'] || $mid != $md && !empty($_REQUEST['cityid'])){
                 if($_REQUEST[roleid]==2){//经销商审核
                     if (empty(json_decode($_REQUEST[stroe_id]))) { // 如果未选择门店，则不能申请经销商
                         echo '{"code":"500","msg":"请先选择所属门店"}';
@@ -207,7 +210,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         exit();
                     }
                 
-                    $sql = "insert into rv_verify (uid,mid,type,addtime,status,cityid,areaid) VALUES (?,?,?,$time,?,?,?)";
+                    $sql = "insert into rv_verify (uid,mid,type,addtime1,status,cityid,areaid) VALUES (?,?,?,$time,?,?,?)";
                     $arr = array(
                         $uid,
                         $mid,
@@ -244,7 +247,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                         echo '{"code":"500","msg":"您有未处理的申请，请耐心等待"}';
                         exit();
                     }
-                    $sql = "insert into rv_verify (uid,mid,type,addtime,status,cityid,areaid) VALUES (?,?,?,$time,?,?,?)";
+                    $sql = "insert into rv_verify (uid,mid,type,addtime1,status,cityid,areaid) VALUES (?,?,?,$time,?,?,?)";
                 
                     $arr = array(
                         $uid,
@@ -300,7 +303,6 @@ if ($do == "userinfo") { // 用户中心个人信息
             $stroe['name'].=$name['name'].'&nbsp;&nbsp;';
             $stroe['store'][]=array('id'=>$v,'name'=>$name['name']);
         } 
-        
         //处理接收的区域
         if($stroe['areaid']){
             $sql="select * from rv_city where cityid=?";
@@ -312,7 +314,7 @@ if ($do == "userinfo") { // 用户中心个人信息
                 $sql="select * from rv_area where areaid=?";
                 $db->p_e($sql, array($vv));
                 $areaname=$db->fetchRow();
-                $stroe['position'].=$cityname['city'].$areaname['area'].'&nbsp;&nbsp;';
+                $stroe['position'].=$areaname['area'].'&nbsp;&nbsp;';
             }
         }else{
             $sql="select a.city,b.province from rv_city as a left join rv_province as b on a.fatherid=b.provinceid where a.cityid=?";
@@ -404,7 +406,7 @@ if ($do == "userinfo") { // 用户中心个人信息
         "password='$password'",
         "roleid=5",
         "mobile=$mobile",
-        "created_at='$time'",
+        "created_at1='$time'",
         "type=$user_type",
         "weixin_id='$weixinid'"
     ));
@@ -546,7 +548,7 @@ elseif($do=='info'){//获取用户个人信息
         ));
         $info=$db->fetchRow();
     }
-    $sql = "select status from rv_verify where 1=1 and uid=? order by addtime desc limit 1";
+    $sql = "select status from rv_verify where 1=1 and uid=? order by addtime1 desc limit 1";
     $db->p_e($sql, array($uid));
     $verify_status=$db->fetchRow();
     if(!empty($info)){
@@ -635,7 +637,8 @@ elseif($do=='info'){//获取用户个人信息
     smarty_cfg($smt);
     $smt->assign('province', $province);
     $smt->assign('cids', $cids);
-    $smt->display('city.html');    
+    $smt->display('city.html');
+    
 }
 
 

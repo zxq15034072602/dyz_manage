@@ -14,7 +14,7 @@ if ($do == "xiaoxi") {
     ));
     $xiaoxi = $db->fetchAll();
     foreach ($xiaoxi as &$k) {
-        $k['addtime']=date('%m月%d日',$k['addtime']);
+        $k['addtime']=date('m月d日',$k['addtime']);
         $sql = "select count(*) from rv_xiaoxi where 1=1 and uid=? and toid=? and is_du=0";
         $db->p_e($sql, array(
             $uid,
@@ -54,18 +54,20 @@ if ($do == "xiaoxi") {
     $total = ceil($total / $pagenum);
     
     // 获取群聊消息
-    $sql = "select * ,date_format(ug_create_time,'%m月%d日') as addtime1 from rv_users_groups where ug_id in( SELECT gu_gid from rv_group_to_users where gu_uid=?)";
+    $sql = "select * from rv_users_groups where ug_id in( SELECT gu_gid from rv_group_to_users where gu_uid=?)";
     $db->p_e($sql, array(
         $uid
     ));
     $user_groups_list = $db->fetchAll();
     foreach ($user_groups_list as &$groups) {
+        $groups['addtime1']=date('m月d日',$groups['addtime1']);
         $groups['ug_name'] = $groups['ug_name'] == '未命名' || empty($groups['ug_name']) ? '未命名的群聊' : $groups['ug_name'];
-        $sql = "select *,date_format(addtime,'%m月%d日') as addtime1 from rv_groups_xiaoxi where id in (SELECT max(id) FROM rv_groups_xiaoxi where togid= ? GROUP BY togid) order by addtime desc";
+        $sql = "select * from rv_groups_xiaoxi where id in (SELECT max(id) FROM rv_groups_xiaoxi where togid= ? GROUP BY togid) order by addtime1 desc";
         $db->p_e($sql, array(
             $groups['ug_id']
         ));
         $from_xiaoxi = $db->fetchRow();
+        $from_xiaoxi['addtime1']=date('m月d日',$from_xiaoxi['addtime1']);
         if ($groups['ug_admin_id'] == $uid) { // 如果是群主时 不管有无消息显示群聊信息
             $groups['admin'] = 1;
         }
@@ -84,7 +86,6 @@ if ($do == "xiaoxi") {
                 $groups['xiaoxi']['togid']
             ));
             $groups['weidu'] = $db->fetch_count();
-
             $sql = "select gu_group_nick from rv_group_to_users where 1=1 and gu_uid=?";
             $db->p_e($sql, array(
                 $groups['xiaoxi']['from_uid']
@@ -107,12 +108,13 @@ if ($do == "xiaoxi") {
     $page = $_REQUEST['page'] ?? 1;
     $page = ($page - 1) * $pagenum;
     // 总部
-    $sql = "select *,date_format(addtime,'%m月%d日') as addtime1 from rv_xiaoxi where id in (SELECT max(id) FROM rv_xiaoxi where uid=? GROUP BY toid) order by addtime desc limit " . $page . "," . $pagenum;
+    $sql = "select * from rv_xiaoxi where id in (SELECT max(id) FROM rv_xiaoxi where uid=? GROUP BY toid) order by addtime desc limit " . $page . "," . $pagenum;
     $db->p_e($sql, array(
         $uid
     ));
     $xiaoxi = $db->fetchAll();
     foreach ($xiaoxi as &$k) {
+        $k['addtime']=date('m月d日',$k['addtime']);
         $sql = "select count(*) from rv_xiaoxi where 1=1 and uid=? and toid=? and is_du=0";
         $db->p_e($sql, array(
             $uid,
@@ -152,18 +154,20 @@ if ($do == "xiaoxi") {
     $total = ceil($total / $pagenum);
     
     // 获取群聊消息
-    $sql = "select * ,date_format(ug_create_time,'%m月%d日') as addtime1 from rv_users_groups where ug_id in( SELECT gu_gid from rv_group_to_users where gu_uid=?)";
+    $sql = "select * from rv_users_groups where ug_id in( SELECT gu_gid from rv_group_to_users where gu_uid=?)";
     $db->p_e($sql, array(
         $uid
     ));
     $user_groups_list = $db->fetchAll();
     foreach ($user_groups_list as &$groups) {
+        $groups['addtime1']=date('m月d日',$groups['ug_create_time1']);
         $groups['ug_name'] = $groups['ug_name'] == '未命名' || empty($groups['ug_name']) ? '未命名的群聊' : $groups['ug_name'];
-        $sql = "select *,date_format(addtime,'%m月%d日') as addtime1 from rv_groups_xiaoxi where id in (SELECT max(id) FROM rv_groups_xiaoxi where togid= ? GROUP BY togid) order by addtime desc";
+        $sql = "select * from rv_groups_xiaoxi where id in (SELECT max(id) FROM rv_groups_xiaoxi where togid= ? GROUP BY togid) order by addtime1 desc";
         $db->p_e($sql, array(
             $groups['ug_id']
         ));
         $from_xiaoxi = $db->fetchRow();
+        $from_xiaoxi['addtime1']=date('m月d日',$from_xiaoxi['addtime1']);
         if ($groups['ug_admin_id'] == $uid) { // 如果是群主时 不管有无消息显示群聊信息
             $groups['admin'] = 1;
         }

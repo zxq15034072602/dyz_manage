@@ -6,6 +6,7 @@
  */
 if (! defined("CORE"))
     exit("error");
+$time=time();
 if ($do == "question") {//提问
     $uid = $_REQUEST['uid']; // 用户id
     $content = $_REQUEST['content']; // 用户反馈的内容
@@ -15,11 +16,11 @@ if ($do == "question") {//提问
         exit();
     }
     
-    $sql = "select addtime from rv_feedback where 1=1 and uid=? order by id desc";
+    $sql = "select addtime1 from rv_feedback where 1=1 and uid=? order by id desc";
     $db->p_e($sql, array(
         $uid
     ));
-    $last_time = $db->fetchRow()['addtime'];
+    $last_time = $db->fetchRow()['addtime1'];
    
     if ($last_time) {
         $cil = time() - $last_time;
@@ -29,11 +30,10 @@ if ($do == "question") {//提问
         }
     }
    
-    $addtime = time();
     if ($db->insert(0, 2, "rv_feedback", array(
         "uid=$uid",
         "content='$content'",
-        "addtime='$addtime'",
+        "addtime1='$time'",
         "type=$type"
     ))) {
         echo '{"code":"200","msg":"问题发布成功 "}';
@@ -47,16 +47,15 @@ if ($do == "question") {//提问
     $page = $_REQUEST['page'] ?? 1;
     $page = ($page - 1) * $pagenum;
     if($uid){       
-        $sql="select f.id,f.type,f.uid,f.content,f.addtime,GROUP_CONCAT(an.id) as answerid,u.name from (rv_feedback as f left join rv_answer as an on f.id=an.qid )left join rv_user as u on f.uid=u.id GROUP BY f.id ORDER BY f.addtime desc limit " . $page . "," . $pagenum;
+        $sql="select f.id,f.type,f.uid,f.content,f.addtime1,GROUP_CONCAT(an.id) as answerid,u.name from (rv_feedback as f left join rv_answer as an on f.id=an.qid )left join rv_user as u on f.uid=u.id GROUP BY f.id ORDER BY f.addtime1 desc limit " . $page . "," . $pagenum;
         $db->p_e($sql, array());
         //问题答案详情
         $question=$db->fetchAll();  
         $total = $db->fetch_count();
         $total = ceil($total / $pagenum);
         foreach ($question as &$value){
-            $value['addtime']=date('Y-m-d H:i:s',$value['addtime']);
-            $value['answerid']=$value['answerid']??0;            
-            $sql="select a.id,a.uid,a.qid,a.content,a.addtime,count(g.id) as count,u.name from (rv_answer as a LEFT JOIN rv_answer_greet as g on a.id=g.aid)left join rv_user as u on a.uid=u.id where a.id in ($value[answerid]) GROUP BY id ORDER BY count desc LIMIT 1";
+            $value['answerid']=$value['answerid']??0;
+            $sql="select a.id,a.uid,a.qid,a.content,a.addtime1,count(g.id) as count,u.name from (rv_answer as a LEFT JOIN rv_answer_greet as g on a.id=g.aid)left join rv_user as u on a.uid=u.id where a.id in ($value[answerid]) GROUP BY id ORDER BY count desc LIMIT 1";
             $db->p_e($sql,array());
             $value['answer']=$db->fetchRow();
             
@@ -92,10 +91,10 @@ if ($do == "question") {//提问
     //问题
     $qArr=$db->fetchAll();
     foreach($qArr as &$v){
-        $v['addtime']=date('Y-m-d H:i:s',$v['addtime']);
+        $v['addtime']=date('Y-m-d H:i:s',$v['addtime1']);
     }
-
-    $sql1="select a.id as aid,a.uid,a.qid,a.content,a.addtime,b.name from rv_answer as a left join rv_user as b on a.uid=b.id where qid=?";
+    
+    $sql1="select a.id as aid,a.uid,a.qid,a.content,a.addtime1,b.name from rv_answer as a left join rv_user as b on a.uid=b.id where qid=?";
     $db->p_e($sql1, array(
         $qid
     ));
@@ -142,7 +141,7 @@ if ($do == "question") {//提问
     //回复列表
     $rArr=$db->fetchAll();
     foreach($rArr as &$v){
-        $v['addtime']=date('Y-m-d H:i:s',$v['addtime']);
+        $v['addtime']=date('Y-m-d H:i:s',$v['addtime1']);
     }
     //模板
     $smt=new Smarty();
@@ -167,13 +166,23 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回答内容不能为空"}';
         exit();
     }
-   
-    $addtime = time();
+    /* $sql="select addtime1 from rv_answer where 1=1 and uid=? order by id desc";
+    $db->p_e($sql, array(
+        $uid
+    ));
+    $last_time = strtotime($db->fetchRow()[addtime1]);
+    if ($last_time) {
+        $cil = time() - $last_time;
+        if ($cil < 10) {
+            echo '{"code":"500","msg":"对不起，不要频繁提交"}';
+            exit();
+        }
+    } */
     
     $last_id=$db->insert(0, 2, "rv_answer", array(
         "uid=$uid",
         "content='$content'",
-        "addtime='$addtime'",
+        "addtime1='$time'",
         "qid='$qid'"
     ));  
     if($last_id) {
@@ -190,11 +199,22 @@ if ($do == "question") {//提问
         echo '{"code":"500","msg":"回复内容不能为空"}';
         exit();
     }
-    $addtime = time();
+   /*  $sql="select addtime1 from rv_answer_reply where 1=1 and uid=? order by id desc";
+    $db->p_e($sql, array(
+        $uid
+    ));
+    $last_time = strtotime($db->fetchRow()[addtime1]);
+    if ($last_time) {
+        $cil = time() - $last_time;
+        if ($cil < 10) {
+            echo '{"code":"500","msg":"对不起，不要频繁提交"}';
+            exit();
+        }
+    } */
     if($db->insert(0, 2, "rv_answer_reply", array(
         "uid=$uid",
         "content='$content'",
-        "addtime='$addtime'",
+        "addtime1='$time'",
         "aid='$aid'"
     ))){
         echo '{"code":"200","msg":"回复成功"}';

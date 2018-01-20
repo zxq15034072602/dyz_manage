@@ -1,14 +1,15 @@
 <?php
 if (! defined('CORE'))
     exit("error!"); // 检查某常量是否存在。
-                                        // 首页
+$time=time();                    // 首页
+
 $base64 = $_POST['path_s'];
 
 $IMG = base64_decode($base64);
- $save_url = "http://static.duyiwang.cn/image/";
-$dir_name = "E:/apptupian/image/"; 
- /*$save_url = "http://192.168.1.138/apptupian/image/";
-$dir_name = "F:/wamp/www/apptupian/image/";  */
+$save_url = "http://static.duyiwang.cn/image/";
+$dir_name = "E:/apptupian/image/";
+/* $save_url = "http://192.168.1.138/apptupian/image/";
+$dir_name = "F:/wamp/www/apptupian/image/"; */
 $ymd = date("Ymd");
 $dir_name .= $ymd . "/";
 $save_url .= $ymd . "/";
@@ -150,16 +151,16 @@ if ($do == 'fasixin_img') {
     ));
     $head=$db->fetchRow();
     $head_img=$head['head_img'];
-    $addtime=time();
     $cont = array(
         'lx' => 1,
         "sj" => 0,//事件添加 1
-        'nr' => $file_url_s,
-        'thumb_pic'=> $file_url,
+        'nr' => $y_img,
+        'thumb_pic'=>$img,
         'time' => date('m月d日 H:i'),
         "from_id" => $uid,      
         "send_name" => $send_name[gu_group_nick],
         "head_img"=>$head_img,
+        "gid"=>$gid,
         "groups_room"=>$groups_room
     );
     $cont = json_encode($cont);
@@ -178,18 +179,17 @@ if ($do == 'fasixin_img') {
              exit();
         }
     }else{
-        $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content_s_img,content_type,addtime) values(?,?,?,1,?)";
+        $sql = "insert into rv_groups_xiaoxi (from_uid,togid,content_s_img,content_type,addtime1) values(?,?,?,1,$time)";
         if ($db->p_e($sql, array(
             $uid,
             $gid,
-            $img,
-            $addtime
+            $img
         ))) { // 成功后像socket 服务端推送数据
-            to_msg(array(
-                'type' => 'sixin_to_groups',
-                'cont' => $cont,
-                'to' => $groups_room
-            )); // 推送消息
+            // to_msg(array(
+            //     'type' => 'sixin_to_groups',
+            //     'cont' => $cont,
+            //     'to' => $groups_room
+            // )); // 推送消息
             
             echo '{"code":"200","url":"' . $file_url_s . '","time":"' . $nowtime . '","send_name":"' . $send_name[gu_group_nick] . '","head_img":"'.$head_img.'"}';
             exit();

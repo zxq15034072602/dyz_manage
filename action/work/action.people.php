@@ -74,6 +74,6 @@ if ($do == "index") { // 人员管理页面
         echo '{"code":"200","msg":"删除店员成功"}';
         exit();
     }
-    echo '{"code":"500","msg":"删除店员成功"}';
+    echo '{"code":"500","msg":"删除店员失败"}';
     exit();
 }

@@ -7,33 +7,20 @@ $role=$_REQUEST['roleid'];//权限id
 //经销商 加盟商门店列表 以及产品
 if($do=='index'){
        if(!empty($uid) && !empty($role) && ($role==2 || $role==4 || $role==1 || $role==6 || $role==7)){
-
         $type=$_REQUEST[type]??0;//0独一张/1食维健
-        $good_type = $db->select(0, 0, "rv_type","*","and type=$type and id<5","id asc");
+        $good_type = $db->select(0, 0, "rv_type","*","and type=$type and id<5");
         if($role==2 || $role==4){
             //查询登录用户门店
             $sql="select * from rv_user_jingxiao_jiameng where uid=?";
             $db->p_e($sql, array($uid));
             $userinfo=$db->fetchRow();
-            if($role==2){
-                if($userinfo['areaid']){
-                    $sql="select id,name as mbname from rv_mendian where areaid=?";
-                    $db->p_e($sql, array($userinfo['areaid']));
-                    $store=$db->fetchAll();  
-                }else{
-                    $sql="select id,name as mbname from rv_mendian where cityid=?";
-                    $db->p_e($sql, array($userinfo['cityid']));
-                    $store=$db->fetchAll();
-                }         
-            }else{
-                $userinfo['mid']=explode(",", $userinfo['mid']);
-                foreach($userinfo['mid'] as $v){
-                    $sql="select name from rv_mendian where id=?";
-                    $db->p_e($sql, array($v));
-                    $name=$db->fetchRow();
-                    $store[]=array('id'=>$v,'mbname'=>$name['name']);
-                }
-            }       
+            $userinfo['mid']=explode(",", $userinfo['mid']);
+            foreach($userinfo['mid'] as $v){
+                $sql="select name from rv_mendian where id=?";
+                $db->p_e($sql, array($v));
+                $name=$db->fetchRow();
+                $store[]=array('id'=>$v,'mbname'=>$name['name']);
+            }
             $good=array();
             foreach($store as &$val){
                 foreach ($good_type as $key => $type) {
@@ -91,16 +78,16 @@ if($do=='index'){
                     }elseif($val[0]==3){$num=$val[1];}elseif($val[0]==4){ $num=$val[1];
                     }elseif($val[0]==6){$num=$val[1];
                     }elseif($val[0]==7){$num=$val[1]*300;
-                    }elseif($val[0]==8){$num=$val[1]*20;
+                    }elseif($val[0]==8){$num=$val[1];
                     }elseif($val[0]==9){$num=$val[1]*50;
-                    }elseif($val[0]==10){$num=$val[1]*20;
-                    }elseif($val[0]==11){$num=$val[1]*20;
+                    }elseif($val[0]==10){$num=$val[1];
+                    }elseif($val[0]==11){$num=$val[1];
                     }elseif($val[0]==12){$num=$val[1]*50;
                     }elseif($val[0]==13){$num=$val[1]*5;
                     }elseif($val[0]==14){$num=$val[1]*5;
                     }elseif($val[0]==15){$num=$val[1]*40;
                     }elseif($val[0]==16){$num=$val[1]*40;
-                    }elseif($val[0]==17){$num=$val[1]*40;
+                    }elseif($val[0]==17){$num=$val[1];
                     }elseif($val[0]==18){$num=$val[1];
                     }elseif($val[0]==19){$num=$val[1];
                     }elseif($val[0]==20){$num=$val[1];
@@ -245,7 +232,7 @@ if($do=='index'){
         }
 
          //物流单号
-        $order_info['order_number']=explode("，", $order_info['order_number']);
+        $order_info['order_number']=explode("；", $order_info['order_number']);
         
         //查询门店信息以及产品信息
         $sql="select a.id,a.mid,b.name from rv_order_stores as a left join rv_mendian as b on a.mid=b.id where a.fid=?";
@@ -267,10 +254,10 @@ if($do=='index'){
     if(!empty($uid) && !empty($orderid)){
         $base64 = $_POST['voucher_image'];
         $IMG = base64_decode($base64);
-//         $save_url = "http://static.duyiwang.cn/credentials_image/";
-//         $dir_name = "E:/apptupian/credentials_image/";
-        $save_url = "http://192.168.1.106/apptupian/credentials_image/";
-        $dir_name = "E:wamp/wamp/www/apptupian/credentials_image/"; 
+        $save_url = "http://static.duyiwang.cn/credentials_image/";
+        $dir_name = "E:/apptupian/credentials_image/";
+        // $save_url = "http://192.168.1.106/apptupian/credentials_image/";
+        // $dir_name = "E:wamp/wamp/www/apptupian/credentials_image/"; 
         
         $ymd = date("Ymd");
         $dir_name .= $ymd . "/";
@@ -350,7 +337,7 @@ if($do=='index'){
     if($roleid==2 || $roleid==1 || $roleid==6 || $roleid==7){
         $md=array();
         if($roleid==2){
-            $sql="select mid from rv_user_jingxiao_jiameng where uid=? ";
+            $sql="select mid from rv_user_jingxiao_jiameng where uid=?";
             $db->p_e($sql, array($uid));
             $store=$db->fetch_count();
             $store=explode(",", $store);
@@ -387,7 +374,9 @@ if($do=='index'){
                 $db->p_e($sql, array($mname['person_id']));
                 $head_img=$db->fetch_count();
                 $head_img=$head_img??'http://static.duyiwang.cn/tc_log.jpg';
-                $md[]=array('id'=>$v['mid'],'name'=>$mname['name'],'sum'=>$mname['sum'],"head_img"=>$head_img);
+                if($mname['sum']){
+                    $md[]=array('id'=>$v['mid'],'name'=>$mname['name'],'sum'=>$mname['sum'],"head_img"=>$head_img);
+                }
             }
         }
         $sort = array(
