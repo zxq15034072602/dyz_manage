@@ -137,7 +137,7 @@ if ($do == 'fasixin_img') {
         $file_url_s=$_REQUEST['pic_path'];
     }
 
-    $sql="select content_s_img from rv_groups_xiaoxi where 1=1 and from_uid=? order by addtime desc limit 1";
+    $sql="select content_s_img from rv_groups_xiaoxi where 1=1 and from_uid=? order by addtime1 desc limit 1";
     $db->p_e($sql,array($uid));
     $s_img=$db->fetchRow();
     $s_img=$s_img['content_s_img'];
